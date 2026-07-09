@@ -22,7 +22,7 @@ export default function Footer() {
           <p style={{ color: 'var(--color-soft-ivory)', opacity: 0.8, marginBottom: '25px', lineHeight: '1.6' }}>
             Empowering students with clarity, strategy, and confidence to achieve global university admissions.
           </p>
-          <form style={{ display: 'flex', gap: '10px' }}>
+          <form className="footer-subscribe-form" style={{ display: 'flex', gap: '10px' }}>
             <input type="email" placeholder="Subscribe for updates" style={{ padding: '10px', borderRadius: '4px', border: 'none', width: '100%' }} required />
             <button type="submit" style={{ background: 'var(--color-muted-coral)', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Join</button>
           </form>
@@ -69,7 +69,7 @@ export default function Footer() {
 
       </div>
 
-      <div className="container" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
+      <div className="container footer-bottom" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
         <p>&copy; {new Date().getFullYear()} My Skill Counsellor. All Rights Reserved.</p>
         <div style={{ display: 'flex', gap: '20px' }}>
             <Link href="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</Link>
