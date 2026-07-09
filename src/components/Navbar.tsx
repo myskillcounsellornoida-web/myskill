@@ -26,6 +26,18 @@ export default function Navbar() {
     setIsMenuOpen(false);
   }, [pathname]);
 
+  // Prevent background scrolling when mobile menu is active
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMenuOpen]);
+
   return (
     <header className={isScrolled ? "scrolled" : ""}>
       <div className="container navbar">
@@ -33,15 +45,6 @@ export default function Navbar() {
           <img src="/assets/logo.png" alt="My Skill Counsellor" />
           <span>My Skill<br />Counsellor</span>
         </Link>
-
-        <button 
-          className="menu-toggle" 
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle Menu"
-          aria-expanded={isMenuOpen}
-        >
-          <i className={isMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
-        </button>
 
         <nav>
           <ul className={`nav-links ${isMenuOpen ? "active" : ""}`}>
@@ -72,18 +75,26 @@ export default function Navbar() {
                 Blog
               </Link>
             </li>
-            <li className="mobile-cta-li">
+            <li className="mobile-cta-li" style={{ marginTop: "20px" }}>
               <Link 
                 href="/contact" 
                 className="btn btn-primary" 
                 onClick={() => setIsMenuOpen(false)}
-                style={{ width: "100%", display: "block", textAlign: "center" }}
               >
                 Let's Connect
               </Link>
             </li>
           </ul>
         </nav>
+
+        <button 
+          className="menu-toggle" 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle Menu"
+          aria-expanded={isMenuOpen}
+        >
+          <i className={isMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
+        </button>
         
         <div className="nav-cta">
           <Link href="/contact" className="btn btn-primary">Let's Connect</Link>
