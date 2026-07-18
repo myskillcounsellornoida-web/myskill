@@ -1,40 +1,42 @@
 /* ==========================================================================
    DESIGN SYSTEM & VARIABLES (Ria Jain - My Skill Counsellor)
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300..900;1,300..900&family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap');
 
 :root {
-    /* Brand Colors */
-    --color-soft-teal: #4DA8B3;
-    --color-deep-teal: #2D6F7A;
-    --color-soft-ivory: #F8F6F2;
-    --color-sage-green: #A8B9A3;
-    --color-soft-beige: #DCCDB8;
-    --color-muted-coral: #D97B66;
+    /* Brand Colors — warm, eye-comfortable palette */
+    --color-soft-teal: #4A9FAA;       /* warm calm teal */
+    --color-deep-teal: #2D6B78;       /* rich dark teal – not too harsh */
+    --color-soft-ivory: #FAF8F4;      /* warm paper white */
+    --color-sage-green: #7FA87A;      /* muted moss green */
+    --color-soft-beige: #EDE5D8;      /* warm warm sand */
+    --color-muted-coral: #C47558;     /* terracotta warm red */
+    --color-warm-amber: #D4A055;      /* soft warm gold */
     
     /* Functional Colors */
-    --bg-primary: var(--color-soft-ivory);
-    --bg-secondary: #FFFFFF;
-    --text-primary: #2C3E40;
-    --text-secondary: #5A6E70;
+    --bg-primary: #F5F2ED;            /* warm parchment – easy on eyes */
+    --bg-secondary: #FDFCF9;          /* near white, warm */
+    --text-primary: #2E3F40;          /* dark teal-grey – softer than black */
+    --text-secondary: #5A7071;        /* medium muted – not too gray */
     --text-light: #FFFFFF;
-    --border-color: #E2DDD6;
+    --border-color: #DDD5C8;          /* warm sand border */
+    --color-accent: #C47558;
     
     /* Typography */
-    --font-heading: 'DM Sans', sans-serif;
-    --font-body: 'Inter', sans-serif;
+    --font-heading: 'Nunito', sans-serif;
+    --font-body: 'Lato', sans-serif;
     
     /* Transitions & Shadows */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --shadow-soft: 0 4px 20px rgba(45, 111, 122, 0.06);
-    --shadow-medium: 0 10px 30px rgba(45, 111, 122, 0.1);
-    --shadow-hover: 0 20px 40px rgba(45, 111, 122, 0.15);
+    --shadow-soft: 0 4px 20px rgba(45, 107, 120, 0.07);
+    --shadow-medium: 0 10px 30px rgba(45, 107, 120, 0.11);
+    --shadow-hover: 0 20px 40px rgba(45, 107, 120, 0.15);
     
     /* Layout */
     --max-width: 1200px;
-    --radius-sm: 8px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
+    --radius-sm: 10px;
+    --radius-md: 18px;
+    --radius-lg: 28px;
 }
 
 /* ==========================================================================
@@ -55,17 +57,21 @@ body {
     font-family: var(--font-body);
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    line-height: 1.6;
+    line-height: 1.7;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
     color: var(--color-deep-teal);
-    font-weight: 700;
-    line-height: 1.25;
+    font-weight: 800;
+    line-height: 1.22;
     margin-bottom: 0.5em;
+    letter-spacing: -0.01em;
 }
 
 h1 { font-size: clamp(2.5rem, 5vw, 4rem); }
@@ -148,7 +154,7 @@ section {
 }
 
 .bg-sage-section {
-    background-color: rgba(168, 185, 163, 0.12); /* Subtly tinted Sage Green */
+    background-color: #EEF4EE; /* Very soft warm mint — easy on eyes */
 }
 
 /* ==========================================================================
@@ -1503,6 +1509,22 @@ footer {
         margin-top: 5px;
     }
 
+    .service-stage-card {
+        flex-direction: column !important;
+        gap: 30px !important;
+    }
+    
+    .service-stage-card > div {
+        flex: 1 1 100% !important;
+    }
+
+    .author-profile-card {
+        flex-direction: column !important;
+        text-align: center !important;
+        align-items: center !important;
+        padding: 30px 20px !important;
+    }
+
     .newsletter-form {
         flex-direction: column;
     }
@@ -1562,6 +1584,76 @@ footer {
     .footer-bottom {
         flex-direction: column;
         text-align: center;
+    }
+
+    /* -------------------------------------------------------
+       HERO CAROUSEL – mobile
+    ------------------------------------------------------- */
+    .hero {
+        padding-top: 130px !important;
+        padding-bottom: 60px !important;
+        min-height: 100svh !important;
+    }
+
+    /* Prevent any child from causing horizontal overflow */
+    .hero .container {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+
+    .hero h1 {
+        font-size: clamp(1.8rem, 7vw, 2.5rem) !important;
+    }
+
+    .hero p {
+        font-size: 1rem !important;
+    }
+
+    /* -------------------------------------------------------
+       STATS BAND – switch from 4-col to 2-col
+    ------------------------------------------------------- */
+    .stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 20px !important;
+    }
+
+    /* -------------------------------------------------------
+       HOW IT WORKS – force single column
+    ------------------------------------------------------- */
+    .steps-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* -------------------------------------------------------
+       FLEX SECTIONS (Workshop, Founder, Media)
+    ------------------------------------------------------- */
+    .flex-section {
+        flex-direction: column !important;
+        gap: 30px !important;
+    }
+
+    /* -------------------------------------------------------
+       SERVICE CARDS – reduce image height on small screens
+    ------------------------------------------------------- */
+    .svc-card-img {
+        height: 180px !important;
+    }
+
+    /* -------------------------------------------------------
+       CONTACT INFO 3-COLUMN GRID
+    ------------------------------------------------------- */
+    .contact-info-3col {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* -------------------------------------------------------
+       GENERAL: prevent very wide grids from causing x-overflow
+    ------------------------------------------------------- */
+    [style*="minmax(160px"] {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    [style*="minmax(220px"] {
+        grid-template-columns: 1fr !important;
     }
 }
 
@@ -1636,4 +1728,23 @@ footer {
     .whatsapp-tooltip {
         display: none; /* Hide tooltip on mobile to avoid covering content */
     }
+}
+
+/* Interactive Service Card Hover */
+.service-card-interactive {
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.service-card-interactive:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.12) !important;
+}
+.service-card-interactive:hover .svc-img {
+  transform: scale(1.08) !important;
+}
+.service-card-interactive .svc-details-visible {
+  transition: opacity 0.3s ease;
+}
+.service-card-interactive:hover .svc-details-visible {
+  opacity: 0.9;
 }
