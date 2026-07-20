@@ -311,38 +311,53 @@ export default function Home() {
                   title: "Certified Career Counsellor",
                   org: "EduMilestones",
                   desc: "Certified in psychometric assessment, career planning & stream selection for Class 9-12 and graduates.",
-                  icon: "fa-certificate"
+                  icon: "fa-certificate",
+                  link: "https://www.linkedin.com/in/riajain26/details/certifications/",
+                  linkText: "Verify on LinkedIn",
+                  isLinkedIn: true
                 },
                 {
                   title: "CCCIS Certified",
                   org: "Career Counselling & Int'l Studies",
                   desc: "Specialized certification in global university admissions, program mapping, and country-specific guidance.",
-                  icon: "fa-user-check"
+                  icon: "fa-user-check",
+                  link: "https://www.linkedin.com/in/riajain26/details/certifications/",
+                  linkText: "Verify on LinkedIn",
+                  isLinkedIn: true
                 },
                 {
                   title: "MA English Degree",
                   org: "Master's Degree",
                   desc: "Advanced qualification ensuring high-level SOP/LOR writing, narrative drafting & verbal mentorship.",
                   icon: "fa-graduation-cap",
-                  link: "https://drive.google.com/file/d/1nCf-64QLptZQfCwG85Z34-1mBKPnfoyx/view?usp=sharing"
+                  link: "https://drive.google.com/file/d/1nCf-64QLptZQfCwG85Z34-1mBKPnfoyx/view?usp=sharing",
+                  linkText: "View Certificate Document",
+                  isDrive: true
                 },
                 {
                   title: "Visa Training Certifications",
                   org: "USA, UK, Canada & Global",
                   desc: "Extensive training in student visa regulations, financial documentation, and embassy mock interviews.",
-                  icon: "fa-passport"
+                  icon: "fa-passport",
+                  link: "https://www.linkedin.com/in/riajain26/details/certifications/",
+                  linkText: "Verify on LinkedIn",
+                  isLinkedIn: true
                 }
               ].map((cert, idx) => (
-                <div key={idx} style={{background:"var(--bg-secondary)",padding:20,borderRadius:14,borderLeft:"4px solid var(--color-deep-teal)"}}>
-                  <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
-                    <i className={`fas ${cert.icon}`} style={{color:"var(--color-soft-teal)",fontSize:"1.1rem"}}/>
-                    <h4 style={{margin:0,fontSize:"1rem",color:"var(--color-deep-teal)",fontFamily:"var(--font-heading)",fontWeight:800}}>{cert.title}</h4>
+                <div key={idx} style={{background:"var(--bg-secondary)",padding:20,borderRadius:14,borderLeft:"4px solid var(--color-deep-teal)",display:"flex",flexDirection:"column",justifyContent:"space-between"}}>
+                  <div>
+                    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+                      <i className={`fas ${cert.icon}`} style={{color:"var(--color-soft-teal)",fontSize:"1.1rem"}}/>
+                      <h4 style={{margin:0,fontSize:"1rem",color:"var(--color-deep-teal)",fontFamily:"var(--font-heading)",fontWeight:800}}>{cert.title}</h4>
+                    </div>
+                    <span style={{fontSize:"0.75rem",fontWeight:700,color:"var(--color-muted-coral)",textTransform:"uppercase",letterSpacing:"1px"}}>{cert.org}</span>
+                    <p style={{fontSize:"0.85rem",color:"var(--text-secondary)",lineHeight:1.6,margin:"8px 0 0"}}>{cert.desc}</p>
                   </div>
-                  <span style={{fontSize:"0.75rem",fontWeight:700,color:"var(--color-muted-coral)",textTransform:"uppercase",letterSpacing:"1px"}}>{cert.org}</span>
-                  <p style={{fontSize:"0.85rem",color:"var(--text-secondary)",lineHeight:1.6,margin:"8px 0 0"}}>{cert.desc}</p>
                   {cert.link && (
-                    <a href={cert.link} target="_blank" rel="noreferrer" style={{display:"inline-flex",alignItems:"center",gap:6,fontSize:"0.8rem",color:"var(--color-soft-teal)",fontWeight:700,marginTop:10,textDecoration:"none"}}>
-                      View Certificate <i className="fas fa-external-link-alt" style={{fontSize:"0.75rem"}}/>
+                    <a href={cert.link} target="_blank" rel="noreferrer" style={{display:"inline-flex",alignItems:"center",gap:6,fontSize:"0.8rem",color:cert.isLinkedIn ? "#0077b5" : "var(--color-soft-teal)",fontWeight:700,marginTop:14,textDecoration:"none"}}>
+                      {cert.isLinkedIn && <i className="fab fa-linkedin" style={{fontSize:"0.9rem"}}/>}
+                      {cert.isDrive && <i className="fas fa-file-pdf" style={{fontSize:"0.9rem"}}/>}
+                      {cert.linkText} <i className="fas fa-external-link-alt" style={{fontSize:"0.75rem"}}/>
                     </a>
                   )}
                 </div>
