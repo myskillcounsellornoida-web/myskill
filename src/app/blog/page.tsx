@@ -28,12 +28,42 @@ export default function Blog() {
   ];
 
   const blogs = [
-    { img: "/images/poster_journey.png", title: "Demystifying Study Abroad: A Parent's Guide", desc: "Essential advice and financial checkpoints for parents navigating the complex landscape of international admissions." },
-    { img: "/images/poster_sop_profile.png", title: "How Profile Building Can Set Your Application Apart", desc: "Why academic grades alone are no longer enough for top-tier universities, and how to start building a portfolio today." },
-    { img: "/images/poster_ielts_visa.png", title: "IELTS vs TOEFL: Which test should you take?", desc: "A comprehensive breakdown of both exams to help you decide which format best aligns with your target universities and strengths." },
-    { img: "/images/poster_career_compass.png", title: "The Ultimate Statement of Purpose (SOP) Checklist", desc: "Ensure your essay hooks the admissions officer. Avoid these 5 common mistakes that most students make in their first drafts." },
-    { img: "/images/poster_study_abroad.png", title: "Understanding Need-Blind vs Need-Aware Admissions in the USA", desc: "How your financial aid requests can actively impact your chances of getting admitted into US universities." },
-    { img: "/images/poster_career_compass.png", title: "Top 10 Emerging Careers for the Next Decade", desc: "Psychometric insights into which fields will experience the most growth, helping Class 9-10 students pick the right streams." }
+    {
+      img: "/images/poster_journey.png",
+      title: "One Story Step: Daily Lessons from My Path (Day 0)",
+      desc: "Insights on starting a counselling journey, personal growth, and taking small consistent steps towards your career goals.",
+      url: "https://www.linkedin.com/pulse/one-story-step-daily-lessons-from-my-path-day-0-ria-vkf2c"
+    },
+    {
+      img: "/images/poster_study_abroad.png",
+      title: "A Mother's Journey of Learning to Let Go",
+      desc: "A personal perspective on supporting children as they prepare for international education and independence.",
+      url: "https://www.linkedin.com/posts/riajain26_a-mothers-journey-of-learning-to-let-go-activity-7477334864858345472-c7NN?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAClBJu4BRZFv7BreULj10-xogiz1UcSS78E"
+    },
+    {
+      img: "/images/poster_career_compass.png",
+      title: "Career Story Counsellor — Part 1",
+      desc: "Deep dive into career storytelling, identifying strengths, and helping students find their authentic direction.",
+      url: "https://www.linkedin.com/pulse/career-story-counsellor-part-1-ria-lnoxc"
+    },
+    {
+      img: "/images/poster_sop_profile.png",
+      title: "Three Offers → Three Programs → One Decision",
+      desc: "Case study: How personalized guidance helped a student secure 3 international university offers for business & marketing in Dubai.",
+      url: "https://www.linkedin.com/posts/riajain26_studentsuccess-careercounselling-studyabroad-activity-7449459855624441856-BBZH?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAClBJu4BRZFv7BreULj10-xogiz1UcSS78E"
+    },
+    {
+      img: "/images/poster_ielts_visa.png",
+      title: "How Profile Building Can Set Your Application Apart",
+      desc: "Why academic grades alone are no longer enough for top-tier universities, and how to start building a portfolio today.",
+      url: "#"
+    },
+    {
+      img: "/images/poster_journey.png",
+      title: "Demystifying Study Abroad: A Parent's Guide",
+      desc: "Essential advice and financial checkpoints for parents navigating the complex landscape of international admissions.",
+      url: "#"
+    }
   ];
 
   return (
@@ -62,10 +92,10 @@ export default function Blog() {
               Insights & Advice
             </span>
             <h1 style={{ color: "#fff", fontSize: "clamp(2.5rem,5vw,4rem)", marginBottom: 20, textShadow: "0 4px 20px rgba(0,0,0,0.3)", fontFamily: "var(--font-heading)", fontWeight: 800 }}>
-              Counselling Blog
+              Counselling Blog & Articles
             </h1>
             <p style={{ color: "rgba(255,255,255,0.9)", fontSize: "1.15rem", maxWidth: 600, margin: "0 auto", lineHeight: 1.6 }}>
-              Expert advice, latest trends, and comprehensive guides for students and parents navigating global education.
+              Expert advice, personal journeys, and comprehensive guides for students and parents navigating global education.
             </p>
           </motion.div>
         </div>
@@ -80,7 +110,20 @@ export default function Blog() {
              </div>
              <div style={{ flex: '1 1 300px' }}>
                 <h3 style={{ fontSize: '1.5rem', color: 'var(--color-deep-teal)', marginBottom: '10px' }}>Meet the Lead Editor: Ria Jain</h3>
-                <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>With years of hands-on experience in global university admissions and career psychology, Ria curates every article on this blog to ensure students receive the most accurate, actionable, and up-to-date guidance possible.</p>
+                <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', marginBottom: '16px' }}>
+                  Founder of My Skill Counsellor, Certified Career Counsellor (EduMilestones, CCCIS), and MA English graduate. Ria brings professional expertise and real-world understanding as both a counsellor and parent of an international student.
+                </p>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
+                  {["EduMilestones Certified", "CCCIS Certified", "MA English", "Visa Training Certified"].map((cert, idx) => (
+                    <span key={idx} style={{ padding: '4px 12px', borderRadius: '15px', background: 'rgba(37,95,107,0.1)', color: 'var(--color-deep-teal)', fontSize: '0.8rem', fontWeight: 700 }}>
+                      <i className="fas fa-check-circle" style={{ color: 'var(--color-soft-teal)', marginRight: '5px' }} />
+                      {cert}
+                    </span>
+                  ))}
+                </div>
+                <a href="https://www.linkedin.com/in/riajain26" target="_blank" rel="noreferrer" style={{ color: '#0077b5', fontWeight: 'bold', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.95rem' }}>
+                  <i className="fab fa-linkedin" style={{ fontSize: '1.2rem' }} /> Connect & Verify on LinkedIn
+                </a>
              </div>
            </motion.div>
         </div>
@@ -104,7 +147,9 @@ export default function Blog() {
                 <div className="blog-card-content" style={{ padding: '25px' }}>
                   <h3 style={{ fontSize: '1.2rem', marginBottom: '10px', color: 'var(--color-deep-teal)', lineHeight: '1.4' }}>{b.title}</h3>
                   <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '20px', lineHeight: '1.6' }}>{b.desc}</p>
-                  <a href="#" style={{ color: 'var(--color-soft-teal)', fontWeight: 'bold', textDecoration: 'none' }}>Read Full Article &rarr;</a>
+                  <a href={b.url} target={b.url !== "#" ? "_blank" : "_self"} rel="noreferrer" style={{ color: 'var(--color-soft-teal)', fontWeight: 'bold', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    Read Full Article {b.url !== "#" ? <i className="fab fa-linkedin" /> : "→"}
+                  </a>
                 </div>
               </motion.div>
             ))}
