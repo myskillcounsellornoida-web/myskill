@@ -3,7 +3,9 @@ import {
   fetchTestimonials,
   fetchBlogs,
   fetchServices,
-  fetchSiteContent
+  fetchSiteContent,
+  fetchBookings,
+  fetchSubscribers
 } from "../admin/actions";
 import AdminClient from "../admin/AdminClient";
 
@@ -16,6 +18,8 @@ export default async function AdminRiaPage() {
   const blogsRes = await fetchBlogs();
   const servicesRes = await fetchServices();
   const siteContentRes = await fetchSiteContent();
+  const bookingsRes = await fetchBookings();
+  const subscribersRes = await fetchSubscribers();
 
   const dbConnected = !!process.env.DATABASE_URL && inquiriesRes.success;
   const dbError = !process.env.DATABASE_URL
@@ -29,6 +33,8 @@ export default async function AdminRiaPage() {
       initialBlogs={blogsRes.data || []}
       initialServices={servicesRes.data || []}
       initialSiteContent={siteContentRes.data || []}
+      initialBookings={bookingsRes.data || []}
+      initialSubscribers={subscribersRes.data || []}
       dbConnected={dbConnected}
       dbError={dbError}
     />

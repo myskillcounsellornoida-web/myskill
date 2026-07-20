@@ -1,10 +1,13 @@
 "use server";
 
 import { db } from "@/db";
-import { inquiries, testimonials, services, blogs, siteContent } from "@/db/schema";
+import { inquiries, testimonials, services, blogs, siteContent, bookings, subscribers } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getLocalData, saveLocalData } from "@/db/localStore";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_key");
 
 export type ActionResult<T = any> = { success: boolean; data: T; error?: string };
 
@@ -404,3 +407,217 @@ export async function updateSiteContent(key: string, value: string): Promise<Act
   revalidatePath("/", "layout");
   return { success: true, data: { key, value } };
 }
+
+/* ==========================================
+   BOOKINGS ACTIONS
+   ========================================== */
+
+export async function fetchBookings(): Promise<ActionResult> {
+  if (process.env.DATABASE_URL) {
+    try {
+      const res = await db.select().from(bookings).orderBy(desc(bookings.createdAt));
+      return { success: true, data: res };
+    } catch (e: any) {
+      console.error("DB Error fetchBookings:", e);
+      return { success: false, data: [], error: e.message };
+    }
+  }
+  const local = getLocalData();
+  return { success: true, data: local.bookings || [] };
+}
+
+export async function updateBookingStatus(id: number, status: string): Promise<ActionResult> {
+  if (process.env.DATABASE_URL) {
+    try {
+      const res = await db.update(bookings)
+        .set({ status })
+        .where(eq(bookings.id, id))
+        .returning();
+      revalidatePath("/admin");
+      revalidatePath("/adminria");
+      return { success: true, data: res };
+    } catch (e: any) {
+      console.error("DB Error updateBookingStatus:", e);
+      return { success: false, data: null, error: e.message };
+    }
+  }
+
+  const local = getLocalData();
+  if (!local.bookings) local.bookings = [];
+  local.bookings = local.bookings.map(b => b.id === id ? { ...b, status } : b);
+  saveLocalData(local);
+  revalidatePath("/admin");
+  revalidatePath("/adminria");
+  return { success: true, data: local.bookings };
+}
+
+export async function deleteBooking(id: number): Promise<ActionResult> {
+  if (process.env.DATABASE_URL) {
+    try {
+      const res = await db.delete(bookings)
+        .where(eq(bookings.id, id))
+        .returning();
+      revalidatePath("/admin");
+      revalidatePath("/adminria");
+      return { success: true, data: res };
+    } catch (e: any) {
+      console.error("DB Error deleteBooking:", e);
+      return { success: false, data: null, error: e.message };
+    }
+  }
+
+  const local = getLocalData();
+  if (!local.bookings) local.bookings = [];
+  local.bookings = local.bookings.filter(b => b.id !== id);
+  saveLocalData(local);
+  revalidatePath("/admin");
+  revalidatePath("/adminria");
+  return { success: true, data: local.bookings };
+}
+
+/* ==========================================
+   SUBSCRIBERS ACTIONS
+   ========================================== */
+
+export async function fetchSubscribers(): Promise<ActionResult> {
+  if (process.env.DATABASE_URL) {
+    try {
+      const res = await db.select().from(subscribers).orderBy(desc(subscribers.createdAt));
+      return { success: true, data: res };
+    } catch (e: any) {
+      console.error("DB Error fetchSubscribers:", e);
+      return { success: false, data: [], error: e.message };
+    }
+  }
+  const local = getLocalData();
+  return { success: true, data: local.subscribers || [] };
+}
+
+export async function deleteSubscriber(id: number): Promise<ActionResult> {
+  if (process.env.DATABASE_URL) {
+    try {
+      const res = await db.delete(subscribers)
+        .where(eq(subscribers.id, id))
+        .returning();
+      revalidatePath("/admin");
+      revalidatePath("/adminria");
+      return { success: true, data: res };
+    } catch (e: any) {
+      console.error("DB Error deleteSubscriber:", e);
+      return { success: false, data: null, error: e.message };
+    }
+  }
+
+  const local = getLocalData();
+  if (!local.subscribers) local.subscribers = [];
+  local.subscribers = local.subscribers.filter(s => s.id !== id);
+  saveLocalData(local);
+  revalidatePath("/admin");
+  revalidatePath("/adminria");
+  return { success: true, data: local.subscribers };
+}
+
+/* ==========================================
+   BROADCAST EMAIL ACTIONS
+   ========================================== */
+
+export async function sendBroadcastEmail(
+  subject: string,
+  bodyHtml: string,
+  targetAudience: "subscribers" | "bookings" | "inquiries" | "all" | "custom",
+  customEmail?: string
+): Promise<ActionResult<{ total: number; sent: number; failed: number }>> {
+  if (!subject.trim() || !bodyHtml.trim()) {
+    return { success: false, data: { total: 0, sent: 0, failed: 0 }, error: "Subject and Body content are required." };
+  }
+
+  if (!process.env.RESEND_API_KEY) {
+    return { success: false, data: { total: 0, sent: 0, failed: 0 }, error: "RESEND_API_KEY is missing in environment." };
+  }
+
+  try {
+    let emailList: string[] = [];
+
+    if (targetAudience === "custom") {
+      if (customEmail && customEmail.includes("@")) {
+        emailList = [customEmail.trim()];
+      }
+    } else {
+      // Gather emails from DB or localStore based on targetAudience
+      let subEmails: string[] = [];
+      let bookEmails: string[] = [];
+      let inqEmails: string[] = [];
+
+      if (process.env.DATABASE_URL) {
+        if (targetAudience === "subscribers" || targetAudience === "all") {
+          const subs = await db.select({ email: subscribers.email }).from(subscribers);
+          subEmails = subs.map(s => s.email);
+        }
+        if (targetAudience === "bookings" || targetAudience === "all") {
+          const bks = await db.select({ email: bookings.email }).from(bookings);
+          bookEmails = bks.map(b => b.email);
+        }
+        if (targetAudience === "inquiries" || targetAudience === "all") {
+          const inqs = await db.select({ email: inquiries.email }).from(inquiries);
+          inqEmails = inqs.map(i => i.email);
+        }
+      }
+
+      // Merge with localStore if any
+      const local = getLocalData();
+      if (targetAudience === "subscribers" || targetAudience === "all") {
+        subEmails = [...subEmails, ...(local.subscribers || []).map(s => s.email)];
+      }
+      if (targetAudience === "bookings" || targetAudience === "all") {
+        bookEmails = [...bookEmails, ...(local.bookings || []).map(b => b.email)];
+      }
+      if (targetAudience === "inquiries" || targetAudience === "all") {
+        inqEmails = [...inqEmails, ...(local.inquiries || []).map(i => i.email)];
+      }
+
+      // Deduplicate emails & sanitize
+      emailList = Array.from(
+        new Set([...subEmails, ...bookEmails, ...inqEmails].map(e => e?.trim().toLowerCase()))
+      ).filter(e => e && e.includes("@"));
+    }
+
+    if (emailList.length === 0) {
+      return { success: false, data: { total: 0, sent: 0, failed: 0 }, error: "No target email addresses found for the selected audience." };
+    }
+
+    let sent = 0;
+    let failed = 0;
+
+    for (const toEmail of emailList) {
+      try {
+        await resend.emails.send({
+          from: "My Skill Counsellor <onboarding@resend.dev>",
+          to: toEmail,
+          subject: subject,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+              ${bodyHtml}
+              <div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px; color: #64748b; font-size: 12px; text-align: center;">
+                <p>Sent by <strong>My Skill Counsellor</strong> | Career & Study Abroad Guidance</p>
+                <p>Noida, India | info@myskillcounsellor.com</p>
+              </div>
+            </div>
+          `,
+        });
+        sent++;
+      } catch (err) {
+        console.error(`Failed to send broadcast email to ${toEmail}:`, err);
+        failed++;
+      }
+    }
+
+    return {
+      success: true,
+      data: { total: emailList.length, sent, failed },
+    };
+  } catch (e: any) {
+    console.error("Broadcast Error:", e);
+    return { success: false, data: { total: 0, sent: 0, failed: 0 }, error: e.message };
+  }
+}
+

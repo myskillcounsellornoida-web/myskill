@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import BookingModal from "@/components/BookingModal";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
   const pathname = usePathname();
 
   if (pathname?.startsWith("/admin")) {
@@ -40,79 +42,118 @@ export default function Navbar() {
   }, [isMenuOpen]);
 
   return (
-    <header className={isScrolled ? "scrolled" : ""}>
-      <div className="container navbar">
-        <Link href="/" className="logo" onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', gap: '14px' }}>
-          <div style={{ position: 'relative', width: '46px', height: '46px', flexShrink: 0 }}>
-            <Image src="/assets/logo.png" alt="My Skill Counsellor" fill sizes="46px" style={{ objectFit: 'contain' }} />
-          </div>
-          <span style={{ lineHeight: 1.15 }}>
-            <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '1.45rem', color: 'var(--color-deep-teal)', letterSpacing: '0.4px' }}>
-              My Skill
+    <>
+      <header className={isScrolled ? "scrolled" : ""}>
+        <div className="container navbar">
+          <Link href="/" className="logo" onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', gap: '14px' }}>
+            <div style={{ position: 'relative', width: '46px', height: '46px', flexShrink: 0 }}>
+              <Image src="/assets/logo.png" alt="My Skill Counsellor" fill sizes="46px" style={{ objectFit: 'contain' }} />
+            </div>
+            <span style={{ lineHeight: 1.15 }}>
+              <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '1.45rem', color: 'var(--color-deep-teal)', letterSpacing: '0.4px' }}>
+                My Skill
+              </span>
+              <span style={{ display: 'block', fontFamily: 'var(--font-sans)', fontWeight: 700, fontSize: '0.74rem', color: 'var(--color-muted-coral)', letterSpacing: '2.5px', textTransform: 'uppercase', marginTop: '2px' }}>
+                Counsellor
+              </span>
             </span>
-            <span style={{ display: 'block', fontFamily: 'var(--font-sans)', fontWeight: 700, fontSize: '0.74rem', color: 'var(--color-muted-coral)', letterSpacing: '2.5px', textTransform: 'uppercase', marginTop: '2px' }}>
-              Counsellor
-            </span>
-          </span>
-        </Link>
-
-        <nav>
-          <ul className={`nav-links ${isMenuOpen ? "active" : ""}`}>
-            <li>
-              <Link 
-                href="/services" 
-                className={pathname === "/services" ? "active" : ""} 
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Services
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/testimonials" 
-                className={pathname === "/testimonials" ? "active" : ""} 
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Testimonials
-              </Link>
-            </li>
-            <li>
-              <Link 
-                href="/blog" 
-                className={pathname === "/blog" ? "active" : ""} 
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Blog
-              </Link>
-            </li>
-            <li className="mobile-cta-li" style={{ marginTop: "20px" }}>
-              <Link 
-                href="/contact" 
-                className="btn btn-primary" 
-                style={{ padding: '14px 28px', fontSize: '1.05rem', fontWeight: 700 }}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Let's Connect <i className="fas fa-arrow-right" style={{ marginLeft: 6 }}/>
-              </Link>
-            </li>
-          </ul>
-        </nav>
-
-        <button 
-          className="menu-toggle" 
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle Menu"
-          aria-expanded={isMenuOpen}
-        >
-          <i className={isMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
-        </button>
-        
-        <div className="nav-cta">
-          <Link href="/contact" className="btn btn-primary" style={{ padding: '12px 26px', fontSize: '1.02rem', fontWeight: 700, fontFamily: 'var(--font-sans)', letterSpacing: '0.5px' }}>
-            Let's Connect <i className="fas fa-arrow-right" style={{ marginLeft: 6, fontSize: '0.9rem' }}/>
           </Link>
+
+          <nav>
+            <ul className={`nav-links ${isMenuOpen ? "active" : ""}`}>
+              <li>
+                <Link 
+                  href="/services" 
+                  className={pathname === "/services" ? "active" : ""} 
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Services
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/testimonials" 
+                  className={pathname === "/testimonials" ? "active" : ""} 
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Testimonials
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/blog" 
+                  className={pathname === "/blog" ? "active" : ""} 
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Blog
+                </Link>
+              </li>
+              <li className="mobile-cta-li" style={{ marginTop: "15px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                <button
+                  onClick={() => { setIsMenuOpen(false); setIsBookingOpen(true); }}
+                  style={{
+                    background: "var(--color-accent-gold, #f59e0b)",
+                    color: "#0f172a",
+                    border: "none",
+                    padding: "12px 24px",
+                    borderRadius: "8px",
+                    fontWeight: 700,
+                    cursor: "pointer"
+                  }}
+                >
+                  📅 Book Session
+                </button>
+                <Link 
+                  href="/contact" 
+                  className="btn btn-primary" 
+                  style={{ padding: '12px 24px', fontSize: '1rem', fontWeight: 700 }}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Let's Connect <i className="fas fa-arrow-right" style={{ marginLeft: 6 }}/>
+                </Link>
+              </li>
+            </ul>
+          </nav>
+
+          <button 
+            className="menu-toggle" 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle Menu"
+            aria-expanded={isMenuOpen}
+          >
+            <i className={isMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
+          </button>
+          
+          <div className="nav-cta" style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            <button
+              onClick={() => setIsBookingOpen(true)}
+              style={{
+                background: "var(--color-soft-teal, #0d9488)",
+                color: "#FFFFFF",
+                border: "none",
+                padding: '10px 20px',
+                borderRadius: '6px',
+                fontSize: '0.95rem',
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                transition: "all 0.2s"
+              }}
+            >
+              <i className="far fa-calendar-alt" /> Book Session
+            </button>
+
+            <Link href="/contact" className="btn btn-primary" style={{ padding: '10px 22px', fontSize: '0.95rem', fontWeight: 700, fontFamily: 'var(--font-sans)', letterSpacing: '0.5px' }}>
+              Let's Connect <i className="fas fa-arrow-right" style={{ marginLeft: 6, fontSize: '0.9rem' }}/>
+            </Link>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Calendly-Style Booking Modal */}
+      <BookingModal isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
+    </>
   );
 }

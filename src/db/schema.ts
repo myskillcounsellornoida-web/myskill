@@ -49,3 +49,26 @@ export const siteContent = pgTable("site_content", {
   value: text("value").notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// Bookings Table (Calendly-like session booking)
+export const bookings = pgTable("bookings", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  phone: varchar("phone", { length: 50 }).notNull(),
+  service: varchar("service", { length: 255 }).notNull(),
+  bookingDate: varchar("booking_date", { length: 50 }).notNull(),
+  bookingTime: varchar("booking_time", { length: 50 }).notNull(),
+  notes: text("notes"),
+  status: varchar("status", { length: 50 }).default("confirmed").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Newsletter Subscribers Table
+export const subscribers = pgTable("subscribers", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  name: varchar("name", { length: 255 }),
+  isSubscribed: boolean("is_subscribed").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

@@ -40,7 +40,13 @@ import {
   createBlog,
   updateBlog,
   deleteBlog,
-  updateSiteContent
+  updateSiteContent,
+  fetchBookings,
+  updateBookingStatus,
+  deleteBooking,
+  fetchSubscribers,
+  deleteSubscriber,
+  sendBroadcastEmail
 } from "./actions";
 
 // Default dummy data if database is empty or not configured
@@ -199,6 +205,8 @@ interface AdminClientProps {
   initialBlogs: any[];
   initialServices: any[];
   initialSiteContent: any[];
+  initialBookings?: any[];
+  initialSubscribers?: any[];
   dbConnected: boolean;
   dbError: string | null;
 }
@@ -209,6 +217,8 @@ export default function AdminClient({
   initialBlogs,
   initialServices,
   initialSiteContent,
+  initialBookings = [],
+  initialSubscribers = [],
   dbConnected,
   dbError
 }: AdminClientProps) {
@@ -220,7 +230,7 @@ export default function AdminClient({
   const [authError, setAuthError] = useState("");
 
   // Tab State
-  const [activeTab, setActiveTab] = useState<"dashboard" | "inquiries" | "testimonials" | "blogs" | "services" | "cms" | "faqs">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "bookings" | "inquiries" | "subscribers" | "testimonials" | "blogs" | "services" | "cms" | "faqs">("dashboard");
 
   // FAQ State
   const [faqsList, setFaqsList] = useState<any[]>(initialDummyFaqs);
@@ -237,10 +247,22 @@ export default function AdminClient({
   const [blogsList, setBlogsList] = useState<any[]>([]);
   const [servicesList, setServicesList] = useState<any[]>([]);
   const [siteContentList, setSiteContentList] = useState<any[]>([]);
+  const [bookingsList, setBookingsList] = useState<any[]>([]);
+  const [subscribersList, setSubscribersList] = useState<any[]>([]);
 
   // Search & Filters
   const [inquirySearch, setInquirySearch] = useState("");
   const [inquiryFilter, setInquiryFilter] = useState<"all" | "contacted" | "uncontacted">("all");
+  const [bookingSearch, setBookingSearch] = useState("");
+  const [subscriberSearch, setSubscriberSearch] = useState("");
+
+  // Broadcast Email Form State
+  const [broadcastSubject, setBroadcastSubject] = useState("");
+  const [broadcastBody, setBroadcastBody] = useState("");
+  const [broadcastTarget, setBroadcastTarget] = useState<"all" | "subscribers" | "bookings" | "inquiries" | "custom">("all");
+  const [customEmailInput, setCustomEmailInput] = useState("");
+  const [isSendingBroadcast, setIsSendingBroadcast] = useState(false);
+  const [broadcastReport, setBroadcastReport] = useState<{ total: number; sent: number; failed: number } | null>(null);
 
   // Modals & Selected Items for editing
   const [selectedInquiry, setSelectedInquiry] = useState<any | null>(null);
@@ -292,7 +314,23 @@ export default function AdminClient({
     } else {
       setSiteContentList(initialDummySiteContent);
     }
-  }, [dbConnected, initialInquiries, initialTestimonials, initialBlogs, initialServices, initialSiteContent]);
+
+    if (initialBookings && initialBookings.length > 0) {
+      setBookingsList(initialBookings);
+    } else {
+      fetchBookings().then(res => {
+        if (res.success && res.data) setBookingsList(res.data);
+      });
+    }
+
+    if (initialSubscribers && initialSubscribers.length > 0) {
+      setSubscribersList(initialSubscribers);
+    } else {
+      fetchSubscribers().then(res => {
+        if (res.success && res.data) setSubscribersList(res.data);
+      });
+    }
+  }, [dbConnected, initialInquiries, initialTestimonials, initialBlogs, initialServices, initialSiteContent, initialBookings, initialSubscribers]);
 
   // Auth local check
   useEffect(() => {
@@ -367,6 +405,71 @@ export default function AdminClient({
     } else {
       showNotify("Error: " + res.error, "error");
       setIsDemoMode(true);
+    }
+  };
+
+  /* ====================================================
+     BOOKINGS & SUBSCRIBERS & BROADCAST LOGIC
+     ==================================================== */
+  const handleUpdateBookingStatus = async (id: number, nextStatus: string) => {
+    setBookingsList(prev => prev.map(b => b.id === id ? { ...b, status: nextStatus } : b));
+    const res = await updateBookingStatus(id, nextStatus);
+    if (res.success) {
+      showNotify(`Booking status updated to ${nextStatus}`, "success");
+    } else {
+      showNotify(`Error updating status: ${res.error}`, "error");
+    }
+  };
+
+  const handleDeleteBooking = async (id: number) => {
+    if (!confirm("Delete this session booking?")) return;
+    setBookingsList(prev => prev.filter(b => b.id !== id));
+    const res = await deleteBooking(id);
+    if (res.success) {
+      showNotify("Booking deleted", "success");
+    } else {
+      showNotify(`Error deleting: ${res.error}`, "error");
+    }
+  };
+
+  const handleDeleteSubscriber = async (id: number) => {
+    if (!confirm("Delete subscriber?")) return;
+    setSubscribersList(prev => prev.filter(s => s.id !== id));
+    const res = await deleteSubscriber(id);
+    if (res.success) {
+      showNotify("Subscriber removed", "success");
+    } else {
+      showNotify(`Error deleting: ${res.error}`, "error");
+    }
+  };
+
+  const handleSendBroadcast = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!broadcastSubject.trim() || !broadcastBody.trim()) {
+      showNotify("Subject and Body are required.", "error");
+      return;
+    }
+    if (broadcastTarget === "custom" && (!customEmailInput || !customEmailInput.includes("@"))) {
+      showNotify("Valid email address required for custom target.", "error");
+      return;
+    }
+
+    setIsSendingBroadcast(true);
+    setBroadcastReport(null);
+
+    const res = await sendBroadcastEmail(
+      broadcastSubject,
+      broadcastBody,
+      broadcastTarget,
+      customEmailInput
+    );
+
+    setIsSendingBroadcast(false);
+    if (res.success && res.data) {
+      setBroadcastReport(res.data);
+      showNotify(`Broadcast executed! Sent ${res.data.sent} of ${res.data.total} emails via Resend.`, "success");
+    } else {
+      showNotify(`Broadcast failed: ${res.error}`, "error");
     }
   };
 
@@ -925,7 +1028,9 @@ export default function AdminClient({
           <nav style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             {[
               { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
+              { id: "bookings", label: "Session Bookings", icon: <Briefcase size={20} />, badge: bookingsList.length > 0 ? bookingsList.length : null },
               { id: "inquiries", label: "Leads/Inquiries", icon: <MessageSquare size={20} />, badge: uncontactedLeads > 0 ? uncontactedLeads : null },
+              { id: "subscribers", label: "Broadcast Mailer", icon: <Mail size={20} />, badge: subscribersList.length > 0 ? subscribersList.length : null },
               { id: "testimonials", label: "Testimonials", icon: <User size={20} /> },
               { id: "blogs", label: "Counselling Blogs", icon: <BookOpen size={20} /> },
               { id: "services", label: "Services", icon: <Briefcase size={20} /> },
@@ -1338,6 +1443,312 @@ export default function AdminClient({
                     <span>All services running normally. Drizzle ORM connected.</span>
                   </div>
                 </div>
+              </div>
+
+            </motion.div>
+          )}
+
+          {/* ====================================================
+             TAB: SESSION BOOKINGS
+             ==================================================== */}
+          {activeTab === "bookings" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "15px",
+                marginBottom: "30px"
+              }}>
+                <div style={{ position: "relative", flex: 1, maxWidth: "400px" }}>
+                  <Search size={18} style={{ position: "absolute", left: "15px", top: "50%", transform: "translateY(-50%)", color: "#888" }} />
+                  <input
+                    type="text"
+                    placeholder="Search bookings by name, email, service..."
+                    value={bookingSearch}
+                    onChange={(e) => setBookingSearch(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "12px 16px 12px 45px",
+                      borderRadius: "var(--radius-sm)",
+                      border: "1px solid var(--border-color)",
+                      outline: "none",
+                      fontSize: "0.95rem"
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                  <span style={{ fontSize: "0.85rem", color: "#666", fontWeight: 600 }}>
+                    Total Bookings: {bookingsList.length}
+                  </span>
+                </div>
+              </div>
+
+              {bookingsList.length === 0 ? (
+                <div style={{ backgroundColor: "white", padding: "60px 20px", textAlign: "center", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
+                  <Briefcase size={48} style={{ color: "#ccc", marginBottom: "15px" }} />
+                  <h3 style={{ color: "var(--color-deep-teal)", marginBottom: "8px" }}>No Session Bookings Yet</h3>
+                  <p style={{ color: "#888", fontSize: "0.9rem" }}>When candidates schedule 1-on-1 sessions on the website, they will appear here live.</p>
+                </div>
+              ) : (
+                <div style={{ backgroundColor: "white", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-soft)", border: "1px solid var(--border-color)", overflow: "hidden" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.9rem" }}>
+                    <thead>
+                      <tr style={{ background: "#FCFAF6", borderBottom: "1px solid var(--border-color)", color: "var(--color-deep-teal)" }}>
+                        <th style={{ padding: "16px 20px", fontWeight: 600 }}>Candidate</th>
+                        <th style={{ padding: "16px 20px", fontWeight: 600 }}>Service</th>
+                        <th style={{ padding: "16px 20px", fontWeight: 600 }}>Date & Time Slot</th>
+                        <th style={{ padding: "16px 20px", fontWeight: 600 }}>Status</th>
+                        <th style={{ padding: "16px 20px", fontWeight: 600 }}>Notes</th>
+                        <th style={{ padding: "16px 20px", fontWeight: 600, textAlign: "right" }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {bookingsList
+                        .filter(b => 
+                          b.name?.toLowerCase().includes(bookingSearch.toLowerCase()) ||
+                          b.email?.toLowerCase().includes(bookingSearch.toLowerCase()) ||
+                          b.service?.toLowerCase().includes(bookingSearch.toLowerCase()) ||
+                          b.bookingDate?.toLowerCase().includes(bookingSearch.toLowerCase())
+                        )
+                        .map((b) => (
+                          <tr key={b.id} style={{ borderBottom: "1px solid #F0ECE1" }}>
+                            <td style={{ padding: "16px 20px" }}>
+                              <strong style={{ color: "var(--color-deep-teal)", display: "block" }}>{b.name}</strong>
+                              <span style={{ fontSize: "0.8rem", color: "#666", display: "block" }}>✉ {b.email}</span>
+                              <span style={{ fontSize: "0.8rem", color: "#666", display: "block" }}>📞 {b.phone}</span>
+                            </td>
+                            <td style={{ padding: "16px 20px", fontWeight: 500 }}>{b.service}</td>
+                            <td style={{ padding: "16px 20px" }}>
+                              <span style={{ background: "rgba(15, 76, 129, 0.08)", color: "#0f4c81", padding: "4px 8px", borderRadius: "4px", fontWeight: 600, fontSize: "0.8rem" }}>
+                                📅 {b.bookingDate} at {b.bookingTime}
+                              </span>
+                            </td>
+                            <td style={{ padding: "16px 20px" }}>
+                              <select
+                                value={b.status || "confirmed"}
+                                onChange={(e) => handleUpdateBookingStatus(b.id, e.target.value)}
+                                style={{
+                                  padding: "6px 10px",
+                                  borderRadius: "6px",
+                                  border: "1px solid #cbd5e1",
+                                  fontSize: "0.85rem",
+                                  fontWeight: 600,
+                                  backgroundColor: b.status === "completed" ? "#dcfce7" : b.status === "cancelled" ? "#fee2e2" : "#e0f2fe",
+                                  color: b.status === "completed" ? "#166534" : b.status === "cancelled" ? "#991b1b" : "#075985"
+                                }}
+                              >
+                                <option value="confirmed">Confirmed</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                              </select>
+                            </td>
+                            <td style={{ padding: "16px 20px", color: "#666", maxWidth: "200px" }}>
+                              {b.notes || "No notes"}
+                            </td>
+                            <td style={{ padding: "16px 20px", textAlign: "right" }}>
+                              <button
+                                onClick={() => handleDeleteBooking(b.id)}
+                                style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", padding: "6px" }}
+                                title="Delete booking"
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* ====================================================
+             TAB: BROADCAST MAILER & SUBSCRIBERS
+             ==================================================== */}
+          {activeTab === "subscribers" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              
+              {/* TOP: BROADCAST EMAIL COMPOSER */}
+              <div style={{ backgroundColor: "white", padding: "30px", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-soft)", border: "1px solid var(--border-color)", marginBottom: "35px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
+                  <Mail size={24} style={{ color: "var(--color-soft-teal)" }} />
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: "1.2rem", color: "var(--color-deep-teal)" }}>Resend Broadcast Email Center</h3>
+                    <p style={{ margin: "2px 0 0 0", fontSize: "0.85rem", color: "#666" }}>Send live newsletter broadcasts or announcements to candidate audiences.</p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleSendBroadcast} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>
+                        Target Audience
+                      </label>
+                      <select
+                        value={broadcastTarget}
+                        onChange={(e: any) => setBroadcastTarget(e.target.value)}
+                        style={{ width: "100%", padding: "12px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                      >
+                        <option value="all">All Audiences (Subscribers + Bookings + Leads)</option>
+                        <option value="subscribers">Newsletter Subscribers ({subscribersList.length})</option>
+                        <option value="bookings">Session Bookings ({bookingsList.length})</option>
+                        <option value="inquiries">Contact Inquiries ({inquiriesList.length})</option>
+                        <option value="custom">Custom Single Target Email</option>
+                      </select>
+                    </div>
+
+                    {broadcastTarget === "custom" && (
+                      <div>
+                        <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>
+                          Recipient Email Address
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          placeholder="e.g. client@example.com"
+                          value={customEmailInput}
+                          onChange={(e) => setCustomEmailInput(e.target.value)}
+                          style={{ width: "100%", padding: "12px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>
+                      Email Subject Line *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Masterclass Alert: How to build an Ivy-League SOP for 2026 Admissions"
+                      value={broadcastSubject}
+                      onChange={(e) => setBroadcastSubject(e.target.value)}
+                      style={{ width: "100%", padding: "12px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                    />
+                  </div>
+
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                      <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)" }}>
+                        Email Message Body (HTML or Plain Text) *
+                      </label>
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBroadcastSubject("Study Abroad Masterclass: 5 Secrets to Top US & UK Admissions");
+                            setBroadcastBody(`<h2>Dear Student,</h2><p>Join Ria Jain this Saturday for an exclusive live counselling session on crafting winning application strategies.</p><p><strong>Date:</strong> Saturday | 6:00 PM IST</p><p>Best regards,<br/>My Skill Counsellor Team</p>`);
+                          }}
+                          style={{ fontSize: "0.75rem", background: "#f1f5f9", border: "none", padding: "4px 8px", borderRadius: "4px", cursor: "pointer" }}
+                        >
+                          Template: Webinar Notice
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBroadcastSubject("Important Admission Deadlines & SOP Guidance Update");
+                            setBroadcastBody(`<h2>Hello!</h2><p>As application deadlines approach for Fall 2026, here are the top 3 SOP guidelines every student should follow.</p><p>Book your 1-on-1 session with us to get your essays reviewed before submission.</p><p>Warmly,<br/>Ria Jain</p>`);
+                          }}
+                          style={{ fontSize: "0.75rem", background: "#f1f5f9", border: "none", padding: "4px 8px", borderRadius: "4px", cursor: "pointer" }}
+                        >
+                          Template: SOP Guidance
+                        </button>
+                      </div>
+                    </div>
+                    <textarea
+                      rows={6}
+                      required
+                      placeholder="Write your email body here..."
+                      value={broadcastBody}
+                      onChange={(e) => setBroadcastBody(e.target.value)}
+                      style={{ width: "100%", padding: "12px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.95rem", fontFamily: "monospace" }}
+                    />
+                  </div>
+
+                  {broadcastReport && (
+                    <div style={{ padding: "15px", borderRadius: "8px", background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#166534" }}>
+                      <strong>🎉 Broadcast Execution Report:</strong>
+                      <p style={{ margin: "4px 0 0 0", fontSize: "0.9rem" }}>
+                        Total Target Recipients: {broadcastReport.total} | Successfully Sent via Resend: {broadcastReport.sent} | Failed: {broadcastReport.failed}
+                      </p>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isSendingBroadcast}
+                    style={{
+                      padding: "14px 28px",
+                      backgroundColor: "var(--color-deep-teal)",
+                      color: "#FFF",
+                      border: "none",
+                      borderRadius: "6px",
+                      fontWeight: "bold",
+                      fontSize: "1rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      opacity: isSendingBroadcast ? 0.7 : 1
+                    }}
+                  >
+                    <Mail size={18} />
+                    {isSendingBroadcast ? "Sending Broadcast Mails..." : "Send Live Broadcast Email via Resend"}
+                  </button>
+                </form>
+              </div>
+
+              {/* BOTTOM: SUBSCRIBERS TABLE */}
+              <div style={{ backgroundColor: "white", padding: "30px", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-soft)", border: "1px solid var(--border-color)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                  <h3 style={{ margin: 0, fontSize: "1.1rem", color: "var(--color-deep-teal)" }}>Newsletter Subscribers ({subscribersList.length})</h3>
+                  <input
+                    type="text"
+                    placeholder="Search subscribers..."
+                    value={subscriberSearch}
+                    onChange={(e) => setSubscriberSearch(e.target.value)}
+                    style={{ padding: "8px 14px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.9rem" }}
+                  />
+                </div>
+
+                {subscribersList.length === 0 ? (
+                  <p style={{ color: "#888", textAlign: "center", padding: "20px 0" }}>No newsletter subscribers found yet.</p>
+                ) : (
+                  <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.9rem" }}>
+                    <thead>
+                      <tr style={{ background: "#FCFAF6", borderBottom: "1px solid var(--border-color)", color: "var(--color-deep-teal)" }}>
+                        <th style={{ padding: "12px 16px", fontWeight: 600 }}>Subscriber Email</th>
+                        <th style={{ padding: "12px 16px", fontWeight: 600 }}>Date Subscribed</th>
+                        <th style={{ padding: "12px 16px", fontWeight: 600, textAlign: "right" }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {subscribersList
+                        .filter(s => s.email?.toLowerCase().includes(subscriberSearch.toLowerCase()))
+                        .map(s => (
+                          <tr key={s.id} style={{ borderBottom: "1px solid #F0ECE1" }}>
+                            <td style={{ padding: "12px 16px", fontWeight: 500, color: "var(--color-deep-teal)" }}>✉ {s.email}</td>
+                            <td style={{ padding: "12px 16px", color: "#666" }}>{new Date(s.createdAt).toLocaleDateString()}</td>
+                            <td style={{ padding: "12px 16px", textAlign: "right" }}>
+                              <button
+                                onClick={() => handleDeleteSubscriber(s.id)}
+                                style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer" }}
+                                title="Remove subscriber"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
 
             </motion.div>

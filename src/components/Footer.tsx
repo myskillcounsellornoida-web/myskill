@@ -2,13 +2,34 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { subscribeNewsletter } from "@/app/actions";
 
 export default function Footer() {
   const pathname = usePathname();
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ text: string; error?: boolean } | null>(null);
 
   if (pathname?.startsWith("/admin")) {
     return null;
   }
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setLoading(true);
+    setMessage(null);
+    const res = await subscribeNewsletter(email);
+    setLoading(false);
+    if (res.success) {
+      setMessage({ text: "Subscribed! Welcome email sent ✨" });
+      setEmail("");
+    } else {
+      setMessage({ text: res.message, error: true });
+    }
+  };
+
   return (
     <footer style={{ background: 'var(--color-deep-teal)', color: 'white', paddingTop: '80px', paddingBottom: '30px' }}>
       <div className="container footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '50px', marginBottom: '50px' }}>
@@ -28,9 +49,30 @@ export default function Footer() {
           <p style={{ color: 'var(--color-soft-ivory)', opacity: 0.8, marginBottom: '25px', lineHeight: '1.6' }}>
             Empowering students with clarity, strategy, and confidence to achieve global university admissions.
           </p>
-          <form className="footer-subscribe-form" style={{ display: 'flex', gap: '10px' }}>
-            <input type="email" placeholder="Subscribe for updates" style={{ padding: '10px', borderRadius: '4px', border: 'none', width: '100%' }} required />
-            <button type="submit" style={{ background: 'var(--color-muted-coral)', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Join</button>
+          
+          <form onSubmit={handleSubscribe} className="footer-subscribe-form" style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <input 
+                type="email" 
+                placeholder="Subscribe for updates" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                style={{ padding: '10px', borderRadius: '4px', border: 'none', width: '100%', color: '#333' }} 
+                required 
+              />
+              <button 
+                type="submit" 
+                disabled={loading}
+                style={{ background: 'var(--color-muted-coral)', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap' }}
+              >
+                {loading ? "..." : "Join"}
+              </button>
+            </div>
+            {message && (
+              <span style={{ fontSize: '0.82rem', color: message.error ? '#fca5a5' : '#86efac' }}>
+                {message.text}
+              </span>
+            )}
           </form>
         </div>
 
