@@ -133,8 +133,10 @@ export default function Home() {
       <section className="bg-sage-section" style={{padding:"80px 0"}}>
         <div className="container">
           <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade}>
-            <span className="text-accent">Our Services</span>
-            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>How We Support Your Journey</h2>
+            <span className="text-accent font-sans">Our Services</span>
+            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:600}}>
+              How We Support <span className="text-highlight">Your Journey</span>
+            </h2>
             <p style={{color:"var(--text-secondary)",fontSize:"1.05rem",marginTop:8}}>End-to-end support across every stage of your study abroad journey.</p>
           </motion.div>
           <motion.div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:28,marginTop:40}} initial="hidden" whileInView="visible" viewport={{once:true}} variants={stag}>
@@ -271,14 +273,16 @@ export default function Home() {
           <div className="flex-section" style={{display:"flex",flexWrap:"wrap",gap:50,alignItems:"center"}}>
             <motion.div style={{flex:"1 1 300px",position:"relative"}} initial={{opacity:0,x:-30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.6}}>
               <Image src="/images/ria_portrait.jpg" alt="Ria Jain – Founder & Lead Counsellor" width={500} height={600} style={{width:"100%",height:"auto",borderRadius:20,boxShadow:"0 25px 50px rgba(0,0,0,0.15)"}} />
-              <div className="founder-badge" style={{position:"absolute",bottom:-20,right:-20,background:"var(--color-sage-green)",color:"white",padding:"18px 22px",borderRadius:15,boxShadow:"0 10px 20px rgba(0,0,0,0.12)"}}>
-                <h4 style={{margin:0,fontSize:"1.1rem",fontFamily:"var(--font-heading)",fontWeight:800}}>Ria Jain</h4>
-                <p style={{margin:0,fontSize:"0.82rem",opacity:0.92}}>Lead Counsellor & Founder</p>
+              <div className="founder-badge" style={{position:"absolute",bottom:-20,right:-20,background:"var(--color-deep-teal)",color:"white",padding:"16px 24px",borderRadius:16,boxShadow:"0 15px 30px rgba(0,0,0,0.15)",border:"1px solid var(--color-accent-gold)"}}>
+                <span className="font-cursive" style={{fontSize:"1.8rem",color:"var(--color-accent-gold)",display:"block",lineHeight:1}}>Ria Jain</span>
+                <p style={{margin:"4px 0 0",fontSize:"0.72rem",fontFamily:"var(--font-sans)",textTransform:"uppercase",letterSpacing:"1.5px",opacity:0.9}}>Lead Counsellor & Founder</p>
               </div>
             </motion.div>
             <motion.div style={{flex:"1 1 300px"}} initial={{opacity:0,x:30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.6}}>
-              <span className="text-accent">About Us</span>
-              <h2 style={{fontSize:"clamp(1.8rem,3.5vw,2.5rem)",color:"var(--color-deep-teal)",marginBottom:18,fontFamily:"var(--font-heading)",fontWeight:800}}>Guiding You Beyond Borders</h2>
+              <span className="text-accent font-sans">About Us</span>
+              <h2 style={{fontSize:"clamp(2.2rem,4vw,3.2rem)",color:"var(--color-deep-teal)",marginBottom:18,fontFamily:"var(--font-heading)",fontWeight:600}}>
+                Guiding You <span className="text-highlight">Beyond Borders</span>
+              </h2>
               <p style={{fontSize:"1.05rem",color:"var(--text-secondary)",marginBottom:16,lineHeight:1.8}}>Sometimes, all we need is the right guidance at the right time. That's why My Skill Counsellor was founded in 2023—to be a trusted guide, helping individuals navigate important academic and career decisions with clarity and confidence.</p>
               <p style={{fontSize:"1.05rem",color:"var(--text-secondary)",marginBottom:28,lineHeight:1.8}}>As both a counsellor and a parent of an international student myself, I bring professional expertise and real-world understanding. Every student has a different story, pace, and aspiration.</p>
               <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:28}}>
