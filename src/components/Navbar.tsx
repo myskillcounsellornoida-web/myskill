@@ -88,7 +88,7 @@ export default function Navbar() {
                   Blog
                 </Link>
               </li>
-              <li className="mobile-cta-li" style={{ marginTop: "15px", display: "flex", flexDirection: "column", gap: "10px" }}>
+              <li className="mobile-cta-li" style={{ marginTop: "15px" }}>
                 <button
                   onClick={() => { setIsMenuOpen(false); setIsBookingOpen(true); }}
                   style={{

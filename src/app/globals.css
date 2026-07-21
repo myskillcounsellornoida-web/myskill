@@ -1531,7 +1531,9 @@ footer {
     }
     
     .mobile-cta-li {
-        display: block !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
     }
 
     .footer-subscribe-form {
