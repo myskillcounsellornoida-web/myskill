@@ -29,15 +29,7 @@ export default function TestimonialsClient({ testimonialsList: initialList }: { 
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(initialList);
 
-  useEffect(() => {
-    const handleMessage = (e: MessageEvent) => {
-      if (e.data?.type === "TESTIMONIALS_PREVIEW" && e.data?.data) {
-        setTestimonials(e.data.data.length > 0 ? e.data.data : initialList);
-      }
-    };
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [initialList]);
+
 
   const testFaqs = [
     { q: "Are these reviews verified?", a: "Yes, all our success stories are from actual students and parents who have worked with My Skill Counsellor through the complete admission lifecycle." },
