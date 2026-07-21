@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 const fadeUp = {
@@ -31,6 +31,18 @@ export default function BlogClient({ blogsList }: BlogClientProps) {
     { q: "How often do you post new study abroad insights?", a: "We publish detailed guides and insights bi-weekly to ensure students and parents are always up-to-date with changing admission landscapes." },
     { q: "Can I suggest a topic for the blog?", a: "Yes! If you have specific questions about a country, university, or test prep, reach out via the Contact page and we may feature it in our next guide." }
   ];
+
+  const [blogs, setBlogs] = useState<any[]>(blogsList);
+
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data?.type === "BLOGS_PREVIEW" && e.data?.data) {
+        setBlogs(e.data.data.length > 0 ? e.data.data : blogsList);
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [blogsList]);
 
   return (
     <main>
@@ -108,7 +120,7 @@ export default function BlogClient({ blogsList }: BlogClientProps) {
             variants={staggerContainer}
             style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '35px' }}
           >
-            {blogsList.map((b) => (
+            {blogs.map((b) => (
               <motion.div 
                 key={b.id || b.title} 
                 className="blog-card" 

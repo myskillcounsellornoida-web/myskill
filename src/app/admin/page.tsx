@@ -5,20 +5,33 @@ import {
   fetchServices,
   fetchSiteContent,
   fetchBookings,
-  fetchSubscribers
+  fetchSubscribers,
+  fetchFaqs
 } from "./actions";
 import AdminClient from "./AdminClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const inquiriesRes = await fetchInquiries();
-  const testimonialsRes = await fetchTestimonials();
-  const blogsRes = await fetchBlogs();
-  const servicesRes = await fetchServices();
-  const siteContentRes = await fetchSiteContent();
-  const bookingsRes = await fetchBookings();
-  const subscribersRes = await fetchSubscribers();
+  const [
+    inquiriesRes,
+    testimonialsRes,
+    blogsRes,
+    servicesRes,
+    siteContentRes,
+    bookingsRes,
+    subscribersRes,
+    faqsRes
+  ] = await Promise.all([
+    fetchInquiries(),
+    fetchTestimonials(),
+    fetchBlogs(),
+    fetchServices(),
+    fetchSiteContent(),
+    fetchBookings(),
+    fetchSubscribers(),
+    fetchFaqs()
+  ]);
 
   const dbConnected = !!process.env.DATABASE_URL && inquiriesRes.success;
   const dbError = !process.env.DATABASE_URL 
@@ -34,6 +47,7 @@ export default async function AdminPage() {
       initialSiteContent={siteContentRes.data || []}
       initialBookings={bookingsRes.data || []}
       initialSubscribers={subscribersRes.data || []}
+      initialFaqs={faqsRes.data || []}
       dbConnected={dbConnected}
       dbError={dbError}
     />

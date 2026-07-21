@@ -46,7 +46,9 @@ import {
   deleteBooking,
   fetchSubscribers,
   deleteSubscriber,
-  sendBroadcastEmail
+  sendBroadcastEmail,
+  saveFaq,
+  deleteFaq
 } from "./actions";
 
 // Default dummy data if database is empty or not configured
@@ -192,6 +194,9 @@ const initialDummySiteContent = [
   { key: "meta_description", value: "Expert career counselling, study abroad admissions, IELTS preparation, SOP building, and visa support by Ria Jain.", updatedAt: new Date() },
 ];
 
+const initialDummyBookings: any[] = [];
+const initialDummySubscribers: any[] = [];
+
 const initialDummyFaqs = [
   { id: 1, question: "When is the right time to start planning for study abroad?", answer: "We recommend starting as early as Class 9. This gives ample time to build a robust profile and plan extracurriculars without rushing." },
   { id: 2, question: "Do you guarantee university admissions?", answer: "While no consultant can guarantee admission to ivy-league universities, our track record speaks for itself. We maximise your chances by aligning your profile with university expectations." },
@@ -207,6 +212,7 @@ interface AdminClientProps {
   initialSiteContent: any[];
   initialBookings?: any[];
   initialSubscribers?: any[];
+  initialFaqs?: any[];
   dbConnected: boolean;
   dbError: string | null;
 }
@@ -219,6 +225,7 @@ export default function AdminClient({
   initialSiteContent,
   initialBookings = [],
   initialSubscribers = [],
+  initialFaqs = [],
   dbConnected,
   dbError
 }: AdminClientProps) {
@@ -285,52 +292,26 @@ export default function AdminClient({
 
   // Initialize data
   useEffect(() => {
-    if (dbConnected && initialInquiries?.length > 0) {
-      setInquiriesList(initialInquiries);
+    if (dbConnected) {
+      setInquiriesList(initialInquiries || []);
+      setTestimonialsList(initialTestimonials || []);
+      setBlogsList(initialBlogs || []);
+      setServicesList(initialServices || []);
+      setSiteContentList(initialSiteContent || []);
+      setBookingsList(initialBookings || []);
+      setSubscribersList(initialSubscribers || []);
+      setFaqsList(initialFaqs || []);
     } else {
       setInquiriesList(initialDummyInquiries);
-    }
-
-    if (dbConnected && initialTestimonials?.length > 0) {
-      setTestimonialsList(initialTestimonials);
-    } else {
       setTestimonialsList(initialDummyTestimonials);
-    }
-
-    if (dbConnected && initialBlogs?.length > 0) {
-      setBlogsList(initialBlogs);
-    } else {
       setBlogsList(initialDummyBlogs);
-    }
-
-    if (dbConnected && initialServices?.length > 0) {
-      setServicesList(initialServices);
-    } else {
       setServicesList(initialDummyServices);
-    }
-
-    if (dbConnected && initialSiteContent?.length > 0) {
-      setSiteContentList(initialSiteContent);
-    } else {
       setSiteContentList(initialDummySiteContent);
+      setBookingsList(initialDummyBookings);
+      setSubscribersList(initialDummySubscribers);
+      setFaqsList(initialDummyFaqs);
     }
-
-    if (initialBookings && initialBookings.length > 0) {
-      setBookingsList(initialBookings);
-    } else {
-      fetchBookings().then(res => {
-        if (res.success && res.data) setBookingsList(res.data);
-      });
-    }
-
-    if (initialSubscribers && initialSubscribers.length > 0) {
-      setSubscribersList(initialSubscribers);
-    } else {
-      fetchSubscribers().then(res => {
-        if (res.success && res.data) setSubscribersList(res.data);
-      });
-    }
-  }, [dbConnected, initialInquiries, initialTestimonials, initialBlogs, initialServices, initialSiteContent, initialBookings, initialSubscribers]);
+  }, [initialInquiries, initialTestimonials, initialBlogs, initialServices, initialSiteContent, initialBookings, initialSubscribers, initialFaqs, dbConnected]);
 
   // Auth local check
   useEffect(() => {
@@ -721,26 +702,35 @@ export default function AdminClient({
     setShowFaqModal(true);
   };
 
-  const handleSaveFaq = (e: React.FormEvent) => {
+  const handleSaveFaq = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!faqForm.question || !faqForm.answer) {
       showNotify("Both question and answer are required.", "error");
       return;
     }
-    if (editingFaq) {
-      setFaqsList(prev => prev.map(f => f.id === editingFaq.id ? { ...f, ...faqForm } : f));
-      showNotify("FAQ updated successfully.", "success");
+    const res = await saveFaq({ id: editingFaq?.id, ...faqForm });
+    if (res.success) {
+      if (editingFaq) {
+        setFaqsList(prev => prev.map(f => f.id === editingFaq.id ? res.data : f));
+      } else {
+        setFaqsList(prev => [res.data, ...prev]);
+      }
+      showNotify("FAQ saved successfully.", "success");
+      setShowFaqModal(false);
     } else {
-      setFaqsList(prev => [{ id: Date.now(), ...faqForm }, ...prev]);
-      showNotify("FAQ added successfully.", "success");
+      showNotify("Failed to save FAQ: " + res.error, "error");
     }
-    setShowFaqModal(false);
   };
 
-  const handleDeleteFaq = (id: number) => {
+  const handleDeleteFaq = async (id: number) => {
     if (!confirm("Delete this FAQ?")) return;
-    setFaqsList(prev => prev.filter(f => f.id !== id));
-    showNotify("FAQ deleted.", "success");
+    const res = await deleteFaq(id);
+    if (res.success) {
+      setFaqsList(prev => prev.filter(f => f.id !== id));
+      showNotify("FAQ deleted.", "success");
+    } else {
+      showNotify("Failed to delete FAQ: " + res.error, "error");
+    }
   };
 
   /* ====================================================
@@ -752,6 +742,43 @@ export default function AdminClient({
       iframe.contentWindow.postMessage({ type: "CMS_UPDATE", key, value }, "*");
     }
   };
+
+  // Real-time Canva-like Live Preview syncing for all data models
+  useEffect(() => {
+    const iframe = document.getElementById("live-preview-iframe") as HTMLIFrameElement;
+    if (!iframe || !iframe.contentWindow) return;
+    const data = showTestimonialModal 
+      ? (editingTestimonial ? testimonialsList.map(t => t.id === editingTestimonial.id ? { ...t, ...testimonialForm } : t) : [...testimonialsList, { id: 999999, ...testimonialForm }])
+      : testimonialsList;
+    iframe.contentWindow.postMessage({ type: "TESTIMONIALS_PREVIEW", data }, "*");
+  }, [testimonialForm, testimonialsList, showTestimonialModal, editingTestimonial]);
+
+  useEffect(() => {
+    const iframe = document.getElementById("live-preview-iframe") as HTMLIFrameElement;
+    if (!iframe || !iframe.contentWindow) return;
+    const data = showServiceModal 
+      ? (editingService ? servicesList.map(s => s.id === editingService.id ? { ...s, ...serviceForm } : s) : [...servicesList, { id: 999999, ...serviceForm }])
+      : servicesList;
+    iframe.contentWindow.postMessage({ type: "SERVICES_PREVIEW", data }, "*");
+  }, [serviceForm, servicesList, showServiceModal, editingService]);
+
+  useEffect(() => {
+    const iframe = document.getElementById("live-preview-iframe") as HTMLIFrameElement;
+    if (!iframe || !iframe.contentWindow) return;
+    const data = showBlogModal 
+      ? (editingBlog ? blogsList.map(b => b.id === editingBlog.id ? { ...b, ...blogForm } : b) : [...blogsList, { id: 999999, ...blogForm }])
+      : blogsList;
+    iframe.contentWindow.postMessage({ type: "BLOGS_PREVIEW", data }, "*");
+  }, [blogForm, blogsList, showBlogModal, editingBlog]);
+
+  useEffect(() => {
+    const iframe = document.getElementById("live-preview-iframe") as HTMLIFrameElement;
+    if (!iframe || !iframe.contentWindow) return;
+    const data = showFaqModal 
+      ? (editingFaq ? faqsList.map(f => f.id === editingFaq.id ? { ...f, ...faqForm } : f) : [...faqsList, { id: 999999, ...faqForm }])
+      : faqsList;
+    iframe.contentWindow.postMessage({ type: "FAQS_PREVIEW", data }, "*");
+  }, [faqForm, faqsList, showFaqModal, editingFaq]);
 
   const handleUpdateCmsKey = async (key: string, value: string) => {
     setSiteContentList(prev => prev.map(item => item.key === key ? { ...item, value } : item));
@@ -1179,7 +1206,8 @@ export default function AdminClient({
         </header>
 
         {/* CONTAINER FOR TAB VIEW */}
-        <div style={{ padding: "40px" }}>
+        <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+          <div style={{ flex: "1", padding: "40px", overflowY: "auto" }}>
           
           {/* ====================================================
              TAB 1: DASHBOARD
@@ -2116,8 +2144,8 @@ export default function AdminClient({
              TAB 6: SITE CONTENT (CMS)
              ==================================================== */}
           {activeTab === "cms" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: "flex", gap: "24px", height: "calc(100vh - 120px)" }}>
-              <div style={{ flex: "1", overflowY: "auto", paddingRight: "10px", paddingBottom: "40px" }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <div>
                 <p style={{ color: "var(--text-secondary)", marginBottom: "30px", lineHeight: 1.7 }}>
                   ✏️ <strong>Live Content Editor.</strong> Type in the fields below to instantly preview your changes on the right. Click away from the field to automatically save to the database.
                 </p>
@@ -2176,14 +2204,28 @@ export default function AdminClient({
                   );
                 })}
               </div>
-              <div style={{ flex: "1.2", position: "relative", borderRadius: "var(--radius-md)", overflow: "hidden", border: "4px solid var(--color-deep-teal)", boxShadow: "var(--shadow-soft)", background: "white" }}>
-                <div style={{ background: "var(--color-deep-teal)", padding: "8px 16px", color: "white", fontSize: "0.8rem", fontWeight: "bold", display: "flex", alignItems: "center", gap: "8px" }}>
-                  <i className="fas fa-desktop"></i> Live Website Preview
-                </div>
-                <iframe id="live-preview-iframe" src="/" style={{ width: "100%", height: "calc(100% - 32px)", border: "none" }} />
-              </div>
             </motion.div>
           )}
+
+          </div>
+
+          {/* GLOBAL RIGHT PANE: Live Preview */}
+          <div style={{ flex: "1.1", position: "relative", borderLeft: "2px solid var(--border-color)", background: "white", display: "flex", flexDirection: "column", boxShadow: "-5px 0 15px rgba(0,0,0,0.03)" }}>
+            <div style={{ background: "var(--color-deep-teal)", padding: "12px 16px", color: "white", fontSize: "0.85rem", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <i className="fas fa-desktop"></i> Live Website Preview
+              </div>
+              <button 
+                onClick={() => { const f = document.getElementById("live-preview-iframe") as HTMLIFrameElement; if(f) f.src = f.src; }}
+                style={{ background: "rgba(255,255,255,0.2)", border: "none", color: "white", padding: "6px 12px", borderRadius: "5px", cursor: "pointer", fontSize: "0.75rem", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px", transition: "all 0.2s" }}
+                onMouseOver={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.3)"}
+                onMouseOut={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
+              >
+                <i className="fas fa-sync-alt"></i> Refresh Preview
+              </button>
+            </div>
+            <iframe id="live-preview-iframe" src={activeTab === "blogs" ? "/blog" : activeTab === "services" ? "/services" : "/"} style={{ width: "100%", flex: 1, border: "none" }} />
+          </div>
 
         </div>
       </main>

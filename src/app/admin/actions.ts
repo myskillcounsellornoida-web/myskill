@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { inquiries, testimonials, services, blogs, siteContent, bookings, subscribers } from "@/db/schema";
+import { inquiries, testimonials, services, blogs, siteContent, bookings, subscribers, faqs } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getLocalData, saveLocalData } from "@/db/localStore";
@@ -619,5 +619,63 @@ export async function sendBroadcastEmail(
     console.error("Broadcast Error:", e);
     return { success: false, data: { total: 0, sent: 0, failed: 0 }, error: e.message };
   }
+}
+
+/* ==========================================
+   FAQS ACTIONS
+   ========================================== */
+
+export async function fetchFaqs(): Promise<ActionResult> {
+  if (process.env.DATABASE_URL) {
+    try {
+      const res = await db.select().from(faqs).orderBy(desc(faqs.createdAt));
+      return { success: true, data: res };
+    } catch (e: any) {
+      console.error("DB Error fetchFaqs:", e);
+      return { success: false, data: [], error: e.message };
+    }
+  }
+  return { success: true, data: [] };
+}
+
+export async function saveFaq(data: any): Promise<ActionResult> {
+  if (process.env.DATABASE_URL) {
+    try {
+      if (data.id) {
+        const res = await db.update(faqs)
+          .set({ question: data.question, answer: data.answer, category: data.category })
+          .where(eq(faqs.id, data.id))
+          .returning();
+        revalidatePath("/admin");
+        return { success: true, data: res[0] };
+      } else {
+        const res = await db.insert(faqs)
+          .values({ question: data.question, answer: data.answer, category: data.category })
+          .returning();
+        revalidatePath("/admin");
+        return { success: true, data: res[0] };
+      }
+    } catch (e: any) {
+      console.error("DB Error saveFaq:", e);
+      return { success: false, data: null, error: e.message };
+    }
+  }
+  return { success: false, data: null, error: "Database not connected." };
+}
+
+export async function deleteFaq(id: number): Promise<ActionResult> {
+  if (process.env.DATABASE_URL) {
+    try {
+      const res = await db.delete(faqs)
+        .where(eq(faqs.id, id))
+        .returning();
+      revalidatePath("/admin");
+      return { success: true, data: res[0] };
+    } catch (e: any) {
+      console.error("DB Error deleteFaq:", e);
+      return { success: false, data: null, error: e.message };
+    }
+  }
+  return { success: false, data: null, error: "Database not connected." };
 }
 
