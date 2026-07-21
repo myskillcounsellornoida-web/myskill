@@ -1,19 +1,10 @@
-import { db } from "@/db";
-import { testimonials } from "@/db/schema";
+import { fetchTestimonials } from "@/app/admin/actions";
 import TestimonialsClient from "@/components/TestimonialsClient";
 
 export const revalidate = 60;
 
 export default async function TestimonialsPage() {
-  let dbTestimonials: any[] = [];
-  
-  try {
-    if (process.env.DATABASE_URL) {
-      dbTestimonials = await db.select().from(testimonials);
-    }
-  } catch (error) {
-    console.error("Failed to fetch testimonials from database:", error);
-  }
+  const testimonialsRes = await fetchTestimonials();
 
   // Fallback to static if empty
   const defaultTestimonials = [
@@ -25,7 +16,9 @@ export default async function TestimonialsPage() {
     { name: "Mr. Iyer", role: "Parent", text: "Very professional and transparent career counselling. My son is now much more confident about his future path." }
   ];
 
-  const testimonialsList = dbTestimonials.length > 0 ? dbTestimonials : defaultTestimonials;
+  const testimonialsList = testimonialsRes.success && testimonialsRes.data && testimonialsRes.data.length > 0 
+    ? testimonialsRes.data 
+    : defaultTestimonials;
 
   return <TestimonialsClient testimonialsList={testimonialsList} />;
 }
