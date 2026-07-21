@@ -541,19 +541,23 @@ export default function AdminClient({
       }
     } else {
       // Add
-      const newId = Date.now();
-      const newT = { id: newId, ...testimonialForm, createdAt: new Date() };
-      setTestimonialsList(prev => [newT, ...prev]);
-
       if (!isDemoMode) {
         const res = await createTestimonial(testimonialForm.name, testimonialForm.role, testimonialForm.text);
         if (res.success) {
+          const createdT = Array.isArray(res.data) ? res.data[0] : res.data;
+          setTestimonialsList(prev => [createdT, ...prev]);
           showNotify("Testimonial created.", "success");
         } else {
           showNotify("DB error: " + res.error + ". Switched to Demo Mode.", "error");
           setIsDemoMode(true);
+          const newId = Date.now();
+          const newT = { id: newId, ...testimonialForm, createdAt: new Date() };
+          setTestimonialsList(prev => [newT, ...prev]);
         }
       } else {
+        const newId = Date.now();
+        const newT = { id: newId, ...testimonialForm, createdAt: new Date() };
+        setTestimonialsList(prev => [newT, ...prev]);
         showNotify("Testimonial created (Demo Mode).", "success");
       }
     }
@@ -623,19 +627,23 @@ export default function AdminClient({
         showNotify("Blog updated (Demo Mode).", "success");
       }
     } else {
-      const newId = Date.now();
-      const newB = { id: newId, ...blogForm, createdAt: new Date() };
-      setBlogsList(prev => [newB, ...prev]);
-
       if (!isDemoMode) {
         const res = await createBlog(blogForm.title, blogForm.slug, blogForm.content, blogForm.image, blogForm.tag, blogForm.readTime);
         if (res.success) {
+          const createdB = Array.isArray(res.data) ? res.data[0] : res.data;
+          setBlogsList(prev => [createdB, ...prev]);
           showNotify("Blog article published.", "success");
         } else {
           showNotify("DB error. Switched to Demo Mode.", "error");
           setIsDemoMode(true);
+          const newId = Date.now();
+          const newB = { id: newId, ...blogForm, createdAt: new Date() };
+          setBlogsList(prev => [newB, ...prev]);
         }
       } else {
+        const newId = Date.now();
+        const newB = { id: newId, ...blogForm, createdAt: new Date() };
+        setBlogsList(prev => [newB, ...prev]);
         showNotify("Blog published (Demo Mode).", "success");
       }
     }
@@ -697,19 +705,23 @@ export default function AdminClient({
         showNotify("Service updated (Demo Mode).", "success");
       }
     } else {
-      const newId = Date.now();
-      const newS = { id: newId, ...serviceForm, createdAt: new Date() };
-      setServicesList(prev => [newS, ...prev]);
-
       if (!isDemoMode) {
         const res = await createService(serviceForm.title, serviceForm.description, serviceForm.icon);
         if (res.success) {
+          const createdS = Array.isArray(res.data) ? res.data[0] : res.data;
+          setServicesList(prev => [createdS, ...prev]);
           showNotify("Service created.", "success");
         } else {
           showNotify("DB error. Switched to Demo Mode.", "error");
           setIsDemoMode(true);
+          const newId = Date.now();
+          const newS = { id: newId, ...serviceForm, createdAt: new Date() };
+          setServicesList(prev => [newS, ...prev]);
         }
       } else {
+        const newId = Date.now();
+        const newS = { id: newId, ...serviceForm, createdAt: new Date() };
+        setServicesList(prev => [newS, ...prev]);
         showNotify("Service created (Demo Mode).", "success");
       }
     }
