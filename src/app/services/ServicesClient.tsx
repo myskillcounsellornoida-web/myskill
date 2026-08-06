@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -81,7 +81,7 @@ export default function ServicesClient({ initialServices = [], initialFaqs = [] 
     reverse: i % 2 !== 0
   });
 
-  const [services, setServices] = useState<any[]>(
+  const [services] = useState<any[]>(
     initialServices.length > 0 ? initialServices : defaultServices
   );
 
@@ -93,7 +93,7 @@ export default function ServicesClient({ initialServices = [], initialFaqs = [] 
     { q: "Can you help with student visas for Dubai and the UK?", a: "Absolutely. Visa processing is a core part of our comprehensive package. We guide you through financial documentation, mock interviews, and the application process." }
   ];
 
-  const [faqs, setFaqs] = useState<any[]>(
+  const [faqs] = useState<any[]>(
     initialFaqs.length > 0 ? initialFaqs : defaultFaqs
   );
 

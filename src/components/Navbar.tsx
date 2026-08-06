@@ -11,9 +11,14 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const pathname = usePathname();
+  const isAdminRoute = pathname?.startsWith("/admin");
+  const [prevPathname, setPrevPathname] = useState(pathname);
 
-  if (pathname?.startsWith("/admin")) {
-    return null;
+  // Auto-close menu on route transition (adjust state during render, per
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes)
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setIsMenuOpen(false);
   }
 
   useEffect(() => {
@@ -23,11 +28,6 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Auto-close menu on route transition
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
 
   // Prevent background scrolling when mobile menu is active
   useEffect(() => {
@@ -40,6 +40,10 @@ export default function Navbar() {
       document.body.style.overflow = "";
     };
   }, [isMenuOpen]);
+
+  if (isAdminRoute) {
+    return null;
+  }
 
   return (
     <>
@@ -109,7 +113,7 @@ export default function Navbar() {
                   style={{ padding: '12px 24px', fontSize: '1rem', fontWeight: 700 }}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Let's Connect <i className="fas fa-arrow-right" style={{ marginLeft: 6 }}/>
+                  Let&apos;s Connect <i className="fas fa-arrow-right" style={{ marginLeft: 6 }}/>
                 </Link>
               </li>
             </ul>
@@ -147,7 +151,7 @@ export default function Navbar() {
             </button>
 
             <Link href="/contact" className="btn btn-primary" style={{ padding: '10px 22px', fontSize: '0.95rem', fontWeight: 700, fontFamily: 'var(--font-sans)', letterSpacing: '0.5px' }}>
-              Let's Connect <i className="fas fa-arrow-right" style={{ marginLeft: 6, fontSize: '0.9rem' }}/>
+              Let&apos;s Connect <i className="fas fa-arrow-right" style={{ marginLeft: 6, fontSize: '0.9rem' }}/>
             </Link>
           </div>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
 const fadeUp = {
@@ -27,7 +27,7 @@ type Testimonial = {
 
 export default function TestimonialsClient({ testimonialsList: initialList }: { testimonialsList: Testimonial[] }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialList);
+  const [testimonials] = useState<Testimonial[]>(initialList);
 
 
 
@@ -104,7 +104,7 @@ export default function TestimonialsClient({ testimonialsList: initialList }: { 
                 <span className="text-accent">Press Recognition</span>
                 <h2 style={{ fontSize: '2.5rem', color: 'var(--color-deep-teal)', marginBottom: '20px' }}>Featured in Shah Times</h2>
                 <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', fontSize: '1.1rem' }}>
-                   My Skill Counsellor's innovative approach to profile building and transparent university admissions has been recognized by leading regional publications. We believe in providing actionable, honest advice to every student.
+                   My Skill Counsellor&apos;s innovative approach to profile building and transparent university admissions has been recognized by leading regional publications. We believe in providing actionable, honest advice to every student.
                 </p>
              </div>
              <div style={{ flex: '1 1 400px' }}>
@@ -127,7 +127,7 @@ export default function TestimonialsClient({ testimonialsList: initialList }: { 
             {testimonials.map((t, i) => (
               <motion.div key={i} className="testimonial-card" variants={fadeUp} style={{ background: 'white', padding: '30px', borderRadius: '12px', borderTop: '4px solid var(--color-deep-teal)', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
                 <i className="fas fa-quote-left text-accent" style={{ fontSize: '2rem', opacity: 0.2 }}></i>
-                <p style={{ marginTop: '15px', fontStyle: 'italic', lineHeight: '1.6' }}>"{t.text}"</p>
+                <p style={{ marginTop: '15px', fontStyle: 'italic', lineHeight: '1.6' }}>&quot;{t.text}&quot;</p>
                 <h4 style={{ marginTop: '20px', color: 'var(--color-deep-teal)' }}>{t.name}</h4>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{t.role}</span>
               </motion.div>

@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import {
   fetchInquiries,
   fetchTestimonials,
@@ -9,10 +10,16 @@ import {
   fetchFaqs
 } from "./actions";
 import AdminClient from "./AdminClient";
+import { isAdminAuthenticated } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
+  // Belt-and-braces check alongside the proxy — see docs/app/guides/authentication.
+  if (!(await isAdminAuthenticated())) {
+    redirect("/admin/login?redirect=%2Fadmin");
+  }
+
   const [
     inquiriesRes,
     testimonialsRes,

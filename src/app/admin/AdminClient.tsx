@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -21,10 +22,6 @@ import {
   Mail,
   User,
   ExternalLink,
-  Lock,
-  Eye,
-  EyeOff,
-  AlertCircle,
   Database,
   Info
 } from "lucide-react";
@@ -41,15 +38,14 @@ import {
   updateBlog,
   deleteBlog,
   updateSiteContent,
-  fetchBookings,
   updateBookingStatus,
   deleteBooking,
-  fetchSubscribers,
   deleteSubscriber,
   sendBroadcastEmail,
   saveFaq,
   deleteFaq
 } from "./actions";
+import { logout } from "./login/actions";
 
 // Default dummy data if database is empty or not configured
 const initialDummyInquiries = [
@@ -235,7 +231,7 @@ const ImageUploadButton = ({ onUploadSuccess }: { onUploadSuccess: (url: string)
       } else {
         alert("Upload failed: " + data.error);
       }
-    } catch (err) {
+    } catch {
       alert("Upload failed.");
     } finally {
       setUploading(false);
@@ -277,13 +273,6 @@ export default function AdminClient({
   dbConnected,
   dbError
 }: AdminClientProps) {
-  // Authorization State
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [authError, setAuthError] = useState("");
-
   // Tab State
   const [activeTab, setActiveTab] = useState<"dashboard" | "bookings" | "inquiries" | "subscribers" | "testimonials" | "blogs" | "services" | "cms" | "faqs">("dashboard");
 
@@ -361,30 +350,8 @@ export default function AdminClient({
     }
   }, [initialInquiries, initialTestimonials, initialBlogs, initialServices, initialSiteContent, initialBookings, initialSubscribers, initialFaqs, dbConnected]);
 
-  // Auth local check
-  useEffect(() => {
-    const isSaved = localStorage.getItem("msc_admin_auth") === "true";
-    if (isSaved) {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Secure Admin Passkey check
-    if (username === "admin" && password === "RiaAdmin@2026") {
-      setIsAuthenticated(true);
-      localStorage.setItem("msc_admin_auth", "true");
-      showNotify("Authorized successfully", "success");
-    } else {
-      setAuthError("Incorrect administrator credentials.");
-    }
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem("msc_admin_auth");
-    showNotify("Logged out", "info");
+  const handleLogout = async () => {
+    await logout();
   };
 
   const showNotify = (text: string, type: "success" | "error" | "info") => {
@@ -832,171 +799,8 @@ export default function AdminClient({
   // Stats computation
   const totalLeads = inquiriesList.length;
   const uncontactedLeads = inquiriesList.filter(i => !i.isContacted).length;
-  const contactedLeads = inquiriesList.filter(i => i.isContacted).length;
   const totalTestimonials = testimonialsList.length;
   const totalBlogs = blogsList.length;
-
-  // Custom Chart Data: Inquiries by Service Category
-  const getServiceStats = () => {
-    const stats: Record<string, number> = {};
-    inquiriesList.forEach(inq => {
-      const s = inq.service || "Unspecified";
-      stats[s] = (stats[s] || 0) + 1;
-    });
-    return stats;
-  };
-  const serviceStats = getServiceStats();
-
-  if (!isAuthenticated) {
-    return (
-      <div style={{
-        minHeight: "100vh",
-        background: "radial-gradient(circle at 10% 20%, rgba(45, 111, 122, 0.95) 0%, rgba(77, 168, 179, 0.9) 90%)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
-        fontFamily: "var(--font-body)"
-      }}>
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          style={{
-            background: "rgba(255, 255, 255, 0.95)",
-            backdropFilter: "blur(15px)",
-            borderRadius: "var(--radius-lg)",
-            padding: "50px 40px",
-            width: "100%",
-            maxWidth: "460px",
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-            textAlign: "center"
-          }}
-        >
-          <div style={{
-            width: "70px",
-            height: "70px",
-            borderRadius: "50%",
-            background: "rgba(77, 168, 179, 0.1)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            margin: "0 auto 20px auto"
-          }}>
-            <Lock size={32} style={{ color: "var(--color-deep-teal)" }} />
-          </div>
-
-          <h2 style={{ color: "var(--color-deep-teal)", marginBottom: "8px", fontSize: "1.8rem" }}>Admin Gateway</h2>
-          <p style={{ color: "var(--text-secondary)", marginBottom: "30px", fontSize: "0.95rem" }}>
-            Welcome back. Please input your secure administrator credentials.
-          </p>
-
-          <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-            <div style={{ position: "relative", textAlign: "left" }}>
-              <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>
-                ADMIN USERNAME
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter admin username..."
-                style={{
-                  width: "100%",
-                  padding: "14px 16px",
-                  borderRadius: "var(--radius-sm)",
-                  border: "1px solid var(--border-color)",
-                  outline: "none",
-                  fontSize: "1rem",
-                  color: "var(--text-primary)",
-                  backgroundColor: "#FCFAF6",
-                  transition: "var(--transition-smooth)"
-                }}
-                autoFocus
-              />
-            </div>
-
-            <div style={{ position: "relative", textAlign: "left" }}>
-              <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>
-                ADMIN PASSWORD
-              </label>
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter admin password..."
-                style={{
-                  width: "100%",
-                  padding: "14px 45px 14px 16px",
-                  borderRadius: "var(--radius-sm)",
-                  border: "1px solid var(--border-color)",
-                  outline: "none",
-                  fontSize: "1rem",
-                  color: "var(--text-primary)",
-                  backgroundColor: "#FCFAF6",
-                  transition: "var(--transition-smooth)"
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  right: "15px",
-                  top: "39px",
-                  border: "none",
-                  background: "none",
-                  cursor: "pointer",
-                  color: "var(--text-secondary)"
-                }}
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-
-            {authError && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                style={{
-                  background: "#FDF2F2",
-                  color: "#9B1C1C",
-                  padding: "10px 14px",
-                  borderRadius: "var(--radius-sm)",
-                  fontSize: "0.85rem",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  border: "1px solid #FDE8E8"
-                }}
-              >
-                <AlertCircle size={16} />
-                <span>{authError}</span>
-              </motion.div>
-            )}
-
-            <button
-              type="submit"
-              className="btn btn-primary"
-              style={{
-                width: "100%",
-                padding: "14px 0",
-                justifyContent: "center",
-                borderRadius: "var(--radius-sm)",
-                fontSize: "1.05rem"
-              }}
-            >
-              Sign In to Panel
-            </button>
-          </form>
-
-          <p style={{ marginTop: "30px", fontSize: "0.8rem", color: "var(--text-secondary)" }}>
-            Tip: Try using default credentials <code style={{ background: "#eee", padding: "2px 6px", borderRadius: "3px" }}>admin123</code>
-          </p>
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div style={{
@@ -1177,18 +981,20 @@ export default function AdminClient({
 
           <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
             {isDemoMode ? (
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                backgroundColor: "rgba(217, 123, 102, 0.1)",
-                color: "var(--color-muted-coral)",
-                padding: "8px 16px",
-                borderRadius: "50px",
-                fontSize: "0.85rem",
-                fontWeight: 600,
-                border: "1px solid rgba(217, 123, 102, 0.2)"
-              }}>
+              <div
+                title={dbError || undefined}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  backgroundColor: "rgba(217, 123, 102, 0.1)",
+                  color: "var(--color-muted-coral)",
+                  padding: "8px 16px",
+                  borderRadius: "50px",
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  border: "1px solid rgba(217, 123, 102, 0.2)"
+                }}>
                 <Info size={16} />
                 <span>Demo Sandbox Mode (Database Unconnected)</span>
               </div>
@@ -2000,7 +1806,7 @@ export default function AdminClient({
                   }}>
                     <div>
                       <p style={{ fontStyle: "italic", color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: "1.6", marginBottom: "20px" }}>
-                        "{t.text}"
+                        &quot;{t.text}&quot;
                       </p>
                     </div>
 
@@ -2050,7 +1856,7 @@ export default function AdminClient({
                     flexDirection: "column"
                   }}>
                     <div style={{ height: "160px", backgroundColor: "#ddd", position: "relative" }}>
-                      <img src={b.image || "/images/img_5289_1.jpg"} alt={b.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      <Image src={b.image || "/images/img_5289_1.jpg"} alt={b.title} fill style={{ objectFit: "cover" }} />
                       <span style={{ position: "absolute", top: "15px", left: "15px", backgroundColor: "var(--color-deep-teal)", color: "white", padding: "4px 10px", borderRadius: "30px", fontSize: "0.7rem", fontWeight: "bold", textTransform: "uppercase" }}>
                         {b.tag || "Counselling"}
                       </span>
