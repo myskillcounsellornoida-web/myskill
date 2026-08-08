@@ -2,7 +2,7 @@
    DESIGN SYSTEM & VARIABLES (Ria Jain - My Skill Counsellor)
    Inspired by rich artistic & editorial aesthetic (Mrinalini Art palette)
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Space+Grotesk:wght@400;500;600;700&family=La+Belle+Aurore&family=Nunito:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Space+Grotesk:wght@400;500;600;700&family=La+Belle+Aurore&family=Nunito:ital,wght@0,300..900;1,300..900&family=Poppins:wght@500;600;700&display=swap');
 
 :root {
     /* Rich Warm Palette (Mrinalini Art Inspired) */
@@ -28,6 +28,7 @@
     --font-sans: 'Space Grotesk', sans-serif;
     --font-cursive: 'La Belle Aurore', cursive;
     --font-body: 'Nunito', sans-serif;
+    --font-poppins: 'Poppins', sans-serif;
     
     /* Transitions & Shadows */
     --transition-smooth: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);

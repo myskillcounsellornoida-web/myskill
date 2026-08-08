@@ -54,10 +54,10 @@ export default function Navbar() {
               <Image src="/assets/logo.png" alt="My Skill Counsellor" fill sizes="46px" style={{ objectFit: 'contain' }} />
             </div>
             <span style={{ lineHeight: 1.05 }}>
-              <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontStyle: 'italic', fontWeight: 700, fontSize: '1.6rem', color: 'var(--color-deep-teal)', letterSpacing: '0.3px' }}>
+              <span style={{ display: 'block', fontFamily: 'var(--font-poppins)', fontWeight: 600, fontSize: '1.4rem', color: 'var(--color-deep-teal)', letterSpacing: '0.2px' }}>
                 My Skill
               </span>
-              <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '0.92rem', color: 'var(--color-deep-teal)', letterSpacing: '3px', textTransform: 'uppercase', marginTop: '1px' }}>
+              <span style={{ display: 'block', fontFamily: 'var(--font-poppins)', fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-deep-teal)', letterSpacing: '2.5px', textTransform: 'uppercase', marginTop: '1px' }}>
                 Counsellor
               </span>
             </span>
