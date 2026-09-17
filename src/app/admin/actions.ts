@@ -18,6 +18,8 @@ import {
   type PreviewPage,
 } from "@/lib/siteContent";
 import { VIDEOS_KEY, parseVideoList } from "@/lib/videos";
+import { CUSTOM_SECTIONS_KEY, parseCustomSections, sectionKey, sectionsForPage } from "@/lib/customSections";
+import { CATEGORY_KEYS, TESTIMONIAL_CATEGORY_MAP_KEY, parseCategories, parseCategoryMap } from "@/lib/categories";
 import { EMAIL_RE, MAX_MANUAL_RECIPIENTS, parseEmailList } from "@/lib/emails";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_key");
@@ -466,7 +468,7 @@ export async function updateSiteContent(key: string, value: string): Promise<Act
   return { success: true, data: { key, value } };
 }
 
-const EDITABLE_KEYS = new Set([...Object.keys(DEFAULT_CONTENT), ...THEME_FIELDS.map((f) => f.key), ...LAYOUT_KEY_LIST, VIDEOS_KEY]);
+const EDITABLE_KEYS = new Set([...Object.keys(DEFAULT_CONTENT), ...THEME_FIELDS.map((f) => f.key), ...LAYOUT_KEY_LIST, VIDEOS_KEY, CUSTOM_SECTIONS_KEY, ...CATEGORY_KEYS]);
 const MAX_CONTENT_LENGTH = 5000;
 const MAX_STRUCTURED_LENGTH = 20000;
 
@@ -475,11 +477,18 @@ const PAGE_BY_LAYOUT_KEY = Object.fromEntries(
 ) as Record<string, PreviewPage>;
 
 // JSON-valued keys are re-serialized from their validated form so junk never reaches the site.
-function normalizeValue(key: string, value: string): string {
+function normalizeValue(key: string, value: string, all: Record<string, string>): string {
   if (value === "") return value;
   if (key === VIDEOS_KEY) return JSON.stringify(parseVideoList(value));
+  if (key === CUSTOM_SECTIONS_KEY) return JSON.stringify(parseCustomSections(value));
+  if (key === TESTIMONIAL_CATEGORY_MAP_KEY) return JSON.stringify(parseCategoryMap(value));
+  if (CATEGORY_KEYS.includes(key)) return JSON.stringify(parseCategories(value));
   const page = PAGE_BY_LAYOUT_KEY[key];
-  if (page) return JSON.stringify(resolveLayout(value, page));
+  if (page) {
+    // Custom section ids must survive layout normalization.
+    const custom = sectionsForPage(parseCustomSections(all[CUSTOM_SECTIONS_KEY] ?? ""), page);
+    return JSON.stringify(resolveLayout(value, page, custom.map((s) => sectionKey(s.id))));
+  }
   return value;
 }
 
@@ -490,17 +499,36 @@ function isEditableKey(key: string): boolean {
 
 // Publishes every pending edit from the live editor in one round-trip.
 // An empty string removes the override so the site falls back to the default.
+async function readStoredValue(key: string): Promise<string> {
+  if (process.env.DATABASE_URL) {
+    try {
+      const rows = await db.select().from(siteContent).where(eq(siteContent.key, key)).limit(1);
+      return rows[0]?.value ?? "";
+    } catch (e) {
+      console.error("DB Error readStoredValue:", e);
+      return "";
+    }
+  }
+  return getLocalData().siteContent[key] ?? "";
+}
+
 export async function updateSiteContentBatch(entries: Record<string, string>): Promise<ActionResult<number>> {
   if (!(await requireAdmin())) return { success: false, data: 0, error: UNAUTHORIZED_ERROR };
 
   const raw = Object.entries(entries).filter(([key, value]) => isEditableKey(key) && typeof value === "string");
   const tooLong = raw.find(([key, value]) =>
-    value.length > (key === VIDEOS_KEY || PAGE_BY_LAYOUT_KEY[key] ? MAX_STRUCTURED_LENGTH : MAX_CONTENT_LENGTH)
+    value.length > (key === VIDEOS_KEY || key === CUSTOM_SECTIONS_KEY || CATEGORY_KEYS.includes(key) || PAGE_BY_LAYOUT_KEY[key] ? MAX_STRUCTURED_LENGTH : MAX_CONTENT_LENGTH)
   );
   if (tooLong) {
     return { success: false, data: 0, error: `"${tooLong[0]}" is too long.` };
   }
-  const pairs = raw.map(([key, value]) => [key, normalizeValue(key, value)] as const);
+  // Layout normalization needs the current section list: from this publish when
+  // it is part of it, otherwise from what is already stored.
+  const merged: Record<string, string> = Object.fromEntries(raw);
+  if (!(CUSTOM_SECTIONS_KEY in merged) && raw.some(([key]) => PAGE_BY_LAYOUT_KEY[key])) {
+    merged[CUSTOM_SECTIONS_KEY] = await readStoredValue(CUSTOM_SECTIONS_KEY);
+  }
+  const pairs = raw.map(([key, value]) => [key, normalizeValue(key, value, merged)] as const);
 
   try {
     if (process.env.DATABASE_URL) {

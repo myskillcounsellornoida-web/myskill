@@ -120,8 +120,8 @@ export const layoutKey = (page: PreviewPage) => LAYOUT_KEYS[page];
 export const LAYOUT_KEY_LIST = Object.values(LAYOUT_KEYS);
 
 /** Stored order + visibility, tolerant of unknown/missing ids (new sections are appended). */
-export function resolveLayout(raw: string | undefined, page: PreviewPage): SectionState[] {
-  const defs = PAGE_SECTIONS[page];
+export function resolveLayout(raw: string | undefined, page: PreviewPage, extraIds: string[] = []): SectionState[] {
+  const defs = [...PAGE_SECTIONS[page], ...extraIds.map((id) => ({ id, label: id }))];
   const known = new Set(defs.map((d) => d.id));
   const result: SectionState[] = [];
   const seen = new Set<string>();

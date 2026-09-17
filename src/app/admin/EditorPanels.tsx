@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { PAGE_SECTIONS, layoutKey, resolveLayout, type PreviewPage, type SectionState } from "@/lib/siteContent";
 import { MAX_VIDEOS, VIDEOS_KEY, parseVideoList, parseVideoUrl, type VideoEntry } from "@/lib/videos";
+import { MAX_CATEGORIES, VIDEO_CATEGORIES_KEY, parseCategories } from "@/lib/categories";
 
 interface PanelProps {
   draft: Record<string, string>;
@@ -40,10 +41,19 @@ function PanelShell({ icon, title, badge, children, defaultOpen = false }: {
 }
 
 /* ---------------- Page sections: reorder + show/hide ---------------- */
-export function LayoutPanel({ page, draft, setValue, onReveal }: PanelProps & { page: PreviewPage; onReveal: (id: string) => void }) {
+export function LayoutPanel({ page, draft, setValue, onReveal, extra = [] }: PanelProps & {
+  page: PreviewPage;
+  onReveal: (id: string) => void;
+  /** Sections created by the admin, so they can be ordered alongside the built-in ones. */
+  extra?: { id: string; label: string }[];
+}) {
   const key = layoutKey(page);
-  const layout = resolveLayout(draft[key], page);
-  const labels = Object.fromEntries(PAGE_SECTIONS[page].map((d) => [d.id, d.label]));
+  const layout = resolveLayout(draft[key], page, extra.map((e) => e.id));
+  const labels: Record<string, string> = {
+    ...Object.fromEntries(PAGE_SECTIONS[page].map((d) => [d.id, d.label])),
+    ...Object.fromEntries(extra.map((e) => [e.id, e.label])),
+  };
+  const isCustom = (id: string) => extra.some((e) => e.id === id);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
 
@@ -73,6 +83,7 @@ export function LayoutPanel({ page, draft, setValue, onReveal }: PanelProps & { 
             <span className="cms-drag" aria-hidden="true"><i className="fas fa-grip-vertical" /></span>
             <button type="button" className="cms-layout-name" onClick={() => onReveal(s.id)} title="Show in preview">
               {labels[s.id]}
+              {isCustom(s.id) && <span className="cms-tag-yours">yours</span>}
             </button>
             <button type="button" className="cms-icon-btn" aria-label="Move up" disabled={i === 0} onClick={() => save(move(layout, i, i - 1))}>
               <i className="fas fa-arrow-up" />
@@ -106,9 +117,26 @@ export function VideosPanel({ draft, setValue, page }: PanelProps & { page: Prev
   const videos = parseVideoList(draft[VIDEOS_KEY]);
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const save = (next: VideoEntry[]) => setValue(VIDEOS_KEY, next.length ? JSON.stringify(next) : "");
+
+  // Category order is stored separately so renaming or reordering never touches the videos.
+  const categories = parseCategories(draft[VIDEO_CATEGORIES_KEY]);
+  const usedCategories = [...new Set(videos.map((v) => v.category).filter(Boolean) as string[])];
+  const allCategories = [...categories, ...usedCategories.filter((c) => !categories.includes(c))];
+  const saveCategories = (next: string[]) => setValue(VIDEO_CATEGORIES_KEY, next.length ? JSON.stringify(next) : "");
+  const rememberCategory = (name: string) => {
+    const clean = name.trim();
+    if (clean && !allCategories.includes(clean) && allCategories.length < MAX_CATEGORIES) {
+      saveCategories([...allCategories, clean]);
+    }
+  };
+  const setVideoCategory = (index: number, name: string) => {
+    rememberCategory(name);
+    save(videos.map((v, j) => (j === index ? { ...v, category: name.trim() || undefined } : v)));
+  };
 
   const add = (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,7 +153,8 @@ export function VideosPanel({ draft, setValue, page }: PanelProps & { page: Prev
       setError(`You can add up to ${MAX_VIDEOS} videos.`);
       return;
     }
-    save([...videos, { url: url.trim(), title: title.trim() }]);
+    rememberCategory(category);
+    save([...videos, { url: url.trim(), title: title.trim(), category: category.trim() || undefined }]);
     setUrl("");
     setTitle("");
     setError(null);
@@ -159,6 +188,18 @@ export function VideosPanel({ draft, setValue, page }: PanelProps & { page: Prev
           required
         />
         <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title (optional)" aria-label="Video title" maxLength={160} />
+        <input
+          type="text"
+          list="video-category-options"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          placeholder="Category (optional) — type a new one to create it"
+          aria-label="Video category"
+          maxLength={40}
+        />
+        <datalist id="video-category-options">
+          {allCategories.map((c) => <option key={c} value={c} />)}
+        </datalist>
         <button type="submit" className="cms-btn-primary"><i className="fas fa-plus" /> Add video</button>
         {url && !error && (
           <span className={`cms-video-detect ${parseVideoUrl(url) ? "is-ok" : ""}`}>
@@ -169,6 +210,32 @@ export function VideosPanel({ draft, setValue, page }: PanelProps & { page: Prev
         )}
         {error && <span className="cms-video-error">{error}</span>}
       </form>
+
+      {allCategories.length > 0 && (
+        <div className="cms-cat-order">
+          <span className="cms-cat-order-title">Category order (tabs on the website)</span>
+          <ul>
+            {allCategories.map((c, i) => (
+              <li key={c}>
+                <span>{c}</span>
+                <small>{videos.filter((v) => v.category === c).length}</small>
+                <button type="button" className="cms-icon-btn" aria-label={`Move ${c} up`} disabled={i === 0} onClick={() => saveCategories(move(allCategories, i, i - 1))}><i className="fas fa-arrow-up" /></button>
+                <button type="button" className="cms-icon-btn" aria-label={`Move ${c} down`} disabled={i === allCategories.length - 1} onClick={() => saveCategories(move(allCategories, i, i + 1))}><i className="fas fa-arrow-down" /></button>
+                <button
+                  type="button"
+                  className="cms-icon-btn is-danger"
+                  aria-label={`Delete ${c}`}
+                  title="Delete category (videos are kept)"
+                  onClick={() => {
+                    saveCategories(allCategories.filter((x) => x !== c));
+                    save(videos.map((v) => (v.category === c ? { ...v, category: undefined } : v)));
+                  }}
+                ><i className="fas fa-trash" /></button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {videos.length === 0 ? (
         <p className="cms-empty">No videos yet. The Videos section stays hidden on the site until you add one.</p>
@@ -189,6 +256,16 @@ export function VideosPanel({ draft, setValue, page }: PanelProps & { page: Prev
                     maxLength={160}
                     aria-label="Video title"
                     onChange={(e) => save(videos.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)))}
+                  />
+                  <input
+                    type="text"
+                    list="video-category-options"
+                    className="cms-video-cat"
+                    value={v.category ?? ""}
+                    placeholder="No category"
+                    maxLength={40}
+                    aria-label="Video category"
+                    onChange={(e) => setVideoCategory(i, e.target.value)}
                   />
                   <a href={v.url} target="_blank" rel="noopener noreferrer">{v.url}</a>
                 </div>
