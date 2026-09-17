@@ -1,9 +1,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useCms } from "@/components/cms/CmsProvider";
 
 export default function WhatsAppWidget() {
   const pathname = usePathname();
+  const { t } = useCms();
 
   // Hide the floating widget in the admin panels
   if (pathname?.startsWith("/admin")) {
@@ -12,7 +14,7 @@ export default function WhatsAppWidget() {
 
   return (
     <a
-      href="https://wa.me/message/24XQYF3LERXWA1"
+      href={t("whatsapp_url")}
       target="_blank"
       rel="noopener noreferrer"
       className="whatsapp-float"

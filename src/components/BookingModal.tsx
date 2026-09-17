@@ -28,10 +28,9 @@ const TIME_SLOTS = [
 export default function BookingModal({ isOpen, onClose, initialService }: BookingModalProps) {
   const [step, setStep] = useState<number>(1);
   const [selectedService, setSelectedService] = useState<string>(initialService || SERVICES[0].title);
-  // Computed once per mount as a sensible default; a same-day hydration mismatch
-  // at the midnight boundary is harmless and self-corrects on the next render.
+  // Default to tomorrow; the modal only renders client-side after a click.
   const [selectedDate, setSelectedDate] = useState<string>(
-    new Date(Date.now() + 86400000).toISOString().split("T")[0]
+    () => new Date(Date.now() + 86400000).toISOString().split("T")[0]
   );
   const [selectedTime, setSelectedTime] = useState<string>(TIME_SLOTS[0]);
   const [name, setName] = useState<string>("");

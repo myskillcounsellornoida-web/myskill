@@ -1,31 +1,17 @@
-import { fetchSiteContent, fetchServices, fetchTestimonials, fetchFaqs } from "@/app/admin/actions";
+import { fetchTestimonials, fetchFaqs } from "@/app/admin/actions";
 import HomePageClient from "./HomePageClient";
 
+const DEFAULT_TESTIMONIALS = [
+  { name: "Aarav Sharma", role: "Admitted to NYU", text: "Ria completely transformed my application. Her insights on my SOP made all the difference." },
+  { name: "Mrs. Kapoor", role: "Parent", text: "We were overwhelmed with the UK visa process. Ria handled everything smoothly and professionally." },
+  { name: "Simran Kaur", role: "IELTS Band 8", text: "The structured mock interviews and writing evaluations helped me score far above my target." },
+];
+
 export default async function Home() {
-  const [siteContentRes, servicesRes, testimonialsRes, faqsRes] = await Promise.all([
-    fetchSiteContent(),
-    fetchServices(),
-    fetchTestimonials(),
-    fetchFaqs()
-  ]);
+  const [testimonialsRes, faqsRes] = await Promise.all([fetchTestimonials(), fetchFaqs()]);
 
-  const cmsData: Record<string, string> = {};
-  if (siteContentRes.success && siteContentRes.data) {
-    siteContentRes.data.forEach((item: any) => {
-      cmsData[item.key] = item.value;
-    });
-  }
+  const testimonials = testimonialsRes.success && testimonialsRes.data?.length ? testimonialsRes.data : DEFAULT_TESTIMONIALS;
+  const faqs = faqsRes.success && faqsRes.data ? faqsRes.data : [];
 
-  const initialServices = servicesRes.success && servicesRes.data ? servicesRes.data : [];
-  const initialTestimonials = testimonialsRes.success && testimonialsRes.data ? testimonialsRes.data : [];
-  const initialFaqs = faqsRes.success && faqsRes.data ? faqsRes.data : [];
-
-  return (
-    <HomePageClient 
-      initialCmsData={cmsData} 
-      initialServices={initialServices} 
-      initialTestimonials={initialTestimonials} 
-      initialFaqs={initialFaqs}
-    />
-  );
+  return <HomePageClient testimonials={testimonials} faqs={faqs} />;
 }

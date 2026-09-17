@@ -4,9 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { subscribeNewsletter } from "@/app/actions";
+import { Txt, useCms } from "@/components/cms/CmsProvider";
 
 export default function Footer() {
   const pathname = usePathname();
+  const { t } = useCms();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; error?: boolean } | null>(null);
@@ -46,9 +48,7 @@ export default function Footer() {
                </span>
              </span>
           </Link>
-          <p style={{ color: 'var(--color-soft-ivory)', opacity: 0.8, marginBottom: '25px', lineHeight: '1.6' }}>
-            Empowering students with clarity, strategy, and confidence to achieve global university admissions.
-          </p>
+          <Txt k="footer_tagline" as="p" style={{ color: 'var(--color-soft-ivory)', opacity: 0.8, marginBottom: '25px', lineHeight: '1.6' }} />
           
           <form onSubmit={handleSubscribe} className="footer-subscribe-form" style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
             <div className="subscribe-input-group" style={{ display: 'flex', gap: '10px' }}>
@@ -102,23 +102,23 @@ export default function Footer() {
         <div>
           <h4 style={{ color: 'white', fontSize: '1.2rem', marginBottom: '20px', borderBottom: '2px solid var(--color-soft-teal)', paddingBottom: '10px', display: 'inline-block' }}>Get in Touch</h4>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '15px', color: 'var(--color-soft-ivory)', opacity: 0.8 }}>
-            <li><i className="fas fa-envelope" style={{ marginRight: '10px', color: 'var(--color-soft-teal)' }}></i> <a href="mailto:info@myskillcounsellor.com" style={{ color: 'inherit', textDecoration: 'none' }}>info@myskillcounsellor.com</a></li>
-            <li><i className="fab fa-whatsapp" style={{ marginRight: '10px', color: 'var(--color-soft-teal)' }}></i> +91 9990004878</li>
-            <li><i className="fas fa-map-marker-alt" style={{ marginRight: '10px', color: 'var(--color-soft-teal)' }}></i> Noida, India</li>
+            <li><i className="fas fa-envelope" style={{ marginRight: '10px', color: 'var(--color-soft-teal)' }}></i> <a href={`mailto:${t("contact_email")}`} style={{ color: 'inherit', textDecoration: 'none' }}><Txt k="contact_email" /></a></li>
+            <li><i className="fab fa-whatsapp" style={{ marginRight: '10px', color: 'var(--color-soft-teal)' }}></i> <a href={`tel:${t("contact_phone").replace(/\s/g, "")}`} style={{ color: 'inherit', textDecoration: 'none' }}><Txt k="contact_phone" /></a></li>
+            <li><i className="fas fa-map-marker-alt" style={{ marginRight: '10px', color: 'var(--color-soft-teal)' }}></i> <Txt k="contact_location" /></li>
           </ul>
           
           {/* Social Icons */}
           <div style={{ marginTop: '25px', display: 'flex', gap: '15px' }}>
-            <a href="https://www.linkedin.com/in/riajain26" target="_blank" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-linkedin-in"></i></a>
-            <a href="https://wa.me/message/24XQYF3LERXWA1" target="_blank" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-whatsapp"></i></a>
-            <a href="https://instagram.com" target="_blank" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-instagram"></i></a>
+            <a href={t("linkedin_url")} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="footer-social" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-linkedin-in"></i></a>
+            <a href={t("whatsapp_url")} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="footer-social" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-whatsapp"></i></a>
+            <a href={t("instagram_url")} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="footer-social" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-instagram"></i></a>
           </div>
         </div>
 
       </div>
 
       <div className="container footer-bottom" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
-        <p>&copy; {new Date().getFullYear()} My Skill Counsellor. All Rights Reserved.</p>
+        <p>{t("footer_copyright").trim().startsWith("©") ? null : <>&copy; {new Date().getFullYear()} </>}<Txt k="footer_copyright" /></p>
         <div style={{ display: 'flex', gap: '20px' }}>
             <Link href="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</Link>
             <Link href="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms of Service</Link>

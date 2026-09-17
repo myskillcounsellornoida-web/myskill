@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { getLocalData, saveLocalData } from "@/db/localStore";
 import { Resend } from "resend";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
+import { DEFAULT_CONTENT, THEME_FIELDS, COLOR_SUFFIX } from "@/lib/siteContent";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_key");
 
@@ -48,7 +49,8 @@ export async function toggleInquiryContacted(id: number, isContacted: boolean): 
         .where(eq(inquiries.id, id))
         .returning();
       revalidatePath("/admin");
-      revalidatePath("/adminria");      return { success: true, data: res };
+      revalidatePath("/adminria");
+      return { success: true, data: res };
     } catch (e: any) {
       console.error("DB Error toggleInquiryContacted:", e);
       return { success: false, data: null, error: e.message };
@@ -59,7 +61,8 @@ export async function toggleInquiryContacted(id: number, isContacted: boolean): 
   local.inquiries = local.inquiries.map(inq => inq.id === id ? { ...inq, isContacted } : inq);
   saveLocalData(local);
   revalidatePath("/admin");
-  revalidatePath("/adminria");  return { success: true, data: local.inquiries };
+  revalidatePath("/adminria");
+  return { success: true, data: local.inquiries };
 }
 
 export async function deleteInquiry(id: number): Promise<ActionResult> {
@@ -70,7 +73,8 @@ export async function deleteInquiry(id: number): Promise<ActionResult> {
         .where(eq(inquiries.id, id))
         .returning();
       revalidatePath("/admin");
-      revalidatePath("/adminria");      return { success: true, data: res };
+      revalidatePath("/adminria");
+      return { success: true, data: res };
     } catch (e: any) {
       console.error("DB Error deleteInquiry:", e);
       return { success: false, data: null, error: e.message };
@@ -81,7 +85,8 @@ export async function deleteInquiry(id: number): Promise<ActionResult> {
   local.inquiries = local.inquiries.filter(inq => inq.id !== id);
   saveLocalData(local);
   revalidatePath("/admin");
-  revalidatePath("/adminria");  return { success: true, data: local.inquiries };
+  revalidatePath("/adminria");
+  return { success: true, data: local.inquiries };
 }
 
 /* ==========================================
@@ -110,7 +115,8 @@ export async function createTestimonial(name: string, role: string, text: string
         .values({ name, role, text })
         .returning();
       revalidatePath("/admin");
-      revalidatePath("/adminria");      revalidatePath("/testimonials");
+      revalidatePath("/adminria");
+      revalidatePath("/testimonials");
       revalidatePath("/", "layout");
       return { success: true, data: res };
     } catch (e: any) {
@@ -124,7 +130,8 @@ export async function createTestimonial(name: string, role: string, text: string
   local.testimonials = [newT, ...local.testimonials];
   saveLocalData(local);
   revalidatePath("/admin");
-  revalidatePath("/adminria");  revalidatePath("/testimonials");
+  revalidatePath("/adminria");
+  revalidatePath("/testimonials");
   revalidatePath("/", "layout");
   return { success: true, data: newT };
 }
@@ -138,7 +145,8 @@ export async function updateTestimonial(id: number, name: string, role: string, 
         .where(eq(testimonials.id, id))
         .returning();
       revalidatePath("/admin");
-      revalidatePath("/adminria");      revalidatePath("/testimonials");
+      revalidatePath("/adminria");
+      revalidatePath("/testimonials");
       revalidatePath("/", "layout");
       return { success: true, data: res };
     } catch (e: any) {
@@ -151,7 +159,8 @@ export async function updateTestimonial(id: number, name: string, role: string, 
   local.testimonials = local.testimonials.map(t => t.id === id ? { ...t, name, role, text } : t);
   saveLocalData(local);
   revalidatePath("/admin");
-  revalidatePath("/adminria");  revalidatePath("/testimonials");
+  revalidatePath("/adminria");
+  revalidatePath("/testimonials");
   revalidatePath("/", "layout");
   return { success: true, data: local.testimonials };
 }
@@ -164,7 +173,8 @@ export async function deleteTestimonial(id: number): Promise<ActionResult> {
         .where(eq(testimonials.id, id))
         .returning();
       revalidatePath("/admin");
-      revalidatePath("/adminria");      revalidatePath("/testimonials");
+      revalidatePath("/adminria");
+      revalidatePath("/testimonials");
       revalidatePath("/", "layout");
       return { success: true, data: res };
     } catch (e: any) {
@@ -177,7 +187,8 @@ export async function deleteTestimonial(id: number): Promise<ActionResult> {
   local.testimonials = local.testimonials.filter(t => t.id !== id);
   saveLocalData(local);
   revalidatePath("/admin");
-  revalidatePath("/adminria");  revalidatePath("/testimonials");
+  revalidatePath("/adminria");
+  revalidatePath("/testimonials");
   revalidatePath("/", "layout");
   return { success: true, data: local.testimonials };
 }
@@ -208,7 +219,8 @@ export async function createService(title: string, description: string, icon: st
         .values({ title, description, icon })
         .returning();
       revalidatePath("/admin");
-      revalidatePath("/adminria");      revalidatePath("/services");
+      revalidatePath("/adminria");
+      revalidatePath("/services");
       revalidatePath("/", "layout");
       return { success: true, data: res };
     } catch (e: any) {
@@ -222,7 +234,8 @@ export async function createService(title: string, description: string, icon: st
   local.services = [newS, ...local.services];
   saveLocalData(local);
   revalidatePath("/admin");
-  revalidatePath("/adminria");  revalidatePath("/services");
+  revalidatePath("/adminria");
+  revalidatePath("/services");
   revalidatePath("/", "layout");
   return { success: true, data: newS };
 }
@@ -236,7 +249,8 @@ export async function updateService(id: number, title: string, description: stri
         .where(eq(services.id, id))
         .returning();
       revalidatePath("/admin");
-      revalidatePath("/adminria");      revalidatePath("/services");
+      revalidatePath("/adminria");
+      revalidatePath("/services");
       revalidatePath("/", "layout");
       return { success: true, data: res };
     } catch (e: any) {
@@ -249,7 +263,8 @@ export async function updateService(id: number, title: string, description: stri
   local.services = local.services.map(s => s.id === id ? { ...s, title, description, icon } : s);
   saveLocalData(local);
   revalidatePath("/admin");
-  revalidatePath("/adminria");  revalidatePath("/services");
+  revalidatePath("/adminria");
+  revalidatePath("/services");
   revalidatePath("/", "layout");
   return { success: true, data: local.services };
 }
@@ -262,7 +277,8 @@ export async function deleteService(id: number): Promise<ActionResult> {
         .where(eq(services.id, id))
         .returning();
       revalidatePath("/admin");
-      revalidatePath("/adminria");      revalidatePath("/services");
+      revalidatePath("/adminria");
+      revalidatePath("/services");
       revalidatePath("/", "layout");
       return { success: true, data: res };
     } catch (e: any) {
@@ -275,7 +291,8 @@ export async function deleteService(id: number): Promise<ActionResult> {
   local.services = local.services.filter(s => s.id !== id);
   saveLocalData(local);
   revalidatePath("/admin");
-  revalidatePath("/adminria");  revalidatePath("/services");
+  revalidatePath("/adminria");
+  revalidatePath("/services");
   revalidatePath("/", "layout");
   return { success: true, data: local.services };
 }
@@ -306,7 +323,8 @@ export async function createBlog(title: string, slug: string, content: string, i
         .values({ title, slug, content, image, tag, readTime })
         .returning();
       revalidatePath("/admin");
-      revalidatePath("/adminria");      revalidatePath("/blog");
+      revalidatePath("/adminria");
+      revalidatePath("/blog");
       revalidatePath("/", "layout");
       return { success: true, data: res };
     } catch (e: any) {
@@ -320,7 +338,8 @@ export async function createBlog(title: string, slug: string, content: string, i
   local.blogs = [newB, ...local.blogs];
   saveLocalData(local);
   revalidatePath("/admin");
-  revalidatePath("/adminria");  revalidatePath("/blog");
+  revalidatePath("/adminria");
+  revalidatePath("/blog");
   revalidatePath("/", "layout");
   return { success: true, data: newB };
 }
@@ -334,7 +353,8 @@ export async function updateBlog(id: number, title: string, slug: string, conten
         .where(eq(blogs.id, id))
         .returning();
       revalidatePath("/admin");
-      revalidatePath("/adminria");      revalidatePath("/blog");
+      revalidatePath("/adminria");
+      revalidatePath("/blog");
       revalidatePath("/", "layout");
       return { success: true, data: res };
     } catch (e: any) {
@@ -347,7 +367,8 @@ export async function updateBlog(id: number, title: string, slug: string, conten
   local.blogs = local.blogs.map(b => b.id === id ? { ...b, title, slug, content, image, tag, readTime } : b);
   saveLocalData(local);
   revalidatePath("/admin");
-  revalidatePath("/adminria");  revalidatePath("/blog");
+  revalidatePath("/adminria");
+  revalidatePath("/blog");
   revalidatePath("/", "layout");
   return { success: true, data: local.blogs };
 }
@@ -360,7 +381,8 @@ export async function deleteBlog(id: number): Promise<ActionResult> {
         .where(eq(blogs.id, id))
         .returning();
       revalidatePath("/admin");
-      revalidatePath("/adminria");      revalidatePath("/blog");
+      revalidatePath("/adminria");
+      revalidatePath("/blog");
       revalidatePath("/", "layout");
       return { success: true, data: res };
     } catch (e: any) {
@@ -373,7 +395,8 @@ export async function deleteBlog(id: number): Promise<ActionResult> {
   local.blogs = local.blogs.filter(b => b.id !== id);
   saveLocalData(local);
   revalidatePath("/admin");
-  revalidatePath("/adminria");  revalidatePath("/blog");
+  revalidatePath("/adminria");
+  revalidatePath("/blog");
   revalidatePath("/", "layout");
   return { success: true, data: local.blogs };
 }
@@ -414,7 +437,8 @@ export async function updateSiteContent(key: string, value: string): Promise<Act
           .returning();
       }
       revalidatePath("/admin");
-      revalidatePath("/adminria");      revalidatePath("/", "layout");
+      revalidatePath("/adminria");
+      revalidatePath("/", "layout");
       return { success: true, data: res };
     } catch (e: any) {
       console.error("DB Error updateSiteContent:", e);
@@ -426,8 +450,57 @@ export async function updateSiteContent(key: string, value: string): Promise<Act
   local.siteContent[key] = value;
   saveLocalData(local);
   revalidatePath("/admin");
-  revalidatePath("/adminria");  revalidatePath("/", "layout");
+  revalidatePath("/adminria");
+  revalidatePath("/", "layout");
   return { success: true, data: { key, value } };
+}
+
+const EDITABLE_KEYS = new Set([...Object.keys(DEFAULT_CONTENT), ...THEME_FIELDS.map((f) => f.key)]);
+const MAX_CONTENT_LENGTH = 5000;
+
+function isEditableKey(key: string): boolean {
+  const base = key.endsWith(COLOR_SUFFIX) ? key.slice(0, -COLOR_SUFFIX.length) : key;
+  return EDITABLE_KEYS.has(base);
+}
+
+// Publishes every pending edit from the live editor in one round-trip.
+// An empty string removes the override so the site falls back to the default.
+export async function updateSiteContentBatch(entries: Record<string, string>): Promise<ActionResult<number>> {
+  if (!(await requireAdmin())) return { success: false, data: 0, error: UNAUTHORIZED_ERROR };
+
+  const pairs = Object.entries(entries).filter(([key, value]) => isEditableKey(key) && typeof value === "string");
+  if (pairs.some(([, value]) => value.length > MAX_CONTENT_LENGTH)) {
+    return { success: false, data: 0, error: `Each field must be under ${MAX_CONTENT_LENGTH} characters.` };
+  }
+
+  try {
+    if (process.env.DATABASE_URL) {
+      await db.transaction(async (tx) => {
+        for (const [key, value] of pairs) {
+          if (value === "") {
+            await tx.delete(siteContent).where(eq(siteContent.key, key));
+          } else {
+            await tx.insert(siteContent)
+              .values({ key, value })
+              .onConflictDoUpdate({ target: siteContent.key, set: { value, updatedAt: new Date() } });
+          }
+        }
+      });
+    } else {
+      const local = getLocalData();
+      for (const [key, value] of pairs) {
+        if (value === "") delete local.siteContent[key];
+        else local.siteContent[key] = value;
+      }
+      saveLocalData(local);
+    }
+  } catch (e: any) {
+    console.error("Error updateSiteContentBatch:", e);
+    return { success: false, data: 0, error: e.message };
+  }
+
+  revalidatePath("/", "layout");
+  return { success: true, data: pairs.length };
 }
 
 /* ==========================================
@@ -665,7 +738,8 @@ export async function fetchFaqs(): Promise<ActionResult> {
       return { success: false, data: [], error: e.message };
     }
   }
-  return { success: true, data: [] };
+  const local = getLocalData();
+  return { success: true, data: local.faqs || [] };
 }
 
 export async function saveFaq(data: any): Promise<ActionResult> {
@@ -679,21 +753,36 @@ export async function saveFaq(data: any): Promise<ActionResult> {
           .returning();
         revalidatePath("/admin");
         revalidatePath("/adminria");
-        revalidatePath("/", "layout");        return { success: true, data: res[0] };
+        revalidatePath("/", "layout");
+      return { success: true, data: res[0] };
       } else {
         const res = await db.insert(faqs)
           .values({ question: data.question, answer: data.answer, category: data.category })
           .returning();
         revalidatePath("/admin");
         revalidatePath("/adminria");
-        revalidatePath("/", "layout");        return { success: true, data: res[0] };
+        revalidatePath("/", "layout");
+      return { success: true, data: res[0] };
       }
     } catch (e: any) {
       console.error("DB Error saveFaq:", e);
       return { success: false, data: null, error: e.message };
     }
   }
-  return { success: false, data: null, error: "Database not connected." };
+
+  const local = getLocalData();
+  if (!local.faqs) local.faqs = [];
+  const faq = { question: data.question, answer: data.answer, category: data.category ?? null };
+  let saved;
+  if (data.id) {
+    local.faqs = local.faqs.map(f => f.id === data.id ? (saved = { ...f, ...faq }) : f);
+  } else {
+    saved = { id: Date.now(), ...faq, createdAt: new Date().toISOString() };
+    local.faqs = [saved, ...local.faqs];
+  }
+  saveLocalData(local);
+  revalidatePath("/", "layout");
+  return saved ? { success: true, data: saved } : { success: false, data: null, error: "FAQ not found." };
 }
 
 export async function deleteFaq(id: number): Promise<ActionResult> {
@@ -705,12 +794,18 @@ export async function deleteFaq(id: number): Promise<ActionResult> {
         .returning();
       revalidatePath("/admin");
       revalidatePath("/adminria");
-      revalidatePath("/", "layout");      return { success: true, data: res[0] };
+      revalidatePath("/", "layout");
+      return { success: true, data: res[0] };
     } catch (e: any) {
       console.error("DB Error deleteFaq:", e);
       return { success: false, data: null, error: e.message };
     }
   }
-  return { success: false, data: null, error: "Database not connected." };
+
+  const local = getLocalData();
+  local.faqs = (local.faqs || []).filter(f => f.id !== id);
+  saveLocalData(local);
+  revalidatePath("/", "layout");
+  return { success: true, data: null };
 }
 
