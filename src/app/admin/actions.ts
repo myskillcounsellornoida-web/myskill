@@ -7,7 +7,18 @@ import { revalidatePath } from "next/cache";
 import { getLocalData, saveLocalData } from "@/db/localStore";
 import { Resend } from "resend";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
-import { DEFAULT_CONTENT, THEME_FIELDS, COLOR_SUFFIX } from "@/lib/siteContent";
+import {
+  DEFAULT_CONTENT,
+  THEME_FIELDS,
+  COLOR_SUFFIX,
+  LAYOUT_KEY_LIST,
+  PAGE_SECTIONS,
+  layoutKey,
+  resolveLayout,
+  type PreviewPage,
+} from "@/lib/siteContent";
+import { VIDEOS_KEY, parseVideoList } from "@/lib/videos";
+import { EMAIL_RE, MAX_MANUAL_RECIPIENTS, parseEmailList } from "@/lib/emails";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_key");
 
@@ -455,8 +466,22 @@ export async function updateSiteContent(key: string, value: string): Promise<Act
   return { success: true, data: { key, value } };
 }
 
-const EDITABLE_KEYS = new Set([...Object.keys(DEFAULT_CONTENT), ...THEME_FIELDS.map((f) => f.key)]);
+const EDITABLE_KEYS = new Set([...Object.keys(DEFAULT_CONTENT), ...THEME_FIELDS.map((f) => f.key), ...LAYOUT_KEY_LIST, VIDEOS_KEY]);
 const MAX_CONTENT_LENGTH = 5000;
+const MAX_STRUCTURED_LENGTH = 20000;
+
+const PAGE_BY_LAYOUT_KEY = Object.fromEntries(
+  (Object.keys(PAGE_SECTIONS) as PreviewPage[]).map((page) => [layoutKey(page), page])
+) as Record<string, PreviewPage>;
+
+// JSON-valued keys are re-serialized from their validated form so junk never reaches the site.
+function normalizeValue(key: string, value: string): string {
+  if (value === "") return value;
+  if (key === VIDEOS_KEY) return JSON.stringify(parseVideoList(value));
+  const page = PAGE_BY_LAYOUT_KEY[key];
+  if (page) return JSON.stringify(resolveLayout(value, page));
+  return value;
+}
 
 function isEditableKey(key: string): boolean {
   const base = key.endsWith(COLOR_SUFFIX) ? key.slice(0, -COLOR_SUFFIX.length) : key;
@@ -468,10 +493,14 @@ function isEditableKey(key: string): boolean {
 export async function updateSiteContentBatch(entries: Record<string, string>): Promise<ActionResult<number>> {
   if (!(await requireAdmin())) return { success: false, data: 0, error: UNAUTHORIZED_ERROR };
 
-  const pairs = Object.entries(entries).filter(([key, value]) => isEditableKey(key) && typeof value === "string");
-  if (pairs.some(([, value]) => value.length > MAX_CONTENT_LENGTH)) {
-    return { success: false, data: 0, error: `Each field must be under ${MAX_CONTENT_LENGTH} characters.` };
+  const raw = Object.entries(entries).filter(([key, value]) => isEditableKey(key) && typeof value === "string");
+  const tooLong = raw.find(([key, value]) =>
+    value.length > (key === VIDEOS_KEY || PAGE_BY_LAYOUT_KEY[key] ? MAX_STRUCTURED_LENGTH : MAX_CONTENT_LENGTH)
+  );
+  if (tooLong) {
+    return { success: false, data: 0, error: `"${tooLong[0]}" is too long.` };
   }
+  const pairs = raw.map(([key, value]) => [key, normalizeValue(key, value)] as const);
 
   try {
     if (process.env.DATABASE_URL) {
@@ -621,106 +650,138 @@ export async function deleteSubscriber(id: number): Promise<ActionResult> {
    BROADCAST EMAIL ACTIONS
    ========================================== */
 
+const BATCH_SIZE = 100; // Resend batch limit
+
+function wrapEmailBody(bodyHtml: string): string {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+      ${bodyHtml}
+      <div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px; color: #64748b; font-size: 12px; text-align: center;">
+        <p>Sent by <strong>My Skill Counsellor</strong> | Career & Study Abroad Guidance</p>
+        <p>Noida, India | info@myskillcounsellor.com</p>
+      </div>
+    </div>
+  `;
+}
+
+/** Every known contact, for the "pick recipients" list in the mailer. */
+export async function fetchContacts(): Promise<ActionResult<{ email: string; name: string; source: string }[]>> {
+  if (!(await requireAdmin())) return { success: false, data: [], error: UNAUTHORIZED_ERROR };
+
+  const rows: { email: string; name: string; source: string }[] = [];
+  const push = (email: unknown, name: unknown, source: string) => {
+    if (typeof email === "string" && EMAIL_RE.test(email.trim().toLowerCase())) {
+      rows.push({ email: email.trim().toLowerCase(), name: typeof name === "string" ? name : "", source });
+    }
+  };
+
+  try {
+    if (process.env.DATABASE_URL) {
+      const [subs, bks, inqs] = await Promise.all([
+        db.select({ email: subscribers.email, name: subscribers.name }).from(subscribers),
+        db.select({ email: bookings.email, name: bookings.name }).from(bookings),
+        db.select({ email: inquiries.email, name: inquiries.name }).from(inquiries),
+      ]);
+      subs.forEach((r) => push(r.email, r.name, "Subscriber"));
+      bks.forEach((r) => push(r.email, r.name, "Booking"));
+      inqs.forEach((r) => push(r.email, r.name, "Lead"));
+    } else {
+      const local = getLocalData();
+      (local.subscribers || []).forEach((r) => push(r.email, r.name, "Subscriber"));
+      (local.bookings || []).forEach((r) => push(r.email, r.name, "Booking"));
+      (local.inquiries || []).forEach((r) => push(r.email, r.name, "Lead"));
+    }
+  } catch (e: any) {
+    console.error("DB Error fetchContacts:", e);
+    return { success: false, data: [], error: e.message };
+  }
+
+  // Keep the first entry per address but remember every source it came from.
+  const byEmail = new Map<string, { email: string; name: string; source: string }>();
+  for (const row of rows) {
+    const existing = byEmail.get(row.email);
+    if (!existing) byEmail.set(row.email, row);
+    else {
+      if (!existing.name && row.name) existing.name = row.name;
+      if (!existing.source.includes(row.source)) existing.source += `, ${row.source}`;
+    }
+  }
+  return { success: true, data: [...byEmail.values()].sort((a, b) => a.email.localeCompare(b.email)) };
+}
+
 export async function sendBroadcastEmail(
   subject: string,
   bodyHtml: string,
   targetAudience: "subscribers" | "bookings" | "inquiries" | "all" | "custom",
-  customEmail?: string
+  customEmails?: string | string[]
 ): Promise<ActionResult<{ total: number; sent: number; failed: number }>> {
+  const empty = { total: 0, sent: 0, failed: 0 };
   if (!(await requireAdmin())) {
-    return { success: false, data: { total: 0, sent: 0, failed: 0 }, error: UNAUTHORIZED_ERROR };
+    return { success: false, data: empty, error: UNAUTHORIZED_ERROR };
   }
   if (!subject.trim() || !bodyHtml.trim()) {
-    return { success: false, data: { total: 0, sent: 0, failed: 0 }, error: "Subject and Body content are required." };
+    return { success: false, data: empty, error: "Subject and Body content are required." };
   }
-
   if (!process.env.RESEND_API_KEY) {
-    return { success: false, data: { total: 0, sent: 0, failed: 0 }, error: "RESEND_API_KEY is missing in environment." };
+    return { success: false, data: empty, error: "RESEND_API_KEY is missing in environment." };
   }
 
   try {
     let emailList: string[] = [];
 
     if (targetAudience === "custom") {
-      if (customEmail && customEmail.includes("@")) {
-        emailList = [customEmail.trim()];
+      emailList = parseEmailList(customEmails ?? []);
+      if (emailList.length > MAX_MANUAL_RECIPIENTS) {
+        return { success: false, data: empty, error: `Please send to at most ${MAX_MANUAL_RECIPIENTS} addresses at a time.` };
       }
     } else {
-      // Gather emails from DB or localStore based on targetAudience
-      let subEmails: string[] = [];
-      let bookEmails: string[] = [];
-      let inqEmails: string[] = [];
-
-      if (process.env.DATABASE_URL) {
-        if (targetAudience === "subscribers" || targetAudience === "all") {
-          const subs = await db.select({ email: subscribers.email }).from(subscribers);
-          subEmails = subs.map(s => s.email);
-        }
-        if (targetAudience === "bookings" || targetAudience === "all") {
-          const bks = await db.select({ email: bookings.email }).from(bookings);
-          bookEmails = bks.map(b => b.email);
-        }
-        if (targetAudience === "inquiries" || targetAudience === "all") {
-          const inqs = await db.select({ email: inquiries.email }).from(inquiries);
-          inqEmails = inqs.map(i => i.email);
-        }
+      const contactsRes = await fetchContacts();
+      if (!contactsRes.success) {
+        return { success: false, data: empty, error: contactsRes.error };
       }
-
-      // Merge with localStore if any
-      const local = getLocalData();
-      if (targetAudience === "subscribers" || targetAudience === "all") {
-        subEmails = [...subEmails, ...(local.subscribers || []).map(s => s.email)];
-      }
-      if (targetAudience === "bookings" || targetAudience === "all") {
-        bookEmails = [...bookEmails, ...(local.bookings || []).map(b => b.email)];
-      }
-      if (targetAudience === "inquiries" || targetAudience === "all") {
-        inqEmails = [...inqEmails, ...(local.inquiries || []).map(i => i.email)];
-      }
-
-      // Deduplicate emails & sanitize
-      emailList = Array.from(
-        new Set([...subEmails, ...bookEmails, ...inqEmails].map(e => e?.trim().toLowerCase()))
-      ).filter(e => e && e.includes("@"));
+      const wanted =
+        targetAudience === "subscribers" ? "Subscriber" :
+        targetAudience === "bookings" ? "Booking" :
+        targetAudience === "inquiries" ? "Lead" : null;
+      emailList = contactsRes.data
+        .filter((c) => !wanted || c.source.includes(wanted))
+        .map((c) => c.email);
     }
 
     if (emailList.length === 0) {
-      return { success: false, data: { total: 0, sent: 0, failed: 0 }, error: "No target email addresses found for the selected audience." };
+      return { success: false, data: empty, error: "No valid email addresses found for the selected audience." };
     }
 
+    const html = wrapEmailBody(bodyHtml);
     let sent = 0;
     let failed = 0;
 
-    for (const toEmail of emailList) {
+    // Batched so a large send goes out in one go; each person still gets their own email.
+    for (let i = 0; i < emailList.length; i += BATCH_SIZE) {
+      const chunk = emailList.slice(i, i + BATCH_SIZE);
       try {
-        await resend.emails.send({
-          from: "My Skill Counsellor <onboarding@resend.dev>",
-          to: toEmail,
-          subject: subject,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
-              ${bodyHtml}
-              <div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px; color: #64748b; font-size: 12px; text-align: center;">
-                <p>Sent by <strong>My Skill Counsellor</strong> | Career & Study Abroad Guidance</p>
-                <p>Noida, India | info@myskillcounsellor.com</p>
-              </div>
-            </div>
-          `,
-        });
-        sent++;
+        const res = await resend.batch.send(
+          chunk.map((to) => ({ from: "My Skill Counsellor <onboarding@resend.dev>", to, subject, html })),
+          { batchValidation: "permissive" }
+        );
+        if (res.error) {
+          console.error("Broadcast batch error:", res.error);
+          failed += chunk.length;
+        } else {
+          const rejected = res.data?.errors?.length ?? 0;
+          sent += chunk.length - rejected;
+          failed += rejected;
+        }
       } catch (err) {
-        console.error(`Failed to send broadcast email to ${toEmail}:`, err);
-        failed++;
+        console.error(`Failed to send broadcast batch starting at ${i}:`, err);
+        failed += chunk.length;
       }
     }
 
-    return {
-      success: true,
-      data: { total: emailList.length, sent, failed },
-    };
+    return { success: true, data: { total: emailList.length, sent, failed } };
   } catch (e: any) {
     console.error("Broadcast Error:", e);
-    return { success: false, data: { total: 0, sent: 0, failed: 0 }, error: e.message };
+    return { success: false, data: empty, error: e.message };
   }
 }
 

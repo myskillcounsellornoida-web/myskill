@@ -45,8 +45,22 @@ import {
   deleteFaq
 } from "./actions";
 import { logout } from "./login/actions";
+import RecipientPicker from "./RecipientPicker";
+import { MAX_MANUAL_RECIPIENTS, invalidEmails, parseEmailList } from "@/lib/emails";
 import ContentEditor from "./ContentEditor";
 import ImageUploadButton from "./ImageUploadButton";
+
+const TAB_TITLES: Record<string, string> = {
+  dashboard: "Dashboard",
+  bookings: "Session Bookings",
+  inquiries: "Leads & Inquiries",
+  subscribers: "Broadcast Mailer",
+  testimonials: "Testimonials",
+  blogs: "Counselling Blogs",
+  services: "Services",
+  faqs: "FAQ Manager",
+  cms: "Edit Website Content",
+};
 
 interface AdminClientProps {
   initialInquiries: any[];
@@ -100,7 +114,8 @@ export default function AdminClient({
   const [broadcastSubject, setBroadcastSubject] = useState("");
   const [broadcastBody, setBroadcastBody] = useState("");
   const [broadcastTarget, setBroadcastTarget] = useState<"all" | "subscribers" | "bookings" | "inquiries" | "custom">("all");
-  const [customEmailInput, setCustomEmailInput] = useState("");
+  const [manualRecipients, setManualRecipients] = useState("");
+  const [showPicker, setShowPicker] = useState(false);
   const [isSendingBroadcast, setIsSendingBroadcast] = useState(false);
   const [broadcastReport, setBroadcastReport] = useState<{ total: number; sent: number; failed: number } | null>(null);
 
@@ -213,15 +228,24 @@ export default function AdminClient({
       showNotify("Subject and Body are required.", "error");
       return;
     }
-    if (broadcastTarget === "custom" && (!customEmailInput || !customEmailInput.includes("@"))) {
-      showNotify("Valid email address required for custom target.", "error");
+    if (broadcastTarget === "custom" && manualEmails.length === 0) {
+      showNotify("Add at least one valid recipient email address.", "error");
+      return;
+    }
+    if (broadcastTarget === "custom" && manualEmails.length > MAX_MANUAL_RECIPIENTS) {
+      showNotify(`Please send to at most ${MAX_MANUAL_RECIPIENTS} addresses at a time.`, "error");
+      return;
+    }
+    const recipientCount = broadcastTarget === "custom" ? manualEmails.length : null;
+    if (recipientCount !== null && recipientCount > 1 &&
+        !confirm(`Send this email to ${recipientCount} recipients? Each person receives their own copy.`)) {
       return;
     }
 
     setIsSendingBroadcast(true);
     setBroadcastReport(null);
 
-    const res = await sendBroadcastEmail(broadcastSubject, broadcastBody, broadcastTarget, customEmailInput);
+    const res = await sendBroadcastEmail(broadcastSubject, broadcastBody, broadcastTarget, manualEmails);
 
     setIsSendingBroadcast(false);
     if (res.success && res.data) {
@@ -436,6 +460,19 @@ export default function AdminClient({
     } else {
       showNotify("Failed to delete FAQ: " + res.error, "error");
     }
+  };
+
+  // Manual recipients typed or picked in the broadcast composer.
+  const manualEmails = parseEmailList(manualRecipients);
+  const manualInvalid = invalidEmails(manualRecipients);
+  const addRecipients = (emails: string[]) => {
+    setManualRecipients(prev => {
+      const merged = parseEmailList([...parseEmailList(prev), ...emails]);
+      return merged.join(", ");
+    });
+  };
+  const removeRecipient = (email: string) => {
+    setManualRecipients(parseEmailList(manualRecipients).filter(e => e !== email).join(", "));
   };
 
   // Filter inquiries
@@ -661,7 +698,7 @@ export default function AdminClient({
         }}>
           <div>
             <h1 style={{ fontSize: "1.4rem", margin: 0, textTransform: "capitalize", color: "var(--color-deep-teal)" }}>
-              {activeTab === "cms" ? "Edit Website Content" : `${activeTab} Management`}
+              {TAB_TITLES[activeTab]}
             </h1>
           </div>
 
@@ -1062,7 +1099,7 @@ export default function AdminClient({
                 </div>
 
                 <form onSubmit={handleSendBroadcast} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: broadcastTarget === "custom" ? "1fr" : "1fr 1fr", gap: "20px" }}>
                     <div>
                       <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>
                         Target Audience
@@ -1076,23 +1113,63 @@ export default function AdminClient({
                         <option value="subscribers">Newsletter Subscribers ({subscribersList.length})</option>
                         <option value="bookings">Session Bookings ({bookingsList.length})</option>
                         <option value="inquiries">Contact Inquiries ({inquiriesList.length})</option>
-                        <option value="custom">Custom Single Target Email</option>
+                        <option value="custom">Manual — choose recipients ({manualEmails.length} selected)</option>
                       </select>
                     </div>
 
                     {broadcastTarget === "custom" && (
                       <div>
-                        <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>
-                          Recipient Email Address
-                        </label>
-                        <input
-                          type="email"
-                          required
-                          placeholder="e.g. client@example.com"
-                          value={customEmailInput}
-                          onChange={(e) => setCustomEmailInput(e.target.value)}
-                          style={{ width: "100%", padding: "12px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px", gap: "10px" }}>
+                          <label style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)" }}>
+                            Recipients ({manualEmails.length})
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => setShowPicker(p => !p)}
+                            style={{ fontSize: "0.78rem", fontWeight: 600, background: "#f1f5f9", border: "none", padding: "6px 10px", borderRadius: "6px", cursor: "pointer", color: "var(--color-deep-teal)" }}
+                          >
+                            <User size={13} style={{ verticalAlign: "-2px", marginRight: 4 }} />
+                            {showPicker ? "Hide contacts" : "Pick from contacts"}
+                          </button>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={manualRecipients}
+                          onChange={(e) => setManualRecipients(e.target.value)}
+                          placeholder="Paste addresses separated by commas, spaces or new lines&#10;e.g. one@example.com, two@example.com"
+                          aria-label="Recipient email addresses"
+                          style={{ width: "100%", padding: "12px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.9rem", fontFamily: "var(--font-body)" }}
                         />
+                        {manualInvalid.length > 0 && (
+                          <p style={{ margin: "6px 0 0", fontSize: "0.8rem", color: "#B91C1C" }}>
+                            Not a valid address: {manualInvalid.slice(0, 5).join(", ")}{manualInvalid.length > 5 ? "…" : ""}
+                          </p>
+                        )}
+                        {manualEmails.length > 0 && (
+                          <div className="recipient-chips">
+                            {manualEmails.slice(0, 40).map(email => (
+                              <span key={email} className="recipient-chip">
+                                {email}
+                                <button type="button" onClick={() => removeRecipient(email)} aria-label={`Remove ${email}`}>
+                                  <X size={12} />
+                                </button>
+                              </span>
+                            ))}
+                            {manualEmails.length > 40 && <span className="recipient-chip is-more">+{manualEmails.length - 40} more</span>}
+                            <button type="button" className="recipient-clear" onClick={() => setManualRecipients("")}>Clear all</button>
+                          </div>
+                        )}
+                        <p style={{ margin: "8px 0 0", fontSize: "0.78rem", color: "#666" }}>
+                          Everyone gets their own separate email — recipients never see each other&apos;s addresses.
+                        </p>
+                        {showPicker && (
+                          <RecipientPicker
+                            selected={manualEmails}
+                            onAdd={addRecipients}
+                            onRemove={removeRecipient}
+                            onClose={() => setShowPicker(false)}
+                          />
+                        )}
                       </div>
                     )}
                   </div>
@@ -1178,7 +1255,11 @@ export default function AdminClient({
                     }}
                   >
                     <Mail size={18} />
-                    {isSendingBroadcast ? "Sending Broadcast Mails..." : "Send Live Broadcast Email"}
+                    {isSendingBroadcast
+                      ? "Sending emails..."
+                      : broadcastTarget === "custom"
+                        ? `Send to ${manualEmails.length} recipient${manualEmails.length === 1 ? "" : "s"}`
+                        : "Send Live Broadcast Email"}
                   </button>
                 </form>
               </div>

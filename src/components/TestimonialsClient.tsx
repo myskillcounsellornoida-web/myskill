@@ -1,9 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Image from "next/image";
 import { Txt } from "@/components/cms/CmsProvider";
+import Arranged from "@/components/cms/Arranged";
+import VideoGallery from "@/components/cms/VideoGallery";
 import { CtaBand, PageHero, fadeUp, stagger } from "@/components/cms/Sections";
 
 type Testimonial = {
@@ -20,22 +22,8 @@ const TEST_FAQS = [
 export default function TestimonialsClient({ testimonialsList: testimonials }: { testimonialsList: Testimonial[] }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  return (
-    <main>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: TEST_FAQS.map((faq) => ({ "@type": "Question", name: faq.q, acceptedAnswer: { "@type": "Answer", text: faq.a } })),
-          }).replace(/</g, "\\u003c"),
-        }}
-      />
-
-      <PageHero prefix="testimonials" />
-
-      {/* STATISTICS */}
+  const sections: Record<string, ReactNode> = {
+    stats: (
       <section className="stats-band is-compact">
         <div className="container">
           <motion.div className="stats-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
@@ -48,8 +36,8 @@ export default function TestimonialsClient({ testimonialsList: testimonials }: {
           </motion.div>
         </div>
       </section>
-
-      {/* TESTIMONIAL WALL */}
+    ),
+    stories: (
       <section className="section bg-sage-section">
         <div className="container">
           <motion.div className="testimonial-wall" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
@@ -71,8 +59,8 @@ export default function TestimonialsClient({ testimonialsList: testimonials }: {
           </motion.div>
         </div>
       </section>
-
-      {/* PRESS FEATURE */}
+    ),
+    press: (
       <section className="section bg-white-section">
         <div className="container split-grid">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
@@ -90,8 +78,8 @@ export default function TestimonialsClient({ testimonialsList: testimonials }: {
           </motion.div>
         </div>
       </section>
-
-      {/* FAQ */}
+    ),
+    faq: (
       <section className="section">
         <div className="container narrow">
           <motion.div className="section-heading" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
@@ -111,8 +99,27 @@ export default function TestimonialsClient({ testimonialsList: testimonials }: {
           </div>
         </div>
       </section>
+    ),
+    videos: <VideoGallery className="bg-sage-section" />,
+    cta: <CtaBand />,
+  };
 
-      <CtaBand />
+  return (
+    <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: TEST_FAQS.map((faq) => ({ "@type": "Question", name: faq.q, acceptedAnswer: { "@type": "Answer", text: faq.a } })),
+          }).replace(/</g, "\\u003c"),
+        }}
+      />
+
+      <PageHero prefix="testimonials" />
+
+      <Arranged page="/testimonials" sections={sections} />
     </main>
   );
 }
