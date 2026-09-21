@@ -48,3 +48,5 @@ next-env.d.ts
 # Local screen recordings shared for review
 *.mov
 *.mp4
+# ...but the review clips that ship with the site are tracked
+!/public/videos/*.mp4

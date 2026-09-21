@@ -11,20 +11,45 @@ export interface VideoEntry {
 }
 
 export interface ParsedVideo {
-  platform: "youtube" | "instagram";
+  platform: "youtube" | "instagram" | "file";
   id: string;
   embedUrl: string;
   thumbnail?: string;
   vertical: boolean;
 }
 
+/** Shown until the admin curates their own list under Videos in the editor. */
+export const DEFAULT_VIDEOS = JSON.stringify([
+  { url: "/videos/ria-review.mp4", title: "Ria's students on what changed for them", category: "Student Reviews" },
+  { url: "/videos/maryam-review.mp4", title: "Maryam — on finding the right course", category: "Student Reviews" },
+  { url: "/videos/student-review-1.mp4", title: "Student review — application support", category: "Student Reviews" },
+  { url: "/videos/student-review-2.mp4", title: "Student review — profile building", category: "Student Reviews" },
+]);
+
 const YT_ID = /^[A-Za-z0-9_-]{11}$/;
 const IG_CODE = /^[A-Za-z0-9_-]{5,40}$/;
+const FILE_PATH = /^\/[A-Za-z0-9/_.-]+\.(mp4|webm|m4v|mov)$/i;
 
 export function parseVideoUrl(raw: string): ParsedVideo | null {
+  const value = raw.trim();
+
+  // Self-hosted clip served from /public, e.g. "/videos/ria-review.mp4".
+  // Same-origin paths only: no protocol-relative "//host" and no traversal.
+  if (value.startsWith("/") && !value.startsWith("//")) {
+    if (value.includes("..") || !FILE_PATH.test(value)) return null;
+    return {
+      platform: "file",
+      id: value,
+      vertical: true,
+      embedUrl: value,
+      // Convention: a sibling .jpg is used as the poster when one exists.
+      thumbnail: value.replace(/\.(mp4|webm|m4v|mov)$/i, ".jpg"),
+    };
+  }
+
   let url: URL;
   try {
-    url = new URL(raw.trim());
+    url = new URL(value);
   } catch {
     return null;
   }
