@@ -515,8 +515,11 @@ export const CONTENT_GROUPS: ContentGroup[] = [
       text("contact_email", "Email", "info@myskillcounsellor.com"),
       text("contact_location", "Location", "Noida, India"),
       url("whatsapp_url", "WhatsApp link", "https://wa.me/message/24XQYF3LERXWA1"),
-      url("instagram_url", "Instagram link", "https://instagram.com/myskillcounsellor"),
+      url("instagram_url", "Instagram link", "https://www.instagram.com/myskillcounsellor8"),
       url("linkedin_url", "LinkedIn link", "https://www.linkedin.com/in/riajain26"),
+      url("facebook_url", "Facebook link", "https://www.facebook.com/share/1DpmQtA6gr/"),
+      url("youtube_url", "YouTube link", "https://youtube.com/@myskillcounsellor"),
+      text("legal_email", "Email shown on the policy pages", "ria.myskillcounsellor@gmail.com"),
     ],
   },
   {

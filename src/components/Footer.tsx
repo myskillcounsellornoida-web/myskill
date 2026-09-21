@@ -5,6 +5,16 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { subscribeNewsletter } from "@/app/actions";
 import { Txt, useCms } from "@/components/cms/CmsProvider";
+import { LEGAL_PAGES } from "@/components/LegalPage";
+
+/** Brand colours are fixed — these are other companies' marks, not our palette. */
+const FOOTER_SOCIALS = [
+  { key: "whatsapp_url", label: "WhatsApp", icon: "fab fa-whatsapp", color: "#25D366" },
+  { key: "instagram_url", label: "Instagram", icon: "fab fa-instagram", color: "#E1306C" },
+  { key: "youtube_url", label: "YouTube", icon: "fab fa-youtube", color: "#FF0000" },
+  { key: "linkedin_url", label: "LinkedIn", icon: "fab fa-linkedin-in", color: "#0A66C2" },
+  { key: "facebook_url", label: "Facebook", icon: "fab fa-facebook-f", color: "#1877F2" },
+];
 
 export default function Footer() {
   const pathname = usePathname();
@@ -108,10 +118,24 @@ export default function Footer() {
           </ul>
           
           {/* Social Icons */}
-          <div style={{ marginTop: '25px', display: 'flex', gap: '15px' }}>
-            <a href={t("linkedin_url")} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="footer-social" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-linkedin-in"></i></a>
-            <a href={t("whatsapp_url")} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="footer-social" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-whatsapp"></i></a>
-            <a href={t("instagram_url")} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="footer-social" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-instagram"></i></a>
+          <div style={{ marginTop: '25px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            {FOOTER_SOCIALS.map((s) => {
+              const href = t(s.key);
+              if (!href.trim()) return null;
+              return (
+                <a
+                  key={s.key}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  className="footer-social"
+                  style={{ '--brand': s.color } as React.CSSProperties}
+                >
+                  <i className={s.icon}></i>
+                </a>
+              );
+            })}
           </div>
         </div>
 
@@ -119,9 +143,10 @@ export default function Footer() {
 
       <div className="container footer-bottom" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
         <p>{t("footer_copyright").trim().startsWith("©") ? null : <>&copy; {new Date().getFullYear()} </>}<Txt k="footer_copyright" /></p>
-        <div style={{ display: 'flex', gap: '20px' }}>
-            <Link href="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</Link>
-            <Link href="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>Terms of Service</Link>
+        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+            {LEGAL_PAGES.map((p) => (
+              <Link key={p.href} href={p.href} style={{ color: 'inherit', textDecoration: 'none' }}>{p.label}</Link>
+            ))}
         </div>
       </div>
     </footer>

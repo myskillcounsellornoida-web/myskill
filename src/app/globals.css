@@ -1694,6 +1694,125 @@ footer {
     }
 }
 
+/* Floating social dock (sits above the WhatsApp button) */
+.social-dock {
+    position: fixed;
+    right: 30px;
+    bottom: 102px;
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+.social-dock-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+.social-dock-link {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    color: var(--brand);
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(16, 26, 28, 0.18);
+    transition: transform 0.22s ease, background-color 0.22s ease, color 0.22s ease, box-shadow 0.22s ease;
+}
+.social-dock-link:hover,
+.social-dock-link:focus-visible {
+    background: var(--brand);
+    color: #fff;
+    transform: scale(1.12);
+    box-shadow: 0 10px 26px color-mix(in srgb, var(--brand) 45%, transparent);
+}
+.social-dock-label {
+    position: absolute;
+    right: 60px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    background: var(--color-deep-teal);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(8px);
+    transition: all 0.22s ease;
+    pointer-events: none;
+}
+.social-dock-label::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -5px;
+    width: 10px;
+    height: 10px;
+    background: var(--color-deep-teal);
+    transform: translateY(-50%) rotate(45deg);
+}
+.social-dock-link:hover .social-dock-label,
+.social-dock-link:focus-visible .social-dock-label {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+.social-dock-toggle {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    min-height: 0;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #fff;
+    background: var(--brand);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--brand) 40%, transparent);
+    transition: background-color 0.35s ease, box-shadow 0.35s ease, transform 0.22s ease;
+}
+.social-dock-toggle:hover { transform: translateY(-3px) scale(1.05); }
+.social-dock.is-open .social-dock-toggle { transform: rotate(90deg); }
+/* Soft outward pulse so the collapsed dock reads as interactive. */
+.social-dock-ping {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--brand);
+    animation: social-dock-ping 2.2s ease-out infinite;
+    pointer-events: none;
+}
+@keyframes social-dock-ping {
+    0% { opacity: 0.55; transform: scale(1); }
+    70% { opacity: 0; transform: scale(1.5); }
+    100% { opacity: 0; transform: scale(1.5); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .social-dock-ping { animation: none; }
+    .social-dock.is-open .social-dock-toggle { transform: none; }
+}
+@media (max-width: 768px) {
+    .social-dock { right: 20px; bottom: 88px; gap: 10px; }
+    .social-dock-toggle { width: 52px; height: 52px; font-size: 1.3rem; }
+    .social-dock-link { width: 44px; height: 44px; font-size: 1.05rem; }
+    .social-dock-label { right: 54px; }
+}
+
 /* Floating WhatsApp Widget */
 .whatsapp-float {
     position: fixed;
@@ -2495,6 +2614,89 @@ ul.check-list.is-grid { color: var(--color-deep-teal); }
 .press-main, .press-side { border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-medium); background: #fff; }
 .press-main { align-self: center; }
 
+/* ---------- Legal / policy pages ---------- */
+.page-hero.is-legal { min-height: 320px; background: var(--color-deep-teal); }
+.legal-layout { display: grid; grid-template-columns: 240px 1fr; gap: 56px; align-items: start; }
+.legal-nav {
+    position: sticky;
+    top: 110px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 24px 20px;
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+}
+.legal-nav-title {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-accent-gold);
+    margin-bottom: 10px;
+}
+.legal-nav a {
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 0.93rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: var(--transition-smooth);
+}
+.legal-nav a:hover { background: var(--bg-primary); color: var(--color-deep-teal); }
+.legal-nav a.is-current { background: var(--color-deep-teal); color: #fff; }
+.legal-body { max-width: 760px; }
+.legal-intro { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 36px; }
+.legal-section { margin-bottom: 38px; }
+.legal-section h2 {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+    color: var(--color-deep-teal);
+}
+.legal-num {
+    flex: 0 0 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-soft-teal) 14%, white);
+    color: var(--color-soft-teal);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+.legal-section p {
+    position: relative;
+    padding-left: 50px;
+    margin-bottom: 14px;
+    line-height: 1.8;
+    color: var(--text-secondary);
+}
+.legal-clause {
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-accent-gold);
+}
+.legal-link { color: var(--color-muted-coral); font-weight: 600; text-decoration: underline; }
+@media (max-width: 900px) {
+    .legal-layout { grid-template-columns: 1fr; gap: 32px; }
+    .legal-nav { position: static; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 16px; }
+    .legal-nav-title { width: 100%; margin-bottom: 4px; }
+    .legal-section h2 { font-size: 1.35rem; }
+    .legal-section p { padding-left: 44px; }
+}
+
 /* ---------- Blog ---------- */
 .author-card {
     display: flex;
@@ -2548,7 +2750,19 @@ ul.check-list.is-grid { color: var(--color-deep-teal); }
 .info-card-value a { color: inherit; }
 .info-card-note { color: var(--text-secondary); font-size: 0.9rem; margin: 0; }
 
-.footer-social:hover { background: var(--color-soft-teal) !important; transform: translateY(-3px); }
+.footer-social {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transition: var(--transition-smooth);
+}
+.footer-social:hover,
+.footer-social:focus-visible { background: var(--brand); color: #fff; transform: translateY(-3px); }
 
 /* ---------- Live preview (inside the admin editor iframe) ---------- */
 .cms-preview [data-cms] { cursor: pointer; transition: outline-color 0.15s ease; outline: 2px dashed transparent; outline-offset: 3px; border-radius: 3px; }
