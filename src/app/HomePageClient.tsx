@@ -2,7 +2,7 @@
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { Txt, useCms } from "@/components/cms/CmsProvider";
 import { CtaBand, SectionHeading, cssUrl, fadeUp, iconClass, stagger } from "@/components/cms/Sections";
 import { CountUp, Tilt } from "@/components/cms/motion3d";
@@ -14,6 +14,9 @@ type Testimonial = { name: string; role: string; text: string };
 type Faq = { question: string; answer: string };
 
 const SLIDE_COUNT = 5;
+
+/** Proof points under the hero CTAs — same keys as the impact band, so they stay in sync. */
+const HERO_TRUST = ["stat_students", "stat_universities", "stat_success_rate"];
 
 const DESTINATIONS = [
   { code: "gb", name: "United Kingdom" },
@@ -65,19 +68,23 @@ export default function HomePageClient({
   const heroShift = useTransform(scrollY, [0, 700], [0, 90]);
   const heroFade = useTransform(scrollY, [0, 520], [1, 0.25]);
 
-  // `slide` is a dependency so manually stepping through restarts the countdown
-  // rather than jumping again a moment later.
+  // The carousel advances on a strict interval. It deliberately does NOT pause
+  // on hover: the hero fills the viewport on load, so a cursor resting anywhere
+  // over it used to stop the rotation for the whole visit.
+  // `slide` is a dependency so manually stepping restarts the countdown rather
+  // than jumping again a moment later.
   useEffect(() => {
     if (paused) return;
     const timer = setTimeout(() => setSlide((p) => (p + 1) % SLIDE_COUNT), 5500);
     return () => clearTimeout(timer);
   }, [paused, slide]);
 
-  // Touch browsers fire mouseenter on tap but no matching mouseleave, which used
-  // to leave the carousel paused for good. Only a real mouse pauses it.
-  const hoverPause = (value: boolean) => (e: ReactPointerEvent) => {
-    if (e.pointerType === "mouse") setPaused(value);
-  };
+  // Only a backgrounded tab pauses it, so returning doesn't replay a backlog.
+  useEffect(() => {
+    const onVisibility = () => setPaused(document.hidden);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, []);
 
   const slideNo = slide + 1;
   const displayPrograms = programs.length > 0 ? programs : DEFAULT_PROGRAMS;
@@ -394,8 +401,6 @@ export default function HomePageClient({
       {/* HERO CAROUSEL */}
       <section
         className="hero home-hero"
-        onPointerEnter={hoverPause(true)}
-        onPointerLeave={hoverPause(false)}
       >
         {Array.from({ length: SLIDE_COUNT }, (_, i) => (
           <motion.div
@@ -413,13 +418,33 @@ export default function HomePageClient({
             <AnimatePresence mode="wait">
               <motion.div
                 key={slide}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.45 }}
+                initial="hidden"
+                animate="visible"
+                exit={{ opacity: 0, y: -14, transition: { duration: 0.3 } }}
+                variants={{ visible: { transition: { staggerChildren: 0.09 } } }}
               >
-                <Txt k={`hero_slide${slideNo}_caption`} as="h1" className="home-hero-title" />
-                <Txt k={`hero_slide${slideNo}_sub`} as="p" className="home-hero-sub" />
+                {/* Headline reveals line by line, wiping up from behind a mask. */}
+                <h1 className="home-hero-title" data-cms={`hero_slide${slideNo}_caption`}>
+                  {t(`hero_slide${slideNo}_caption`).split(" ").map((word, i) => (
+                    <span key={i} className="hero-word">
+                      <motion.span
+                        variants={{
+                          hidden: { y: "110%" },
+                          visible: { y: 0, transition: { duration: 0.75, ease: [0.16, 1, 0.3, 1], delay: i * 0.045 } },
+                        }}
+                      >
+                        {word}
+                      </motion.span>
+                    </span>
+                  ))}
+                </h1>
+                <motion.p
+                  className="home-hero-sub"
+                  data-cms={`hero_slide${slideNo}_sub`}
+                  variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, delay: 0.18 } } }}
+                >
+                  {t(`hero_slide${slideNo}_sub`)}
+                </motion.p>
               </motion.div>
             </AnimatePresence>
             <div className="hero-buttons">
@@ -430,20 +455,51 @@ export default function HomePageClient({
                 <Txt k="hero_cta_secondary" />
               </Link>
             </div>
+
+            {/* Proof sits with the CTAs, reusing the same stats as the impact band. */}
+            <motion.ul
+              className="hero-trust"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              {HERO_TRUST.map((k) => (
+                <li key={k}>
+                  <strong data-cms={k}>{t(k)}</strong>
+                  <span data-cms={`${k}_label`}>{t(`${k}_label`)}</span>
+                </li>
+              ))}
+            </motion.ul>
           </motion.div>
 
           <div className="hero-controls">
             <button aria-label="Previous slide" onClick={() => setSlide((p) => (p - 1 + SLIDE_COUNT) % SLIDE_COUNT)} className="hero-nav-btn">
               <i className="fas fa-chevron-left" />
             </button>
-            <div className="hero-dots">
+            {/* Segmented bars double as a countdown to the next slide. */}
+            <div className="hero-progress">
               {Array.from({ length: SLIDE_COUNT }, (_, i) => (
-                <button key={i} aria-label={`Go to slide ${i + 1}`} onClick={() => setSlide(i)} className={slide === i ? "is-active" : ""} />
+                <button key={i} aria-label={`Go to slide ${i + 1}`} onClick={() => setSlide(i)} className={slide === i ? "is-active" : ""}>
+                  <span className="hero-progress-track">
+                    {slide === i && (
+                      <motion.span
+                        key={slide}
+                        className="hero-progress-fill"
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: paused ? 0 : 1 }}
+                        transition={{ duration: paused ? 0 : 5.5, ease: "linear" }}
+                      />
+                    )}
+                  </span>
+                </button>
               ))}
             </div>
             <button aria-label="Next slide" onClick={() => setSlide((p) => (p + 1) % SLIDE_COUNT)} className="hero-nav-btn">
               <i className="fas fa-chevron-right" />
             </button>
+            <span className="hero-count">
+              <strong>{String(slideNo).padStart(2, "0")}</strong> / {String(SLIDE_COUNT).padStart(2, "0")}
+            </span>
           </div>
         </div>
       </section>

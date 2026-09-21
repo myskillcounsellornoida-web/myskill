@@ -2112,7 +2112,7 @@ ul.check-list.is-grid { color: var(--color-deep-teal); }
     position: relative;
     overflow: hidden;
     min-height: min(100vh, 900px);
-    padding: 150px 0 90px;
+    padding: 128px 0 64px;
     background: var(--color-deep-teal);
 }
 .home-hero-slide {
@@ -2129,21 +2129,28 @@ ul.check-list.is-grid { color: var(--color-deep-teal); }
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(100deg, rgba(16, 26, 28, 0.92) 0%, rgba(16, 26, 28, 0.72) 45%, rgba(16, 26, 28, 0.25) 100%),
-        linear-gradient(to top, rgba(16, 26, 28, 0.6), transparent 40%);
+        linear-gradient(105deg, rgba(16, 26, 28, 0.95) 0%, rgba(16, 26, 28, 0.84) 44%, rgba(16, 26, 28, 0.38) 100%),
+        linear-gradient(to top, rgba(16, 26, 28, 0.86) 0%, rgba(16, 26, 28, 0.42) 38%, transparent 68%),
+        radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--color-accent-gold) 22%, transparent), transparent 55%);
 }
 .home-hero-inner { position: relative; z-index: 2; }
-.home-hero-copy { max-width: 720px; }
+.home-hero-copy { max-width: 780px; }
 .home-hero-title {
     color: #fff;
-    font-size: clamp(2.6rem, 6vw, 4.8rem);
-    line-height: 1.05;
-    margin-bottom: 22px;
+    font-size: clamp(2.5rem, 5.1vw, 4.4rem);
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+    margin-bottom: 24px;
     font-weight: 600;
+    text-wrap: balance;
 }
-.home-hero-sub { color: rgba(255, 255, 255, 0.86); font-size: 1.18rem; line-height: 1.7; max-width: 580px; margin-bottom: 40px; min-height: 3.4em; }
+/* Each word gets a clipping mask so the line can wipe up into place. */
+.hero-word { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.hero-word > span { display: inline-block; }
+.hero-word:not(:last-child) { margin-right: 0.26em; }
+.home-hero-sub { color: rgba(255, 255, 255, 0.86); font-size: 1.1rem; line-height: 1.65; max-width: 580px; margin-bottom: 30px; }
 .hero-buttons { display: flex; gap: 14px; flex-wrap: wrap; }
-.hero-controls { display: flex; align-items: center; gap: 16px; margin-top: 64px; }
+.hero-controls { display: flex; align-items: center; gap: 16px; margin-top: 34px; }
 .hero-nav-btn {
     width: 46px;
     height: 46px;
@@ -2155,19 +2162,47 @@ ul.check-list.is-grid { color: var(--color-deep-teal); }
     transition: var(--transition-smooth);
 }
 .hero-nav-btn:hover { background: #fff; color: var(--color-deep-teal); }
-.hero-dots { display: flex; gap: 8px; }
-.hero-dots button {
-    width: 10px;
-    height: 10px;
-    border-radius: 6px;
-    border: none;
-    background: rgba(255, 255, 255, 0.4);
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 0;
-    min-height: 0 !important;
+.hero-trust {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 34px;
+    list-style: none;
+    margin: 26px 0 0;
+    padding: 18px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    max-width: 580px;
 }
-.hero-dots button.is-active { width: 38px; background: var(--color-accent-gold); }
+.hero-trust li { display: flex; flex-direction: column; gap: 2px; }
+.hero-trust strong {
+    font-family: var(--font-heading);
+    font-size: 1.7rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--color-accent-gold);
+}
+.hero-trust span {
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.72);
+}
+.hero-progress { display: flex; gap: 8px; }
+.hero-progress button { padding: 10px 0; border: none; background: none; cursor: pointer; min-height: 0 !important; }
+.hero-progress-track {
+    display: block;
+    width: 34px;
+    height: 3px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.32);
+    overflow: hidden;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hero-progress button.is-active .hero-progress-track { width: 64px; }
+.hero-progress-fill { display: block; height: 100%; background: var(--color-accent-gold); transform-origin: left center; }
+.hero-count { font-family: var(--font-sans); font-size: 0.8rem; letter-spacing: 0.12em; color: rgba(255, 255, 255, 0.55); margin-left: 4px; }
+.hero-count strong { color: #fff; font-size: 0.95rem; }
 
 /* ---------- Destinations ---------- */
 .destinations-strip { padding: 22px 0; background: #fff; border-bottom: 1px solid var(--border-color); }
@@ -2792,13 +2827,21 @@ ul.check-list.is-grid { color: var(--color-deep-teal); }
     .home-hero { padding: 120px 0 60px !important; min-height: 92svh !important; }
     .home-hero-overlay { background: linear-gradient(to bottom, rgba(16, 26, 28, 0.85), rgba(16, 26, 28, 0.75)); }
     .home-hero-sub { min-height: 0; }
-    .hero-controls { margin-top: 40px; justify-content: center; }
+    .hero-controls { margin-top: 40px; justify-content: center; gap: 12px; }
+    .hero-trust { gap: 12px 22px; margin-top: 28px; padding-top: 18px; }
+    .hero-trust strong { font-size: 1.45rem; }
+    .hero-trust span { font-size: 0.64rem; letter-spacing: 0.1em; }
+    .hero-progress-track { width: 22px; }
+    .hero-progress button.is-active .hero-progress-track { width: 44px; }
+    .hero-count { display: none; }
     .stats-grid { grid-template-columns: 1fr 1fr !important; }
     .stat-item + .stat-item { border-left: none; }
             .gallery-grid { grid-auto-rows: 160px; gap: 10px; }
     .gallery-item.is-tall { grid-row: span 1; }
     .gallery-item figcaption { opacity: 1; transform: none; font-size: 0.75rem; }
     .media-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+    .video-grid { grid-template-columns: minmax(0, 420px); }
+    .video-grid.is-tall { grid-template-columns: minmax(0, 290px); }
     .interview-grid { grid-template-columns: 1fr; gap: 28px; }
     .interview-photo { aspect-ratio: 4 / 3; }
     .interview-headline { font-size: 1.25rem; }
@@ -2828,6 +2871,8 @@ ul.check-list.is-grid { color: var(--color-deep-teal); }
 
 @media (prefers-reduced-motion: reduce) {
     .home-hero-slide, .page-hero-bg { transition: opacity 0.3s ease; transform: none !important; animation: none; }
+    .hero-word { overflow: visible; }
+    .hero-word > span { transform: none !important; }
 }
 
 /* ==========================================================================
@@ -2945,14 +2990,17 @@ ul.check-list.is-grid { color: var(--color-deep-teal); }
 }
 
 /* ---------- Videos section ---------- */
-.video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 520px)); justify-content: center; gap: 26px; }
-.video-grid.is-tall { grid-template-columns: repeat(auto-fit, minmax(280px, 360px)); align-items: start; }
+/* Fixed max track widths keep a lone video from stretching across the row. */
+.video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 420px)); justify-content: center; gap: 26px; align-items: start; }
+.video-grid.is-tall { grid-template-columns: repeat(auto-fit, minmax(230px, 290px)); }
 .video-grid + .video-grid { margin-top: 30px; }
 .video-card { margin: 0; background: #fff; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-soft); transition: var(--transition-smooth); }
 .video-card:hover { box-shadow: var(--shadow-medium); }
-.video-frame { position: relative; aspect-ratio: 16 / 9; background: #0F1718; }
+.video-frame { position: relative; aspect-ratio: 16 / 9; background: #0F1718; max-height: 540px; }
 .video-frame.is-vertical { aspect-ratio: 9 / 16; }
-.video-frame.is-instagram { aspect-ratio: auto; height: 560px; background: #fff; }
+/* Instagram embeds carry their own chrome, so they need height rather than a
+   ratio — clamped so a narrow column never leaves a tall empty box. */
+.video-frame.is-instagram { aspect-ratio: auto; height: clamp(400px, 78vw, 515px); background: #fff; }
 .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .video-poster { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; cursor: pointer; background: #000; min-height: 0 !important; }
 .video-poster img { width: 100%; height: 100%; object-fit: cover; opacity: 0.88; transition: opacity 0.3s ease, transform 0.6s ease; }
