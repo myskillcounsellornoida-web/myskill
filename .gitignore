@@ -43,3 +43,6 @@ next-env.d.ts
 # runtime data written by the app (local CMS store, admin uploads)
 /data/
 /public/uploads/
+
+# Local screen recordings shared for review
+*.mov

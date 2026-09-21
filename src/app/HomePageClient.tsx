@@ -2,12 +2,13 @@
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { Txt, useCms } from "@/components/cms/CmsProvider";
-import { CtaBand, SectionHeading, cssUrl, fadeUp, stagger } from "@/components/cms/Sections";
+import { CtaBand, SectionHeading, cssUrl, fadeUp, iconClass, stagger } from "@/components/cms/Sections";
 import { CountUp, Tilt } from "@/components/cms/motion3d";
 import Arranged from "@/components/cms/Arranged";
 import VideoGallery from "@/components/cms/VideoGallery";
+import { DEFAULT_PROGRAMS, type Program } from "@/lib/programs";
 
 type Testimonial = { name: string; role: string; text: string };
 type Faq = { question: string; answer: string };
@@ -24,12 +25,6 @@ const DESTINATIONS = [
   { code: "de", name: "Germany" },
   { code: "fr", name: "France" },
   { code: "sg", name: "Singapore" },
-];
-
-const PARTNER_LOGOS = [
-  { src: "/assets/u2.png", alt: "ERC Institute", dark: true },
-  { src: "/assets/u4.png", alt: "European Institute of Management & Technology" },
-  { src: "/assets/u5.png", alt: "IIAD" },
 ];
 
 const STEP_ICONS = ["fa-user-graduate", "fa-map-marked-alt", "fa-pen-fancy", "fa-passport"];
@@ -56,9 +51,11 @@ const MEDIA = [
 export default function HomePageClient({
   testimonials,
   faqs,
+  programs,
 }: {
   testimonials: Testimonial[];
   faqs: Faq[];
+  programs: Program[];
 }) {
   const { t, color } = useCms();
   const [slide, setSlide] = useState(0);
@@ -68,13 +65,22 @@ export default function HomePageClient({
   const heroShift = useTransform(scrollY, [0, 700], [0, 90]);
   const heroFade = useTransform(scrollY, [0, 520], [1, 0.25]);
 
+  // `slide` is a dependency so manually stepping through restarts the countdown
+  // rather than jumping again a moment later.
   useEffect(() => {
     if (paused) return;
-    const timer = setInterval(() => setSlide((p) => (p + 1) % SLIDE_COUNT), 5500);
-    return () => clearInterval(timer);
-  }, [paused]);
+    const timer = setTimeout(() => setSlide((p) => (p + 1) % SLIDE_COUNT), 5500);
+    return () => clearTimeout(timer);
+  }, [paused, slide]);
+
+  // Touch browsers fire mouseenter on tap but no matching mouseleave, which used
+  // to leave the carousel paused for good. Only a real mouse pauses it.
+  const hoverPause = (value: boolean) => (e: ReactPointerEvent) => {
+    if (e.pointerType === "mouse") setPaused(value);
+  };
 
   const slideNo = slide + 1;
+  const displayPrograms = programs.length > 0 ? programs : DEFAULT_PROGRAMS;
 
   // Admin-managed FAQs take precedence; otherwise fall back to the CMS copy.
   const displayFaqs = faqs.length > 0
@@ -125,6 +131,71 @@ export default function HomePageClient({
           <div className="section-cta">
             <Link href="/services" className="btn btn-secondary"><Txt k="services_cta" /></Link>
           </div>
+        </div>
+      </section>
+    ),
+    programs: (
+      <section className="section bg-white-section">
+        <div className="container">
+          <SectionHeading label="home_programs_label" title="home_programs_title" desc="home_programs_desc" />
+          <motion.div className="program-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            {displayPrograms.map((p, i) => (
+              <motion.div key={p.id ?? i} variants={fadeUp}>
+                <Tilt className="program-card" max={7}>
+                  <div className="program-card-icon"><i className={iconClass(p.icon)} /></div>
+                  <h3>{p.title}</h3>
+                  <p>{p.description}</p>
+                </Tilt>
+              </motion.div>
+            ))}
+          </motion.div>
+          <div className="section-cta">
+            <Link href="/services" className="btn btn-secondary"><Txt k="home_programs_cta" /></Link>
+          </div>
+        </div>
+      </section>
+    ),
+    interview: (
+      <section className="section bg-sage-section">
+        <div className="container">
+          <SectionHeading label="interview_label" title="interview_title" highlight="interview_title_highlight" />
+          <div className="interview-grid">
+            <motion.div
+              className="interview-photo"
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <Image src={t("interview_image")} alt={t("interview_headline")} fill sizes="(max-width: 900px) 100vw, 40vw" style={{ objectFit: "cover" }} />
+            </motion.div>
+            <motion.div
+              className="interview-body"
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <span className="interview-source">
+                <i className="fas fa-newspaper" /> <Txt k="interview_publication" />
+              </span>
+              <Txt k="interview_headline" as="h3" className="interview-headline" />
+              <blockquote className="interview-quote" data-cms="interview_quote">
+                {t("interview_quote")}
+              </blockquote>
+              <a href={t("interview_url")} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                <Txt k="interview_cta" /> <i className="fas fa-arrow-up-right-from-square" />
+              </a>
+            </motion.div>
+          </div>
+          <motion.div className="interview-highlights" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            {[1, 2, 3].map((n) => (
+              <motion.figure key={n} variants={fadeUp} className="interview-card">
+                <Txt k={`interview_q${n}`} as="h4" />
+                <blockquote data-cms={`interview_a${n}`}>{t(`interview_a${n}`)}</blockquote>
+              </motion.figure>
+            ))}
+          </motion.div>
         </div>
       </section>
     ),
@@ -195,18 +266,6 @@ export default function HomePageClient({
               </motion.div>
             ))}
           </motion.div>
-          <div className="partners">
-            <Txt k="partners_label" className="partners-label" />
-            <div className="partners-row">
-              {PARTNER_LOGOS.map((l) => (
-                <div key={l.src} className={`partner-logo ${l.dark ? "is-dark" : ""}`}>
-                  <div className="partner-logo-inner">
-                    <Image src={l.src} alt={l.alt} fill sizes="200px" style={{ objectFit: "contain" }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
     ),
@@ -335,8 +394,8 @@ export default function HomePageClient({
       {/* HERO CAROUSEL */}
       <section
         className="hero home-hero"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
+        onPointerEnter={hoverPause(true)}
+        onPointerLeave={hoverPause(false)}
       >
         {Array.from({ length: SLIDE_COUNT }, (_, i) => (
           <motion.div

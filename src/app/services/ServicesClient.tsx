@@ -6,35 +6,20 @@ import Image from "next/image";
 import { useState, type ReactNode } from "react";
 import { Txt, useCms } from "@/components/cms/CmsProvider";
 import Arranged from "@/components/cms/Arranged";
-import { CtaBand, PageHero, SectionHeading, fadeUp, stagger } from "@/components/cms/Sections";
+import { CtaBand, PageHero, SectionHeading, fadeUp, iconClass, stagger } from "@/components/cms/Sections";
 import { Tilt } from "@/components/cms/motion3d";
+import { DEFAULT_PROGRAMS, type Program } from "@/lib/programs";
 
-type Service = { id?: number; title: string; description: string; icon?: string | null };
+type Service = Program;
 type Faq = { question: string; answer: string };
 
 const STAGE_ANCHORS = ["before-offer", "after-offer", "after-departure"];
-
-const DEFAULT_PROGRAMS: Service[] = [
-  { title: "Customised Internships", description: "Real-world exposure matched to the student's interests and target courses.", icon: "fa-briefcase" },
-  { title: "Leadership Program", description: "Structured projects that build initiative, teamwork and a stand-out profile.", icon: "fa-chess-king" },
-  { title: "Career Library", description: "Explore 160+ career paths with clear descriptions, skills and outlooks.", icon: "fa-book-open" },
-  { title: "Career Boosters", description: "Short, focused courses and certifications that strengthen applications.", icon: "fa-rocket" },
-  { title: "SOP Writing Assistance", description: "Story-first Statements of Purpose that sound authentically like you.", icon: "fa-pen-nib" },
-  { title: "Interview Preparation", description: "Mock university and visa interviews with detailed feedback.", icon: "fa-comments" },
-];
 
 const DEFAULT_FAQS = [
   { q: "How long does the study abroad counselling process take?", a: "Ideally, the process takes 12-18 months. This allows time for profile building, test preparation, university shortlisting, and completing applications without rushing." },
   { q: "Do you offer targeted SOP review if I already wrote my draft?", a: "Yes. If you have drafted your Statement of Purpose, we offer a specialized editing service to refine the narrative and align it with university expectations." },
   { q: "Can you help with student visas for Dubai and the UK?", a: "Absolutely. Visa processing is a core part of our comprehensive package. We guide you through financial documentation, mock interviews, and the application itself." },
 ];
-
-// Stored icons may be "fas fa-globe" or just "fa-globe".
-const ICON_STYLES = new Set(["fa", "fas", "far", "fab", "fa-solid", "fa-regular", "fa-brands"]);
-const iconClass = (icon?: string | null) => {
-  if (!icon) return "fas fa-graduation-cap";
-  return icon.split(/\s+/).some((c) => ICON_STYLES.has(c)) ? icon : `fas ${icon}`;
-};
 
 export default function ServicesClient({ services, faqs }: { services: Service[]; faqs: Faq[] }) {
   const { t, color } = useCms();

@@ -64,13 +64,15 @@ export const PAGE_SECTIONS: Record<PreviewPage, SectionDef[]> = {
   "/": [
     { id: "destinations", label: "Destinations strip" },
     { id: "stages", label: "Services · three stages" },
+    { id: "programs", label: "Specialised services" },
     { id: "steps", label: "How it works" },
     { id: "about", label: "About the founder" },
-    { id: "stats", label: "Statistics & institutions" },
+    { id: "stats", label: "Impact statistics" },
     { id: "videos", label: "Videos" },
     { id: "gallery", label: "Moments gallery" },
     { id: "testimonials", label: "Testimonials" },
     { id: "workshop", label: "Workshop / masterclass" },
+    { id: "interview", label: "Featured interview" },
     { id: "media", label: "Media & recognition" },
     { id: "faq", label: "FAQs" },
     { id: "cta", label: "Call-to-action banner" },
@@ -105,6 +107,9 @@ export const PAGE_SECTIONS: Record<PreviewPage, SectionDef[]> = {
 
 // Sections that start hidden until the admin switches them on.
 const HIDDEN_BY_DEFAULT: Partial<Record<PreviewPage, string[]>> = {
+  // The specialised-services grid replaced the 4-step journey on the home page;
+  // "steps" stays available so it can be switched back on from the editor.
+  "/": ["steps"],
   "/testimonials": ["videos"],
   "/blog": ["videos"],
 };
@@ -140,10 +145,22 @@ export function resolveLayout(raw: string | undefined, page: PreviewPage, extraI
       // fall through to defaults
     }
   }
+  // Sections added after this layout was saved slot in next to their default
+  // neighbour rather than piling up at the bottom of the page.
   const hiddenDefaults = HIDDEN_BY_DEFAULT[page] ?? [];
-  for (const d of defs) {
-    if (!seen.has(d.id)) result.push({ id: d.id, hidden: hiddenDefaults.includes(d.id) });
-  }
+  defs.forEach((d, i) => {
+    if (seen.has(d.id)) return;
+    let at = result.length;
+    for (let j = i - 1; j >= 0; j--) {
+      const prev = result.findIndex((r) => r.id === defs[j].id);
+      if (prev !== -1) {
+        at = prev + 1;
+        break;
+      }
+    }
+    result.splice(at, 0, { id: d.id, hidden: hiddenDefaults.includes(d.id) });
+    seen.add(d.id);
+  });
   return result;
 }
 
@@ -172,6 +189,16 @@ const STAGE_DEFAULTS = [
     desc: "Our support doesn't end at the airport. We remain your trusted point of contact as you navigate the initial weeks of settling into a new country.",
     details: ["Arrival & Settling-In Support", "Local Transport & Safety Navigation", "SIM, Banking & Healthcare Setup", "Campus & Academic Orientation", "Daily Living Support", "Personalised Check-ins"],
   },
+];
+
+/** Session types offered in the "Book a Session" modal; all four are CMS-editable. */
+export const BOOKING_SERVICE_COUNT = 4;
+
+const BOOKING_SERVICE_DEFAULTS = [
+  { title: "Global Study Abroad Counselling", desc: "End-to-end guidance for US, UK, Canada, Dubai & Europe", duration: "45 mins" },
+  { title: "SOP & Essay Strategy Review", desc: "Personalized feedback & story-building for applications", duration: "30 mins" },
+  { title: "Extracurricular & Profile Building", desc: "Strategic roadmap for Class 9-12 & university applicants", duration: "45 mins" },
+  { title: "Visa & Loan Guidance", desc: "Complete documentation and mock visa interview practice", duration: "30 mins" },
 ];
 
 const text = (key: string, label: string, def: string): ContentField => ({ key, label, default: def });
@@ -207,11 +234,10 @@ export const CONTENT_GROUPS: ContentGroup[] = [
   },
   {
     id: "destinations",
-    title: "Destinations & Institutions",
+    title: "Destinations",
     page: "/",
     fields: [
       text("destinations_label", "Destinations label", "Where our students go"),
-      text("partners_label", "Institution logos label", "Institutions in our network"),
     ],
   },
   {
@@ -235,6 +261,17 @@ export const CONTENT_GROUPS: ContentGroup[] = [
         ];
       }),
       text("services_cta", "Button below cards", "View Full Service Details"),
+    ],
+  },
+  {
+    id: "programs_home",
+    title: "Specialised Services (Home)",
+    page: "/",
+    fields: [
+      text("home_programs_label", "Section label", "What We Offer"),
+      text("home_programs_title", "Section heading", "Our Specialised Services"),
+      para("home_programs_desc", "Section description", "Focused programs that go beyond admissions — built around where you are right now and where you want to be."),
+      text("home_programs_cta", "Button below cards", "See All Services"),
     ],
   },
   {
@@ -331,6 +368,28 @@ export const CONTENT_GROUPS: ContentGroup[] = [
       text("workshop_date", "Event date", "August 15th, 2026 | 6:00 PM IST"),
       text("workshop_cta", "Button", "Register for Free"),
       image("workshop_image", "Image", "/images/whatsapp_image_2024-12-30_at_15.24.05.jpeg"),
+    ],
+  },
+  {
+    id: "interview",
+    title: "Featured Interview",
+    page: "/",
+    fields: [
+      text("interview_label", "Section label", "In Her Own Words"),
+      text("interview_title", "Section heading", "The Featured"),
+      text("interview_title_highlight", "Heading highlight (italic)", "Interview"),
+      text("interview_publication", "Publication name", "BrilliantRead Media"),
+      text("interview_headline", "Article headline", "Interview with Ria Jain | Career Counsellor | Founder and CEO at My Skill Counsellor"),
+      para("interview_quote", "Lead pull quote", "Today, through My Skill Counsellor, I create spaces for young people to reflect, imagine, and choose their paths — something I wish someone had done for me when I was 17. This is not just my profession; it's my reclamation."),
+      image("interview_image", "Photo", "/images/ria_portrait.jpg"),
+      url("interview_url", "Link to the full article", "https://www.brilliantread.com/interview-with-ria-jain-career-counsellor-founder-and-ceo-at-my-skill-counsellor/"),
+      text("interview_cta", "Button", "Read the Full Interview"),
+      text("interview_q1", "Highlight 1 · Question", "How did you discover your passion?"),
+      para("interview_a1", "Highlight 1 · Answer", "It didn't come in a lightning bolt. It came slowly, in whispers. In the quiet ache of unread books, in the joy of helping a child dream, in the courage of returning to a classroom after a 15-year pause."),
+      text("interview_q2", "Highlight 2 · Question", "What advice would you give students and young professionals?"),
+      para("interview_a2", "Highlight 2 · Answer", "Build your self-awareness before you build your résumé. Skills can be learned, but a grounded sense of self is your true foundation."),
+      text("interview_q3", "Highlight 3 · Question", "What makes your journey exciting?"),
+      para("interview_a3", "Highlight 3 · Answer", "I get to walk with people at such a pivotal moment in their lives, when everything is open, uncertain, and possible. That's where the magic is."),
     ],
   },
   {
@@ -458,6 +517,42 @@ export const CONTENT_GROUPS: ContentGroup[] = [
       url("whatsapp_url", "WhatsApp link", "https://wa.me/message/24XQYF3LERXWA1"),
       url("instagram_url", "Instagram link", "https://instagram.com/myskillcounsellor"),
       url("linkedin_url", "LinkedIn link", "https://www.linkedin.com/in/riajain26"),
+    ],
+  },
+  {
+    id: "booking",
+    title: "Book a Session Form",
+    page: "/contact",
+    fields: [
+      text("booking_title", "Heading", "Book 1-on-1 Counselling Session"),
+      para("booking_subtitle", "Sub-heading", "Schedule a personal consultation with Ria Jain & the team."),
+      text("booking_step1_title", "Step 1 · Heading", "Step 1: Select a Service"),
+      ...BOOKING_SERVICE_DEFAULTS.flatMap((d, i) => [
+        text(`booking_service${i + 1}_title`, `Service ${i + 1} · Name`, d.title),
+        para(`booking_service${i + 1}_desc`, `Service ${i + 1} · Description`, d.desc),
+        text(`booking_service${i + 1}_duration`, `Service ${i + 1} · Duration`, d.duration),
+      ]),
+      text("booking_next1", "Step 1 · Button", "Next: Choose Date & Time"),
+      text("booking_step2_title", "Step 2 · Heading", "Step 2: Choose Date & Time Slot"),
+      text("booking_date_label", "Step 2 · Date label", "Select Date"),
+      text("booking_slot_label", "Step 2 · Slot label", "Select Available Slot"),
+      para("booking_slots", "Step 2 · Time slots (one per line)", "10:00 AM\n11:30 AM\n02:00 PM\n03:30 PM\n05:00 PM\n06:30 PM"),
+      text("booking_next2", "Step 2 · Button", "Next: Enter Details"),
+      text("booking_back", "Back button", "Back"),
+      text("booking_step3_title", "Step 3 · Heading", "Step 3: Provide Your Contact Information"),
+      text("booking_name_label", "Step 3 · Name label", "Full Name *"),
+      text("booking_name_placeholder", "Step 3 · Name placeholder", "e.g. Aarav Sharma"),
+      text("booking_email_label", "Step 3 · Email label", "Email Address *"),
+      text("booking_email_placeholder", "Step 3 · Email placeholder", "e.g. aarav@example.com"),
+      text("booking_phone_label", "Step 3 · Phone label", "Phone / WhatsApp Number *"),
+      text("booking_phone_placeholder", "Step 3 · Phone placeholder", "e.g. +91 9990004878"),
+      text("booking_notes_label", "Step 3 · Notes label", "Specific Questions / Notes (Optional)"),
+      text("booking_notes_placeholder", "Step 3 · Notes placeholder", "Tell us what country or universities you are targeting..."),
+      text("booking_submit", "Step 3 · Submit button", "Confirm & Send Email"),
+      text("booking_submitting", "Step 3 · Submitting button", "Booking Session..."),
+      text("booking_success_title", "Confirmation · Heading", "Session Booked Successfully!"),
+      para("booking_success_desc", "Confirmation · Message", "A confirmation email is on its way. We have scheduled your 1-on-1 session for:"),
+      text("booking_done", "Confirmation · Button", "Done"),
     ],
   },
   {
