@@ -18,13 +18,18 @@ export interface ParsedVideo {
   vertical: boolean;
 }
 
-/** Shown until the admin curates their own list under Videos in the editor. */
-export const DEFAULT_VIDEOS = JSON.stringify([
-  { url: "/videos/ria-review.mp4", title: "Ria's students on what changed for them", category: "Student Reviews" },
-  { url: "/videos/maryam-review.mp4", title: "Maryam — on finding the right course", category: "Student Reviews" },
-  { url: "/videos/student-review-1.mp4", title: "Student review — application support", category: "Student Reviews" },
-  { url: "/videos/student-review-2.mp4", title: "Student review — profile building", category: "Student Reviews" },
-]);
+/**
+ * Fixed set of self-hosted testimonial clips shown as "Success Stories".
+ * Unlike VIDEOS_KEY, this is not admin-editable content — it always renders,
+ * with the admin's own YouTube/Instagram links (pasted in the Videos panel)
+ * appearing below it.
+ */
+export const SUCCESS_STORY_VIDEOS: VideoEntry[] = [
+  { url: "/videos/ria-review.mp4", title: "Ria's students on what changed for them" },
+  { url: "/videos/maryam-review.mp4", title: "Maryam — on finding the right course" },
+  { url: "/videos/student-review-1.mp4", title: "Student review — application support" },
+  { url: "/videos/student-review-2.mp4", title: "Student review — profile building" },
+];
 
 const YT_ID = /^[A-Za-z0-9_-]{11}$/;
 const IG_CODE = /^[A-Za-z0-9_-]{5,40}$/;
