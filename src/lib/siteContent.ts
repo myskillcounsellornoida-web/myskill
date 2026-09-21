@@ -341,7 +341,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
     page: "/",
     fields: [
       text("video_stories_label", "Section label", "Their Words"),
-      text("video_stories_title", "Section heading", "Success Story Videos"),
+      text("video_stories_title", "Section heading", "Watch & Hear From Them"),
       para("video_stories_desc", "Section description", "Real students and parents, in their own words."),
     ],
   },
