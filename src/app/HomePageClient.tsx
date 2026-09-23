@@ -228,7 +228,7 @@ export default function HomePageClient({
         <div className="container founder-grid">
           <motion.div className="founder-photo" initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <div className="founder-photo-frame">
-              <Image src={t("founder_image")} alt={`${t("founder_name")} – ${t("founder_title")}`} width={500} height={620} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <Image src={t("founder_image")} alt={`${t("founder_name")} – ${t("founder_title")}`} fill sizes="(max-width: 1024px) 90vw, 460px" style={{ objectFit: "cover", objectPosition: "center 15%" }} />
             </div>
             <div className="founder-badge">
               <Txt k="founder_name" className="font-cursive founder-badge-name" />
