@@ -174,7 +174,7 @@ export default function HomePageClient({
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <Image src={t("interview_image")} alt={t("interview_headline")} fill sizes="(max-width: 900px) 100vw, 40vw" style={{ objectFit: "cover" }} />
+              <Image src={t("interview_image")} alt={t("interview_headline")} fill sizes="(max-width: 900px) 100vw, 40vw" style={{ objectFit: "cover", objectPosition: "center top" }} />
             </motion.div>
             <motion.div
               className="interview-body"
@@ -228,7 +228,7 @@ export default function HomePageClient({
         <div className="container founder-grid">
           <motion.div className="founder-photo" initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
             <div className="founder-photo-frame">
-              <Image src={t("founder_image")} alt={`${t("founder_name")} – ${t("founder_title")}`} fill sizes="(max-width: 1024px) 90vw, 460px" style={{ objectFit: "cover", objectPosition: "center 15%" }} />
+              <Image src={t("founder_image")} alt={`${t("founder_name")} – ${t("founder_title")}`} fill sizes="(max-width: 1024px) 90vw, 460px" style={{ objectFit: "cover", objectPosition: "center top" }} />
             </div>
             <div className="founder-badge">
               <Txt k="founder_name" className="font-cursive founder-badge-name" />
