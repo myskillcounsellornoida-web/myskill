@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
 
-const DOMAINS = ["https://myskillcounsellor.com", "https://myskillcounsellor.in"];
+const ALLOWED_HOSTS = new Set(["myskillcounsellor.com", "www.myskillcounsellor.com", "myskillcounsellor.in", "www.myskillcounsellor.in"]);
+const DEFAULT_DOMAIN = "https://myskillcounsellor.com";
 
 const ROUTES: { path: string; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number }[] = [
   { path: "", changeFrequency: "weekly", priority: 1 },
@@ -13,14 +15,15 @@ const ROUTES: { path: string; changeFrequency: MetadataRoute.Sitemap[number]["ch
   { path: "/payment-policy", changeFrequency: "yearly", priority: 0.3 },
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const host = (await headers()).get("host")?.split(":")[0].toLowerCase() ?? "";
+  const domain = ALLOWED_HOSTS.has(host) ? `https://${host}` : DEFAULT_DOMAIN;
   const lastModified = new Date();
-  return DOMAINS.flatMap((domain) =>
-    ROUTES.map((route) => ({
-      url: `${domain}${route.path}`,
-      lastModified,
-      changeFrequency: route.changeFrequency,
-      priority: route.priority,
-    }))
-  );
+
+  return ROUTES.map((route) => ({
+    url: `${domain}${route.path}`,
+    lastModified,
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+  }));
 }
