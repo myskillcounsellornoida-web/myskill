@@ -81,3 +81,13 @@ export const faqs = pgTable("faqs", {
   category: varchar("category", { length: 100 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Web Push subscriptions for admin devices (the installable admin PWA).
+export const pushSubscriptions = pgTable("push_subscriptions", {
+  id: serial("id").primaryKey(),
+  endpoint: text("endpoint").notNull().unique(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  label: varchar("label", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
