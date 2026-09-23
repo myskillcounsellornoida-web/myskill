@@ -105,7 +105,6 @@ export default function Footer() {
             <li><Link href="/services" style={{ color: 'white', textDecoration: 'none', opacity: 0.8 }}>Our Services</Link></li>
             <li><Link href="/testimonials" style={{ color: 'white', textDecoration: 'none', opacity: 0.8 }}>Success Stories</Link></li>
             <li><Link href="/services" style={{ color: 'white', textDecoration: 'none', opacity: 0.8 }}>SOP Maker & Personality Test</Link></li>
-            <li><Link href="/services" style={{ color: 'white', textDecoration: 'none', opacity: 0.8 }}>Application & Loan Documents</Link></li>
           </ul>
         </div>
 

@@ -21,7 +21,7 @@ const extraFallbacks = {
   "contact_location": "New Delhi, India",
   "whatsapp_number": "919990004878",
   "instagram_url": "https://instagram.com/myskillcounsellor",
-  "linkedin_url": "https://linkedin.com/company/myskillcounsellor",
+  "linkedin_url": "https://www.linkedin.com/in/riajain26",
   "footer_tagline": "Empowering students to achieve global education dreams.",
   "footer_copyright": "© 2026 My Skill Counsellor. All rights reserved.",
   "meta_title": "My Skill Counsellor | Global Study Abroad Experts",
