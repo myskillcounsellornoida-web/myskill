@@ -2553,9 +2553,13 @@ ul.check-list.is-grid { color: var(--color-deep-teal); }
 .stage-pill { font-family: var(--font-sans); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #fff; background: var(--color-deep-teal); padding: 5px 14px; border-radius: 20px; }
 .service-stage-copy h2 { font-size: clamp(2rem, 3.6vw, 2.8rem); margin-bottom: 12px; }
 .service-stage-media { position: relative; min-height: 380px; height: 100%; border-radius: 20px; overflow: hidden; }
-.program-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; align-items: stretch; }
+/* flex-wrap centers each leftover row on its own (per spec, justify-content
+   applies per line), so 5 cards land as a centered 3 + 2 without JS. */
+.program-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; }
+.program-grid > * { flex: 1 1 280px; max-width: 340px; display: flex; }
+.program-grid .tilt-scene { flex: 1; width: 100%; }
 .program-card {
-    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
