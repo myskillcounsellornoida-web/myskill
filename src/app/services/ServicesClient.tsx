@@ -99,19 +99,7 @@ export default function ServicesClient({ initialServices = [], initialFaqs = [] 
 
   const displayFaqs = faqs === defaultFaqs ? defaultFaqs : faqs.map(f => ({ q: f.question, a: f.answer }));
 
-  // Listen for Live Preview updates from Admin Panel
-  useEffect(() => {
-    const handleMessage = (e: MessageEvent) => {
-      if (e.data?.type === "SERVICES_PREVIEW" && e.data?.data) {
-        setServices(e.data.data.length > 0 ? e.data.data : defaultServices);
-      }
-      if (e.data?.type === "FAQS_PREVIEW" && e.data?.data) {
-        setFaqs(e.data.data.length > 0 ? e.data.data : defaultFaqs);
-      }
-    };
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, []);
+
 
   return (
     <main>

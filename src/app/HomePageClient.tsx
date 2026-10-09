@@ -34,25 +34,7 @@ export default function HomePageClient({
     return()=>clearInterval(timer);
   },[]);
 
-  // Listen for Live Preview updates from Admin Panel
-  useEffect(() => {
-    const handleMessage = (e: MessageEvent) => {
-      if (e.data?.type === "CMS_UPDATE") {
-        setCmsData(prev => ({ ...prev, [e.data.key]: e.data.value }));
-      }
-      if (e.data?.type === "TESTIMONIALS_PREVIEW" && e.data?.data) {
-        setTestimonials(e.data.data.length > 0 ? e.data.data : defaultTestimonials);
-      }
-      if (e.data?.type === "SERVICES_PREVIEW" && e.data?.data) {
-        setServices(e.data.data.length > 0 ? e.data.data : defaultServices);
-      }
-      if (e.data?.type === "FAQS_PREVIEW" && e.data?.data) {
-        setFaqs(e.data.data.length > 0 ? e.data.data : defaultFaqs);
-      }
-    };
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, []);
+
 
   const t = (key: string, fallback: string) => cmsData[key] || fallback;
 

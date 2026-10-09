@@ -34,15 +34,7 @@ export default function BlogClient({ blogsList }: BlogClientProps) {
 
   const [blogs, setBlogs] = useState<any[]>(blogsList);
 
-  useEffect(() => {
-    const handleMessage = (e: MessageEvent) => {
-      if (e.data?.type === "BLOGS_PREVIEW" && e.data?.data) {
-        setBlogs(e.data.data.length > 0 ? e.data.data : blogsList);
-      }
-    };
-    window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
-  }, [blogsList]);
+
 
   return (
     <main>

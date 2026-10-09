@@ -784,49 +784,6 @@ export default function AdminClient({
   /* ====================================================
      CMS / SITE SETTINGS BUSINESS LOGIC
      ==================================================== */
-  const handleLivePreviewChange = (key: string, value: string) => {
-    const iframe = document.getElementById("live-preview-iframe") as HTMLIFrameElement;
-    if (iframe && iframe.contentWindow) {
-      iframe.contentWindow.postMessage({ type: "CMS_UPDATE", key, value }, "*");
-    }
-  };
-
-  // Real-time Canva-like Live Preview syncing for all data models
-  useEffect(() => {
-    const iframe = document.getElementById("live-preview-iframe") as HTMLIFrameElement;
-    if (!iframe || !iframe.contentWindow) return;
-    const data = showTestimonialModal 
-      ? (editingTestimonial ? testimonialsList.map(t => t.id === editingTestimonial.id ? { ...t, ...testimonialForm } : t) : [...testimonialsList, { id: 999999, ...testimonialForm }])
-      : testimonialsList;
-    iframe.contentWindow.postMessage({ type: "TESTIMONIALS_PREVIEW", data }, "*");
-  }, [testimonialForm, testimonialsList, showTestimonialModal, editingTestimonial]);
-
-  useEffect(() => {
-    const iframe = document.getElementById("live-preview-iframe") as HTMLIFrameElement;
-    if (!iframe || !iframe.contentWindow) return;
-    const data = showServiceModal 
-      ? (editingService ? servicesList.map(s => s.id === editingService.id ? { ...s, ...serviceForm } : s) : [...servicesList, { id: 999999, ...serviceForm }])
-      : servicesList;
-    iframe.contentWindow.postMessage({ type: "SERVICES_PREVIEW", data }, "*");
-  }, [serviceForm, servicesList, showServiceModal, editingService]);
-
-  useEffect(() => {
-    const iframe = document.getElementById("live-preview-iframe") as HTMLIFrameElement;
-    if (!iframe || !iframe.contentWindow) return;
-    const data = showBlogModal 
-      ? (editingBlog ? blogsList.map(b => b.id === editingBlog.id ? { ...b, ...blogForm } : b) : [...blogsList, { id: 999999, ...blogForm }])
-      : blogsList;
-    iframe.contentWindow.postMessage({ type: "BLOGS_PREVIEW", data }, "*");
-  }, [blogForm, blogsList, showBlogModal, editingBlog]);
-
-  useEffect(() => {
-    const iframe = document.getElementById("live-preview-iframe") as HTMLIFrameElement;
-    if (!iframe || !iframe.contentWindow) return;
-    const data = showFaqModal 
-      ? (editingFaq ? faqsList.map(f => f.id === editingFaq.id ? { ...f, ...faqForm } : f) : [...faqsList, { id: 999999, ...faqForm }])
-      : faqsList;
-    iframe.contentWindow.postMessage({ type: "FAQS_PREVIEW", data }, "*");
-  }, [faqForm, faqsList, showFaqModal, editingFaq]);
 
   const handleUpdateCmsKey = async (key: string, value: string) => {
     setSiteContentList(prev => prev.map(item => item.key === key ? { ...item, value } : item));
@@ -2195,7 +2152,7 @@ export default function AdminClient({
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div>
                 <p style={{ color: "var(--text-secondary)", marginBottom: "30px", lineHeight: 1.7 }}>
-                  ✏️ <strong>Live Content Editor.</strong> Type in the fields below to instantly preview your changes on the right. Click away from the field to automatically save to the database.
+                  ✏️ <strong>Content Editor.</strong> Type in the fields below to edit content. Click away from the field to automatically save to the database.
                 </p>
 
                 {/* Group CMS keys by section */}
@@ -2230,7 +2187,6 @@ export default function AdminClient({
                               {item.value.length > 60 ? (
                                 <textarea
                                   defaultValue={item.value}
-                                  onChange={e => handleLivePreviewChange(item.key, e.target.value)}
                                   onBlur={e => handleUpdateCmsKey(item.key, e.target.value)}
                                   rows={3}
                                   style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontFamily: "var(--font-body)", fontSize: "0.9rem", outline: "none", lineHeight: 1.6 }}
@@ -2244,7 +2200,6 @@ export default function AdminClient({
                                     onChange={e => {
                                       const val = e.target.value;
                                       setSiteContentList(prev => prev.map(c => c.key === item.key ? { ...c, value: val } : c));
-                                      handleLivePreviewChange(item.key, val);
                                     }}
                                     onBlur={e => handleUpdateCmsKey(item.key, e.target.value)}
                                     style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontSize: "0.9rem", outline: "none" }}
@@ -2253,7 +2208,6 @@ export default function AdminClient({
                                     <ImageUploadButton 
                                       onUploadSuccess={(url) => {
                                         setSiteContentList(prev => prev.map(c => c.key === item.key ? { ...c, value: url } : c));
-                                        handleLivePreviewChange(item.key, url);
                                         handleUpdateCmsKey(item.key, url);
                                       }}
                                     />
@@ -2273,25 +2227,7 @@ export default function AdminClient({
 
           </div>
 
-          {/* GLOBAL RIGHT PANE: Live Preview */}
-          {["cms", "testimonials", "blogs", "services", "faqs"].includes(activeTab) && (
-            <div style={{ flex: "1.1", position: "relative", borderLeft: "2px solid var(--border-color)", background: "white", display: "flex", flexDirection: "column", boxShadow: "-5px 0 15px rgba(0,0,0,0.03)" }}>
-              <div style={{ background: "var(--color-deep-teal)", padding: "12px 16px", color: "white", fontSize: "0.85rem", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <i className="fas fa-desktop"></i> Live Website Preview
-                </div>
-                <button 
-                  onClick={() => { const f = document.getElementById("live-preview-iframe") as HTMLIFrameElement; if(f) f.src = f.src; }}
-                  style={{ background: "rgba(255,255,255,0.2)", border: "none", color: "white", padding: "6px 12px", borderRadius: "5px", cursor: "pointer", fontSize: "0.75rem", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px", transition: "all 0.2s" }}
-                  onMouseOver={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.3)"}
-                  onMouseOut={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
-                >
-                  <i className="fas fa-sync-alt"></i> Refresh Preview
-                </button>
-              </div>
-              <iframe id="live-preview-iframe" src={activeTab === "blogs" ? "/blog" : activeTab === "services" ? "/services" : activeTab === "testimonials" ? "/testimonials" : "/"} style={{ width: "100%", flex: 1, border: "none" }} />
-            </div>
-          )}
+          {/* REMOVED GLOBAL RIGHT PANE: Live Preview */}
 
         </div>
       </main>
