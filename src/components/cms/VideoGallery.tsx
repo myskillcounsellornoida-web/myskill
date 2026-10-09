@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { DEFAULT_VIDEOS, parseVideoList, parseVideoUrl, VIDEOS_KEY, type ParsedVideo } from "@/lib/videos";
+import { SUCCESS_STORY_VIDEOS, parseVideoList, parseVideoUrl, VIDEOS_KEY, type ParsedVideo } from "@/lib/videos";
 import { VIDEO_CATEGORIES_KEY, orderedCategories, parseCategories } from "@/lib/categories";
 import { useCms } from "./CmsProvider";
 import CategoryTabs from "./CategoryTabs";
@@ -45,24 +45,13 @@ function YouTubeCard({ item }: { item: Item }) {
   );
 }
 
-/** Self-hosted clip. The real aspect ratio is only known once metadata
- *  arrives, so the card starts vertical and corrects itself — that way a
- *  landscape review can't letterbox and a portrait one can't tower. */
+/** Self-hosted clip. Always a fixed 9:16 box with the picture cropped to
+ *  fill it, so every success-story card is identical regardless of the
+ *  source video's own dimensions (square, landscape or portrait phone). */
 function FileCard({ item }: { item: Item }) {
-  const [ratio, setRatio] = useState<string | null>(null);
   return (
-    <div className="video-frame is-file" style={ratio ? { aspectRatio: ratio } : undefined}>
-      <video
-        src={item.video.embedUrl}
-        poster={item.video.thumbnail}
-        controls
-        playsInline
-        preload="metadata"
-        onLoadedMetadata={(e) => {
-          const v = e.currentTarget;
-          if (v.videoWidth && v.videoHeight) setRatio(`${v.videoWidth} / ${v.videoHeight}`);
-        }}
-      />
+    <div className="video-frame is-file">
+      <video src={item.video.embedUrl} poster={item.video.thumbnail} controls playsInline preload="metadata" />
     </div>
   );
 }
@@ -75,23 +64,9 @@ function InstagramCard({ item }: { item: Item }) {
   );
 }
 
-/** Instagram / YouTube links pasted by the admin, rendered as embeds. */
-export default function VideoGallery({ className = "" }: { className?: string }) {
-  const { content } = useCms();
-  const all: Item[] = parseVideoList(content[VIDEOS_KEY] || DEFAULT_VIDEOS)
-    .map((v) => ({ ...v, video: parseVideoUrl(v.url)! }));
-  const categories = orderedCategories(parseCategories(content[VIDEO_CATEGORIES_KEY]), all.map((v) => v.category));
-  const [active, setActive] = useState<string | null>(null);
-
-  if (all.length === 0) return null;
-
-  const items = active ? all.filter((v) => v.category === active) : all;
-  const isWide = (i: Item) => i.video.platform === "youtube" && !i.video.vertical;
-  const wide = items.filter(isWide);
-  const tall = items.filter((i) => !isWide(i));
-
-  const card = (item: Item) => (
-    <motion.figure key={item.url} variants={fadeUp} className="video-card">
+function VideoCard({ item }: { item: Item }) {
+  return (
+    <motion.figure variants={fadeUp} className="video-card">
       {item.video.platform === "youtube" ? <YouTubeCard item={item} />
         : item.video.platform === "file" ? <FileCard item={item} />
         : <InstagramCard item={item} />}
@@ -106,21 +81,62 @@ export default function VideoGallery({ className = "" }: { className?: string })
       </figcaption>
     </motion.figure>
   );
+}
+
+/**
+ * Two independent blocks, always in this order:
+ * 1. Success Stories — the fixed self-hosted testimonial clips, uniform size.
+ * 2. Videos & Reels — YouTube/Instagram links the admin pastes into the
+ *    Videos panel, with their own category tabs.
+ */
+export default function VideoGallery({ className = "" }: { className?: string }) {
+  const { content } = useCms();
+
+  const successStories: Item[] = SUCCESS_STORY_VIDEOS
+    .map((v) => ({ ...v, video: parseVideoUrl(v.url) }))
+    .filter((v): v is Item => !!v.video);
+
+  const adminVideos: Item[] = parseVideoList(content[VIDEOS_KEY])
+    .map((v) => ({ ...v, video: parseVideoUrl(v.url) }))
+    .filter((v): v is Item => !!v.video && v.video.platform !== "file");
+
+  const categories = orderedCategories(parseCategories(content[VIDEO_CATEGORIES_KEY]), adminVideos.map((v) => v.category));
+  const [active, setActive] = useState<string | null>(null);
+
+  if (successStories.length === 0 && adminVideos.length === 0) return null;
+
+  const shownAdminVideos = active ? adminVideos.filter((v) => v.category === active) : adminVideos;
+  const isWide = (i: Item) => i.video.platform === "youtube" && !i.video.vertical;
+  const wide = shownAdminVideos.filter(isWide);
+  const tall = shownAdminVideos.filter((i) => !isWide(i));
 
   return (
     <section className={`section ${className}`}>
       <div className="container">
-        <SectionHeading label="videos_section_label" title="videos_section_title" desc="videos_section_desc" />
-        <CategoryTabs categories={categories} active={active} onChange={setActive} counts={all.map((v) => v.category)} />
-        {wide.length > 0 && (
-          <motion.div className="video-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            {wide.map(card)}
-          </motion.div>
+        {successStories.length > 0 && (
+          <div className={adminVideos.length > 0 ? "video-block" : undefined}>
+            <SectionHeading label="video_stories_label" title="video_stories_title" desc="video_stories_desc" />
+            <motion.div className="video-grid is-stories" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+              {successStories.map((item) => <VideoCard key={item.url} item={item} />)}
+            </motion.div>
+          </div>
         )}
-        {tall.length > 0 && (
-          <motion.div className="video-grid is-tall" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
-            {tall.map(card)}
-          </motion.div>
+
+        {adminVideos.length > 0 && (
+          <div className={successStories.length > 0 ? "video-block" : undefined}>
+            <SectionHeading label="videos_section_label" title="videos_section_title" desc="videos_section_desc" />
+            <CategoryTabs categories={categories} active={active} onChange={setActive} counts={adminVideos.map((v) => v.category)} />
+            {wide.length > 0 && (
+              <motion.div className="video-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+                {wide.map((item) => <VideoCard key={item.url} item={item} />)}
+              </motion.div>
+            )}
+            {tall.length > 0 && (
+              <motion.div className="video-grid is-tall" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+                {tall.map((item) => <VideoCard key={item.url} item={item} />)}
+              </motion.div>
+            )}
+          </div>
         )}
       </div>
     </section>

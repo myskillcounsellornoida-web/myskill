@@ -336,13 +336,23 @@ export const CONTENT_GROUPS: ContentGroup[] = [
     ],
   },
   {
+    id: "video_stories",
+    title: "Success Story Videos",
+    page: "/",
+    fields: [
+      text("video_stories_label", "Section label", "Their Words"),
+      text("video_stories_title", "Section heading", "Success Story Videos"),
+      para("video_stories_desc", "Section description", "Real students and parents, in their own words."),
+    ],
+  },
+  {
     id: "videos_home",
-    title: "Videos Section",
+    title: "Videos & Reels (YouTube / Instagram)",
     page: "/",
     fields: [
       text("videos_section_label", "Section label", "Watch & Learn"),
       text("videos_section_title", "Section heading", "Videos & Reels"),
-      para("videos_section_desc", "Section description", "Real students and parents in their own words, plus quick tips from our sessions."),
+      para("videos_section_desc", "Section description", "Quick tips, live sessions and reels from our YouTube and Instagram."),
     ],
   },
   {
