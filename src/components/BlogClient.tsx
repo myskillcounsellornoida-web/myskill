@@ -76,7 +76,7 @@ export default function BlogClient({ blogsList }: BlogClientProps) {
       <section className="bg-sage-section" style={{ padding: '60px 0' }}>
         <div className="container">
            <motion.div className="author-profile-card" style={{ display: 'flex', flexWrap: 'wrap', gap: '30px', alignItems: 'center', background: 'white', padding: '40px', borderRadius: '20px', boxShadow: 'var(--shadow-soft)', border: '1px solid var(--border-color)' }} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-             <div style={{ flex: '0 0 140px', height: '140px', borderRadius: '50%', overflow: 'hidden', border: '4px solid var(--color-soft-teal)', position: 'relative', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
+             <div style={{ flex: '0 0 140px', width: '140px', height: '140px', borderRadius: '50%', overflow: 'hidden', border: '4px solid var(--color-soft-teal)', position: 'relative', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
                 <Image src="/images/ria_portrait.jpg" alt="Ria Jain" fill sizes="140px" style={{ objectFit: 'cover' }} />
              </div>
              <div style={{ flex: '1 1 300px' }}>

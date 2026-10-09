@@ -192,7 +192,7 @@ export default function ServicesClient({ initialServices = [], initialFaqs = [] 
                   <p style={{ color: "var(--text-secondary)", fontSize: "1.05rem", lineHeight: 1.7, marginBottom: 24 }}>
                     {service.desc}
                   </p>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: 32 }}>
+                  <div className="points-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: 32 }}>
                     {service.points.map((pt: string, i: number) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--color-deep-teal)", fontWeight: 600, fontSize: "0.9rem" }}>
                         <i className="fas fa-check-circle" style={{ color: "var(--color-soft-teal)" }} />

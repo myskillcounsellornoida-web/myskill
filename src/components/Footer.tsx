@@ -51,7 +51,7 @@ export default function Footer() {
           </p>
           
           <form onSubmit={handleSubscribe} className="footer-subscribe-form" style={{ display: 'flex', gap: '10px', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div className="subscribe-input-group" style={{ display: 'flex', gap: '10px' }}>
               <input 
                 type="email" 
                 placeholder="Subscribe for updates" 
@@ -78,7 +78,7 @@ export default function Footer() {
 
         {/* Useful Links & Study Boards */}
         <div>
-          <h4 style={{ fontSize: '1.2rem', marginBottom: '20px', borderBottom: '2px solid var(--color-soft-teal)', paddingBottom: '10px', display: 'inline-block' }}>Useful Links</h4>
+          <h4 style={{ color: 'white', fontSize: '1.2rem', marginBottom: '20px', borderBottom: '2px solid var(--color-soft-teal)', paddingBottom: '10px', display: 'inline-block' }}>Useful Links</h4>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <li><Link href="/" style={{ color: 'white', textDecoration: 'none', opacity: 0.8 }}>Home</Link></li>
             <li><Link href="/services" style={{ color: 'white', textDecoration: 'none', opacity: 0.8 }}>Our Services</Link></li>
@@ -89,7 +89,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4 style={{ fontSize: '1.2rem', marginBottom: '20px', borderBottom: '2px solid var(--color-soft-teal)', paddingBottom: '10px', display: 'inline-block' }}>Study Boards</h4>
+          <h4 style={{ color: 'white', fontSize: '1.2rem', marginBottom: '20px', borderBottom: '2px solid var(--color-soft-teal)', paddingBottom: '10px', display: 'inline-block' }}>Study Boards</h4>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '12px', color: 'white', opacity: 0.8 }}>
             <li><Link href="/services" style={{ color: 'white', textDecoration: 'none' }}>CBSE & ICSE</Link></li>
             <li><Link href="/services" style={{ color: 'white', textDecoration: 'none' }}>IB BOARD & CAIE</Link></li>
@@ -100,7 +100,7 @@ export default function Footer() {
 
         {/* Contact Info */}
         <div>
-          <h4 style={{ fontSize: '1.2rem', marginBottom: '20px', borderBottom: '2px solid var(--color-soft-teal)', paddingBottom: '10px', display: 'inline-block' }}>Get in Touch</h4>
+          <h4 style={{ color: 'white', fontSize: '1.2rem', marginBottom: '20px', borderBottom: '2px solid var(--color-soft-teal)', paddingBottom: '10px', display: 'inline-block' }}>Get in Touch</h4>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '15px', color: 'var(--color-soft-ivory)', opacity: 0.8 }}>
             <li><i className="fas fa-envelope" style={{ marginRight: '10px', color: 'var(--color-soft-teal)' }}></i> <a href="mailto:info@myskillcounsellor.com" style={{ color: 'inherit', textDecoration: 'none' }}>info@myskillcounsellor.com</a></li>
             <li><i className="fab fa-whatsapp" style={{ marginRight: '10px', color: 'var(--color-soft-teal)' }}></i> +91 9990004878</li>
@@ -111,7 +111,7 @@ export default function Footer() {
           <div style={{ marginTop: '25px', display: 'flex', gap: '15px' }}>
             <a href="https://www.linkedin.com/in/riajain26" target="_blank" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-linkedin-in"></i></a>
             <a href="https://wa.me/message/24XQYF3LERXWA1" target="_blank" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-whatsapp"></i></a>
-            <a href="#" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-instagram"></i></a>
+            <a href="https://instagram.com" target="_blank" style={{ background: 'rgba(255,255,255,0.1)', width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'white', transition: 'all 0.3s' }}><i className="fab fa-instagram"></i></a>
           </div>
         </div>
 

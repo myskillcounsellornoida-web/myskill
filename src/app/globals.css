@@ -1868,3 +1868,24 @@ footer {
   }
 }
 
+
+@media (max-width: 768px) {
+    .subscribe-input-group {
+        flex-direction: column !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .founder-badge {
+        right: 0 !important;
+        bottom: -40px !important;
+        left: 0 !important;
+        margin: auto !important;
+        width: 90% !important;
+        text-align: center !important;
+    }
+
+    .points-grid {
+        grid-template-columns: 1fr !important;
+    }
+}

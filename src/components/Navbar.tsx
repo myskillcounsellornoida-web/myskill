@@ -88,7 +88,7 @@ export default function Navbar() {
                   Blog
                 </Link>
               </li>
-              <li className="mobile-cta-li" style={{ marginTop: "15px" }}>
+              <li className="mobile-cta-li" style={{ marginTop: "15px", display: "flex", flexDirection: "column", gap: "12px", width: "100%", padding: "0 20px" }}>
                 <button
                   onClick={() => { setIsMenuOpen(false); setIsBookingOpen(true); }}
                   style={{
@@ -120,11 +120,12 @@ export default function Navbar() {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle Menu"
             aria-expanded={isMenuOpen}
+            style={{ position: 'relative', zIndex: 1002, marginLeft: 'auto' }}
           >
             <i className={isMenuOpen ? "fas fa-times" : "fas fa-bars"}></i>
           </button>
           
-          <div className="nav-cta" style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          <div className="nav-cta" style={{ gap: "12px", alignItems: "center" }}>
             <button
               onClick={() => setIsBookingOpen(true)}
               style={{
