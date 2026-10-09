@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppWidget from "@/components/WhatsAppWidget";
+import SocialDock from "@/components/SocialDock";
 import CmsProvider from "@/components/cms/CmsProvider";
 import { getSiteContent } from "@/lib/cms";
 import { DEFAULT_CONTENT } from "@/lib/siteContent";
@@ -99,6 +100,7 @@ export default async function RootLayout({
         <CmsProvider initialContent={content}>
           <Navbar />
           {children}
+          <SocialDock />
           <WhatsAppWidget />
           <Footer />
         </CmsProvider>

@@ -1,31 +1,61 @@
-export default function TermsOfService() {
+import type { Metadata } from "next";
+import LegalPage from "@/components/LegalPage";
+
+export const metadata: Metadata = {
+  title: "Terms & Conditions | My Skill Counsellor",
+  description:
+    "The terms that govern your use of myskillcounsellor.com and the career counselling and study abroad consulting services we provide.",
+};
+
+export default function TermsAndConditions() {
   return (
-    <main>
-      <section className="inner-hero" style={{ padding: '80px 0', background: 'var(--color-deep-teal)', color: 'white', textAlign: 'center' }}>
-        <div className="container">
-          <h1 style={{ fontSize: '3rem', marginBottom: '20px' }}>Terms of Service</h1>
-          <p style={{ opacity: 0.8 }}>Effective Date: {new Date().toLocaleDateString()}</p>
-        </div>
-      </section>
-
-      <section style={{ padding: '60px 0' }}>
-        <div className="container" style={{ maxWidth: '800px', margin: '0 auto', lineHeight: '1.8', color: 'var(--text-secondary)' }}>
-          <h2 style={{ color: 'var(--color-deep-teal)', marginBottom: '20px' }}>1. Agreement to Terms</h2>
-          <p style={{ marginBottom: '30px' }}>By accessing our website and using our services, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.</p>
-          
-          <h2 style={{ color: 'var(--color-deep-teal)', marginBottom: '20px' }}>2. Use License</h2>
-          <p style={{ marginBottom: '30px' }}>Permission is granted to temporarily download one copy of the materials (information or software) on My Skill Counsellor&apos;s website for personal, non-commercial transitory viewing only.</p>
-
-          <h2 style={{ color: 'var(--color-deep-teal)', marginBottom: '20px' }}>3. Disclaimer</h2>
-          <p style={{ marginBottom: '30px' }}>The materials on My Skill Counsellor&apos;s website are provided on an &apos;as is&apos; basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
-
-          <h2 style={{ color: 'var(--color-deep-teal)', marginBottom: '20px' }}>4. Limitations</h2>
-          <p style={{ marginBottom: '30px' }}>In no event shall My Skill Counsellor or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on our website.</p>
-
-          <h2 style={{ color: 'var(--color-deep-teal)', marginBottom: '20px' }}>5. Contact Us</h2>
-          <p>For any questions regarding these Terms, please contact us at info@myskillcounsellor.com.</p>
-        </div>
-      </section>
-    </main>
+    <LegalPage
+      title="Terms & Conditions"
+      updated="21 September 2026"
+      sections={[
+        {
+          heading: "Introduction",
+          items: [
+            "Welcome to www.myskillcounsellor.com. By accessing or using this website, you agree to comply with these Terms and Conditions.",
+          ],
+        },
+        {
+          heading: "Use of the Website",
+          items: ["You are responsible for the accuracy of the information you provide to My Skill Counsellor."],
+        },
+        {
+          heading: "Privacy",
+          items: ["Our Privacy Policy explains how we collect, use and protect your personal information."],
+        },
+        {
+          heading: "Services",
+          items: [
+            "My Skill Counsellor provides career counselling and study abroad consulting services.",
+            "Our services are intended to provide guidance and support. We do not guarantee admission, scholarships, visa approvals or any specific outcome.",
+            "Final decisions are made by universities, government authorities or other relevant third parties.",
+          ],
+        },
+        {
+          heading: "Disclaimer",
+          items: ["The information on this website is provided for general guidance and on an “as-is” basis."],
+        },
+        {
+          heading: "Limitation of Liability",
+          items: [
+            "My Skill Counsellor shall not be held responsible for losses arising from the use of this website or decisions made based on the information provided.",
+          ],
+        },
+        {
+          heading: "Changes to Terms and Conditions",
+          items: [
+            "We may update these Terms and Conditions from time to time. Any changes will be posted on this website.",
+          ],
+        },
+        {
+          heading: "Contact Information",
+          items: ["For any questions or concerns, please contact us at {email}."],
+        },
+      ]}
+    />
   );
 }
