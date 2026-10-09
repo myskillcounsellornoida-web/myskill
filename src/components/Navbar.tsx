@@ -49,10 +49,18 @@ export default function Navbar() {
     <>
       <header className={isScrolled ? "scrolled" : ""}>
         <div className="container navbar">
-          <Link href="/" className="logo" onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-            <div style={{ position: 'relative', width: '72px', height: '72px', flexShrink: 0 }}>
-              <Image src="/assets/logo.png" alt="My Skill Counsellor" fill sizes="72px" style={{ objectFit: 'contain' }} />
+          <Link href="/" className="logo" onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', gap: '14px' }}>
+            <div style={{ position: 'relative', width: '46px', height: '46px', flexShrink: 0 }}>
+              <Image src="/assets/logo.png" alt="My Skill Counsellor" fill sizes="46px" style={{ objectFit: 'contain' }} />
             </div>
+            <span style={{ lineHeight: 1.05 }}>
+              <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontStyle: 'italic', fontWeight: 700, fontSize: '1.6rem', color: 'var(--color-deep-teal)', letterSpacing: '0.3px' }}>
+                My Skill
+              </span>
+              <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 600, fontSize: '0.92rem', color: 'var(--color-deep-teal)', letterSpacing: '3px', textTransform: 'uppercase', marginTop: '1px' }}>
+                Counsellor
+              </span>
+            </span>
           </Link>
 
           <nav>
