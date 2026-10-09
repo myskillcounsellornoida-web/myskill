@@ -342,7 +342,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
     fields: [
       text("videos_section_label", "Section label", "Watch & Learn"),
       text("videos_section_title", "Section heading", "Videos & Reels"),
-      para("videos_section_desc", "Section description", "Quick tips, student stories and live sessions from our YouTube and Instagram."),
+      para("videos_section_desc", "Section description", "Real students and parents in their own words, plus quick tips from our sessions."),
     ],
   },
   {

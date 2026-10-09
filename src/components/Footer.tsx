@@ -16,6 +16,17 @@ const FOOTER_SOCIALS = [
   { key: "facebook_url", label: "Facebook", icon: "fab fa-facebook-f", color: "#1877F2" },
 ];
 
+/** Board guides Ria wrote, served as PDFs from /public/boards. */
+const STUDY_BOARDS = [
+  { label: "CBSE", href: "/boards/cbse.pdf" },
+  { label: "ICSE & ISC", href: "/boards/icse-isc.pdf" },
+  { label: "IGCSE & O-Level", href: "/boards/igcse-o-level.pdf" },
+  { label: "International Baccalaureate", href: "/boards/ib.pdf" },
+  { label: "CAIE", href: "/boards/caie.pdf" },
+  { label: "K-12 Boards", href: "/boards/k-12.pdf" },
+  { label: "State Boards", href: "/boards/state-boards.pdf" },
+];
+
 export default function Footer() {
   const pathname = usePathname();
   const { t } = useCms();
@@ -101,10 +112,14 @@ export default function Footer() {
         <div>
           <h4 style={{ color: 'white', fontSize: '1.2rem', marginBottom: '20px', borderBottom: '2px solid var(--color-soft-teal)', paddingBottom: '10px', display: 'inline-block' }}>Study Boards</h4>
           <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '12px', color: 'white', opacity: 0.8 }}>
-            <li><Link href="/services" style={{ color: 'white', textDecoration: 'none' }}>CBSE & ICSE</Link></li>
-            <li><Link href="/services" style={{ color: 'white', textDecoration: 'none' }}>IB BOARD & CAIE</Link></li>
-            <li><Link href="/services" style={{ color: 'white', textDecoration: 'none' }}>IGCSE</Link></li>
-            <li><Link href="/services" style={{ color: 'white', textDecoration: 'none' }}>K-12 & STATE BOARDS</Link></li>
+            {STUDY_BOARDS.map((b) => (
+              <li key={b.href}>
+                <a href={b.href} target="_blank" rel="noopener noreferrer" className="footer-board-link">
+                  {b.label}
+                  <i className="fas fa-file-pdf" aria-hidden="true" />
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
 
