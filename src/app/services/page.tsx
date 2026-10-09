@@ -113,40 +113,79 @@ export default function Services() {
         </div>
       </section>
 
-      {/* DETAILED SERVICES */}
-      <section style={{ padding: "80px 0", background: "var(--bg-primary)" }}>
-        <div className="container" style={{ display: "flex", flexDirection: "column", gap: "100px" }}>
-          {services.map((service, idx) => (
-            <motion.div 
-              key={idx} 
-              id={idx === 0 ? "before-offer" : idx === 1 ? "after-offer" : "after-departure"}
-              className="service-stage-card"
-              initial="hidden" 
-              whileInView="visible" 
-              viewport={{ once: true, margin: "-100px" }} 
-              variants={fadeUp}
-              style={{ display: "flex", flexWrap: "wrap", gap: "50px", alignItems: "center", flexDirection: service.reverse ? "row-reverse" : "row" }}
-            >
-              <div style={{ flex: "1 1 400px" }}>
-                <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-muted-coral)", textTransform: "uppercase", letterSpacing: "2px", fontFamily: "var(--font-heading)" }}>Stage 0{idx + 1}</span>
-                <h2 style={{ fontSize: "clamp(2rem,4vw,2.5rem)", color: "var(--color-deep-teal)", marginBottom: 12 }}>{service.title}</h2>
-                <h4 style={{ color: "var(--color-soft-teal)", marginBottom: 20, fontWeight: 600, fontStyle: "italic" }}>{service.subtitle}</h4>
-                <p style={{ color: "var(--text-secondary)", fontSize: "1.05rem", lineHeight: 1.7, marginBottom: 24 }}>{service.desc}</p>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: 30 }}>
-                  {service.points.map((pt, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--color-deep-teal)", fontWeight: 600, fontSize: "0.9rem" }}>
-                      <i className="fas fa-check-circle" style={{ color: "var(--color-soft-teal)" }} />
-                      {pt}
-                    </div>
-                  ))}
+      {/* DETAILED SERVICES - STICKY OVERLAPPING ANIMATED STACK */}
+      <section style={{ padding: "100px 0 140px 0", background: "var(--bg-primary)", position: "relative" }}>
+        <div className="container" style={{ position: "relative" }}>
+          <div style={{ textAlign: "center", marginBottom: "60px" }}>
+            <span className="text-accent">Step-By-Step Journey</span>
+            <h2 style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: "clamp(2rem,4vw,3rem)", color: "var(--color-deep-teal)" }}>
+              The Three Pillars of Guidance
+            </h2>
+            <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", maxWidth: 650, margin: "12px auto 0" }}>
+              Explore how our structured process walks alongside you before application, during decision-making, and after arrival.
+            </p>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
+            {services.map((service, idx) => (
+              <motion.div 
+                key={idx} 
+                id={idx === 0 ? "before-offer" : idx === 1 ? "after-offer" : "after-departure"}
+                className="service-stage-card"
+                initial={{ opacity: 0, y: 60 }} 
+                whileInView={{ opacity: 1, y: 0 }} 
+                viewport={{ once: true, margin: "-40px" }} 
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                style={{ 
+                  position: "sticky",
+                  top: `calc(100px + ${idx * 35}px)`,
+                  zIndex: idx + 1,
+                  background: "white",
+                  borderRadius: "28px",
+                  padding: "48px",
+                  boxShadow: `0 ${15 + idx * 10}px 45px rgba(37,95,107,${0.1 + idx * 0.05})`,
+                  border: "1px solid var(--border-color)",
+                  marginBottom: idx === services.length - 1 ? "0" : "40px",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "50px",
+                  alignItems: "center",
+                  flexDirection: service.reverse ? "row-reverse" : "row"
+                }}
+              >
+                <div style={{ flex: "1 1 380px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+                    <span style={{ fontSize: "0.8rem", fontWeight: 800, color: "white", background: "var(--color-deep-teal)", padding: "4px 14px", borderRadius: 20, textTransform: "uppercase", letterSpacing: "2px", fontFamily: "var(--font-heading)" }}>
+                      Stage 0{idx + 1}
+                    </span>
+                    <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--color-muted-coral)", textTransform: "uppercase", letterSpacing: "1px" }}>
+                      {service.subtitle}
+                    </span>
+                  </div>
+                  <h2 style={{ fontSize: "clamp(1.8rem,3.5vw,2.4rem)", color: "var(--color-deep-teal)", marginBottom: 12, fontFamily: "var(--font-heading)", fontWeight: 800 }}>
+                    {service.title}
+                  </h2>
+                  <p style={{ color: "var(--text-secondary)", fontSize: "1.05rem", lineHeight: 1.7, marginBottom: 24 }}>
+                    {service.desc}
+                  </p>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: 32 }}>
+                    {service.points.map((pt, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--color-deep-teal)", fontWeight: 600, fontSize: "0.9rem" }}>
+                        <i className="fas fa-check-circle" style={{ color: "var(--color-soft-teal)" }} />
+                        {pt}
+                      </div>
+                    ))}
+                  </div>
+                  <Link href="/contact" className="btn btn-primary" style={{ borderRadius: "30px", padding: "12px 28px" }}>
+                    Discuss Your Stage <i className="fas fa-arrow-right" style={{ marginLeft: 6 }}/>
+                  </Link>
                 </div>
-                <Link href="/contact" className="btn btn-primary" style={{ borderRadius: "30px", padding: "12px 28px" }}>Discuss Your Stage</Link>
-              </div>
-              <div style={{ flex: "1 1 400px", position: 'relative', minHeight: '300px' }}>
-                <Image src={service.image} alt={service.title} fill sizes="(max-width: 768px) 100vw, 50vw" style={{ borderRadius: "20px", boxShadow: "0 25px 50px rgba(0,0,0,0.15)", border: "1px solid var(--border-color)", objectFit: "cover" }} />
-              </div>
-            </motion.div>
-          ))}
+                <div style={{ flex: "1 1 380px", position: "relative", minHeight: "320px", borderRadius: "20px", overflow: "hidden", boxShadow: "0 20px 40px rgba(0,0,0,0.12)" }}>
+                  <Image src={service.image} alt={service.title} fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: "cover" }} />
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
