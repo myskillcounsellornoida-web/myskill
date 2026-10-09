@@ -11,6 +11,8 @@ export interface LocalData {
   services: any[];
   siteContent: Record<string, string>;
   faqs: any[];
+  bookings: any[];
+  subscribers: any[];
 }
 
 const defaultData: LocalData = {
@@ -109,6 +111,29 @@ To every parent reading this: your dedication has laid the foundation. Trust in 
   faqs: [
     { id: 1, question: "When is the right time to start planning for study abroad?", answer: "We recommend starting as early as Class 9. This gives ample time to build a robust profile and plan extracurriculars without rushing." },
     { id: 2, question: "Do you guarantee university admissions?", answer: "While no consultant can guarantee admission to ivy-league universities, our track record speaks for itself. We maximise your chances by aligning your profile with university expectations." }
+  ],
+  bookings: [
+    {
+      id: 201,
+      name: "Rohan Varma",
+      email: "rohan.varma@example.com",
+      phone: "+91 98765 00011",
+      service: "Global Study Abroad Counselling",
+      bookingDate: "2026-07-25",
+      bookingTime: "11:00 AM",
+      notes: "Interested in UK Master's degree programs",
+      status: "confirmed",
+      createdAt: new Date().toISOString()
+    }
+  ],
+  subscribers: [
+    {
+      id: 301,
+      email: "subscriber1@example.com",
+      name: "Rohan Varma",
+      isSubscribed: true,
+      createdAt: new Date().toISOString()
+    }
   ]
 };
 
