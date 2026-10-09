@@ -55,3 +55,11 @@ FROM uploaded_images;
 ```
 
 Validation: `node scripts/test-image-upload.cjs`, `npx tsc --noEmit`, and `npm run build`. The image test uses isolated authentication/storage mocks and real Sharp encoding, without connecting to a database.
+
+### Sharp native libraries on Vercel
+
+`vercel.json` installs dependencies with `npm ci --include=optional`, so Sharp's platform-specific native addon and libvips library are installed. `next.config.ts` explicitly includes Sharp and its `@img/sharp-*` packages in the `/api/upload` function trace. The prebuild check performs a real WebP encode, failing the build if native libraries cannot load.
+
+After deploying these changes, redeploy once with **Use existing Build Cache** unchecked to discard any cached installation missing libvips. A successful local macOS build alone cannot confirm the Linux Vercel runtime; verify an admin upload after the new deployment is ready.
+
+Sharp is pinned to `0.35.3`, with an npm override making Next.js use the same installation. Mixing Next.js's `0.34.x` native libraries with the app's `0.35.x` addon can leave a function expecting a different libvips filename. The prebuild check also verifies that the app and Next.js resolve the same Sharp installation. Commit both `package.json` and `package-lock.json` when deploying this change.
