@@ -303,7 +303,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
       text("about_cta", "Button", "Book a Chat"),
       text("founder_name", "Founder name", "Ria Jain"),
       text("founder_title", "Founder title", "Lead Counsellor & Founder"),
-      image("founder_image", "Founder photo", "/images/ria_portrait.jpg"),
+      image("founder_image", "Founder photo", "/images/ria_founder.jpg"),
       text("founder_badge1", "Credential 1", "MA English Degree"),
       text("founder_badge2", "Credential 2", "EduMilestones Certified"),
       text("founder_badge3", "Credential 3", "CCCIS Certified"),

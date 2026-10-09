@@ -1,0 +1,16 @@
+{
+  "name": "My Skill Counsellor — Admin",
+  "short_name": "MSC Admin",
+  "description": "Leads, bookings and live notifications for My Skill Counsellor.",
+  "start_url": "/admin",
+  "scope": "/admin",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#14505C",
+  "orientation": "any",
+  "icons": [
+    { "src": "/images/admin-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/images/admin-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/images/admin-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

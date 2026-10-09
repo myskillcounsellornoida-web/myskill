@@ -21,6 +21,7 @@ import { VIDEOS_KEY, parseVideoList } from "@/lib/videos";
 import { CUSTOM_SECTIONS_KEY, parseCustomSections, sectionKey, sectionsForPage } from "@/lib/customSections";
 import { CATEGORY_KEYS, TESTIMONIAL_CATEGORY_MAP_KEY, parseCategories, parseCategoryMap } from "@/lib/categories";
 import { EMAIL_RE, MAX_MANUAL_RECIPIENTS, parseEmailList } from "@/lib/emails";
+import { MAIL_FROM } from "@/lib/email";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_key");
 
@@ -789,7 +790,7 @@ export async function sendBroadcastEmail(
       const chunk = emailList.slice(i, i + BATCH_SIZE);
       try {
         const res = await resend.batch.send(
-          chunk.map((to) => ({ from: "My Skill Counsellor <onboarding@resend.dev>", to, subject, html })),
+          chunk.map((to) => ({ from: MAIL_FROM, to, subject, html })),
           { batchValidation: "permissive" }
         );
         if (res.error) {

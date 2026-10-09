@@ -2,11 +2,10 @@
 
 import { db } from "@/db";
 import { inquiries, bookings, subscribers } from "@/db/schema";
-import { Resend } from "resend";
 import { getLocalData, saveLocalData } from "@/db/localStore";
 import { revalidatePath } from "next/cache";
-
-const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_key");
+import { adminRecipients, detailRows, esc, layout, sendMail } from "@/lib/email";
+import { notifyAdmins } from "@/lib/push";
 
 export async function submitContactForm(formData: FormData) {
   const name = formData.get("name") as string;
@@ -48,23 +47,47 @@ export async function submitContactForm(formData: FormData) {
     revalidatePath("/admin");
     revalidatePath("/adminria");
 
-    // 3. Send Email Notification via Resend if key present
-    if (process.env.RESEND_API_KEY) {
-      await resend.emails.send({
-        from: "My Skill Counsellor <onboarding@resend.dev>",
-        to: "ria.myskillcounsellor@gmail.com",
-        subject: `New Lead: ${service} Inquiry from ${name}`,
-        html: `
-          <h2>New Website Inquiry</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Phone:</strong> ${phone}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Qualification:</strong> ${qualification}</p>
-          <p><strong>Interested Service:</strong> ${service}</p>
-          <p><strong>Message:</strong> ${message}</p>
-        `,
-      });
-    }
+    // 3. Notify the team, confirm to the visitor, and push to subscribed admin devices.
+    await Promise.all([
+      sendMail({
+        to: await adminRecipients(),
+        replyTo: email,
+        subject: `New Lead: ${service} enquiry from ${name}`,
+        html: layout(
+          "New website enquiry",
+          detailRows([
+            ["Name", name],
+            ["Phone", phone],
+            ["Email", email],
+            ["Qualification", qualification],
+            ["Interested service", service],
+            ["Message", message],
+          ])
+        ),
+      }),
+      sendMail({
+        to: email,
+        subject: "We've received your enquiry — My Skill Counsellor",
+        html: layout(
+          `Thank you, ${esc(name)}!`,
+          `<p style="color:#334155;line-height:1.6;">We've received your enquiry about <strong>${esc(
+            service
+          )}</strong> and will get back to you within 24 hours.</p>
+           <p style="color:#334155;line-height:1.6;">Here's what you sent us:</p>
+           ${detailRows([
+             ["Service", service],
+             ["Message", message],
+           ])}
+           <p style="color:#334155;line-height:1.6;">Need us sooner? Reply to this email or message us on WhatsApp at +91 9990004878.</p>`
+        ),
+      }),
+      notifyAdmins({
+        title: `New lead: ${name}`,
+        body: `${service} · ${phone}`,
+        url: "/admin?tab=inquiries",
+        tag: "inquiry",
+      }),
+    ]);
 
     return { success: true, message: "Inquiry submitted successfully!" };
   } catch (error: any) {
@@ -122,64 +145,50 @@ export async function bookSession(formData: FormData) {
     revalidatePath("/admin");
     revalidatePath("/adminria");
 
-    // 3. Send Email Confirmation via Resend
-    if (process.env.RESEND_API_KEY) {
-      try {
-        await resend.emails.send({
-          from: "My Skill Counsellor <onboarding@resend.dev>",
-          to: email,
-          subject: `Booking Confirmed: 1-on-1 Counselling Session with Ria Jain`,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
-              <div style="text-align: center; margin-bottom: 20px;">
-                <h1 style="color: #0f4c81; font-size: 24px; margin-bottom: 8px;">Session Booking Confirmed! 🎉</h1>
-                <p style="color: #64748b; font-size: 14px;">My Skill Counsellor</p>
-              </div>
-              <p style="color: #334155; font-size: 15px;">Hi <strong>${name}</strong>,</p>
-              <p style="color: #334155; font-size: 15px; line-height: 1.6;">Thank you for scheduling a strategy session. Your appointment details are below:</p>
-
-              <div style="background-color: #f8fafc; padding: 18px; border-left: 4px solid #0f4c81; border-radius: 6px; margin: 20px 0;">
-                <p style="margin: 6px 0; color: #1e293b;"><strong>Service:</strong> ${service}</p>
-                <p style="margin: 6px 0; color: #1e293b;"><strong>Date:</strong> ${bookingDate}</p>
-                <p style="margin: 6px 0; color: #1e293b;"><strong>Time Slot:</strong> ${bookingTime}</p>
-                <p style="margin: 6px 0; color: #1e293b;"><strong>Phone:</strong> ${phone}</p>
-                ${notes ? `<p style="margin: 6px 0; color: #1e293b;"><strong>Notes:</strong> ${notes}</p>` : ''}
-              </div>
-
-              <p style="color: #334155; font-size: 14px; line-height: 1.6;">Our team will send a meeting link (Google Meet / Zoom) or connect with you via call at your scheduled time.</p>
-
-              <div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 15px; color: #64748b; font-size: 13px;">
-                <p style="margin: 2px 0;"><strong>Ria Jain</strong></p>
-                <p style="margin: 2px 0;">Lead Counsellor & Founder, My Skill Counsellor</p>
-                <p style="margin: 2px 0;">Email: info@myskillcounsellor.com | Phone: +91 9990004878</p>
-              </div>
-            </div>
-          `,
-        });
-      } catch (clientMailErr) {
-        console.error("Error sending client confirmation mail:", clientMailErr);
-      }
-
-      try {
-        await resend.emails.send({
-          from: "My Skill Counsellor <onboarding@resend.dev>",
-          to: "ria.myskillcounsellor@gmail.com",
-          subject: `📅 New Session Booking: ${name} (${bookingDate} @ ${bookingTime})`,
-          html: `
-            <h2>New Session Booking Received!</h2>
-            <p><strong>Client Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Phone:</strong> ${phone}</p>
-            <p><strong>Service:</strong> ${service}</p>
-            <p><strong>Date:</strong> ${bookingDate}</p>
-            <p><strong>Time Slot:</strong> ${bookingTime}</p>
-            <p><strong>Notes:</strong> ${notes || 'None'}</p>
-          `,
-        });
-      } catch (adminMailErr) {
-        console.error("Error sending admin booking mail:", adminMailErr);
-      }
-    }
+    // 3. Confirm to the client, notify the team, and push to subscribed admin devices.
+    await Promise.all([
+      sendMail({
+        to: email,
+        subject: "Booking confirmed — 1-on-1 session with Ria Jain",
+        html: layout(
+          "Your session is confirmed",
+          `<p style="color:#334155;line-height:1.6;">Hi <strong>${esc(
+            name
+          )}</strong>, thank you for scheduling a strategy session. Your appointment details are below:</p>
+           ${detailRows([
+             ["Service", service],
+             ["Date", bookingDate],
+             ["Time slot", bookingTime],
+             ["Phone", phone],
+             ["Notes", notes],
+           ])}
+           <p style="color:#334155;line-height:1.6;">We'll send a meeting link (Google Meet / Zoom) or call you at your scheduled time.</p>`
+        ),
+      }),
+      sendMail({
+        to: await adminRecipients(),
+        replyTo: email,
+        subject: `New booking: ${name} (${bookingDate} @ ${bookingTime})`,
+        html: layout(
+          "New session booking",
+          detailRows([
+            ["Client", name],
+            ["Email", email],
+            ["Phone", phone],
+            ["Service", service],
+            ["Date", bookingDate],
+            ["Time slot", bookingTime],
+            ["Notes", notes || "None"],
+          ])
+        ),
+      }),
+      notifyAdmins({
+        title: `New booking: ${name}`,
+        body: `${service} · ${bookingDate} @ ${bookingTime}`,
+        url: "/admin?tab=bookings",
+        tag: "booking",
+      }),
+    ]);
 
     return { success: true, message: "Session booked successfully! Confirmation email has been sent." };
   } catch (error: any) {
@@ -224,23 +233,30 @@ export async function subscribeNewsletter(emailInput: string, nameInput?: string
     revalidatePath("/admin");
     revalidatePath("/adminria");
 
-    // 3. Send Welcome Email via Resend
-    if (process.env.RESEND_API_KEY) {
-      await resend.emails.send({
-        from: "My Skill Counsellor <onboarding@resend.dev>",
+    // 3. Welcome the subscriber and let the team know.
+    await Promise.all([
+      sendMail({
         to: email,
-        subject: "Welcome to My Skill Counsellor Insights ✨",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
-            <h2 style="color: #0f4c81;">Welcome to our Community! 🎓</h2>
-            <p style="color: #334155;">Hi ${name ? `<strong>${name}</strong>` : 'there'},</p>
-            <p style="color: #334155; line-height: 1.6;">Thank you for subscribing to <strong>My Skill Counsellor</strong> newsletter.</p>
-            <p style="color: #334155; line-height: 1.6;">You will get exclusive updates on global university admissions, SOP strategies, profile building tips, and webinar invites directly in your inbox.</p>
-            <p style="margin-top: 30px; font-size: 0.9em; color: #64748b;">Warm regards,<br/><strong>Ria Jain</strong><br/>Founder, My Skill Counsellor</p>
-          </div>
-        `,
-      });
-    }
+        subject: "Welcome to My Skill Counsellor Insights",
+        html: layout(
+          "Welcome to our community",
+          `<p style="color:#334155;line-height:1.6;">Hi ${name ? `<strong>${esc(name)}</strong>` : "there"},</p>
+           <p style="color:#334155;line-height:1.6;">Thank you for subscribing to the <strong>My Skill Counsellor</strong> newsletter.</p>
+           <p style="color:#334155;line-height:1.6;">You'll get updates on global university admissions, SOP strategies, profile building tips and webinar invites straight to your inbox.</p>`
+        ),
+      }),
+      sendMail({
+        to: await adminRecipients(),
+        subject: `New newsletter subscriber: ${email}`,
+        html: layout("New subscriber", detailRows([["Email", email], ["Name", name || "Not provided"]])),
+      }),
+      notifyAdmins({
+        title: "New newsletter subscriber",
+        body: email,
+        url: "/admin?tab=subscribers",
+        tag: "subscriber",
+      }),
+    ]);
 
     return { success: true, message: "Thank you for subscribing! Welcome email sent." };
   } catch (error: any) {

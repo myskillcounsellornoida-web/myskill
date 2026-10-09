@@ -23,7 +23,8 @@ import {
   User,
   ExternalLink,
   Database,
-  Info
+  Info,
+  Bell
 } from "lucide-react";
 import {
   toggleInquiryContacted,
@@ -57,6 +58,8 @@ import {
 } from "@/lib/categories";
 import ContentEditor from "./ContentEditor";
 import ImageUploadButton from "./ImageUploadButton";
+import IconPicker from "./IconPicker";
+import NotificationCenter from "./NotificationCenter";
 
 const TAB_TITLES: Record<string, string> = {
   dashboard: "Dashboard",
@@ -96,7 +99,7 @@ export default function AdminClient({
   loadError
 }: AdminClientProps) {
   // Tab State
-  const [activeTab, setActiveTab] = useState<"dashboard" | "bookings" | "inquiries" | "subscribers" | "testimonials" | "blogs" | "services" | "cms" | "faqs">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "bookings" | "inquiries" | "subscribers" | "testimonials" | "blogs" | "services" | "cms" | "faqs" | "notifications">("dashboard");
 
   // FAQ State
   const [faqsList, setFaqsList] = useState<any[]>(initialFaqs);
@@ -663,6 +666,7 @@ export default function AdminClient({
               { id: "blogs", label: "Counselling Blogs", icon: <BookOpen size={20} /> },
               { id: "services", label: "Services", icon: <Briefcase size={20} /> },
               { id: "faqs", label: "FAQ Manager", icon: <FileText size={20} /> },
+              { id: "notifications", label: "Notifications", icon: <Bell size={20} /> },
               { id: "cms", label: "Edit Website", icon: <Settings size={20} /> }
             ].map(tab => (
               <button
@@ -1743,6 +1747,15 @@ export default function AdminClient({
             <ContentEditor initialContent={initialSiteContent} notify={showNotify} />
           )}
 
+          {activeTab === "notifications" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <p style={{ color: "var(--text-secondary)", margin: "0 0 24px" }}>
+                Choose how you hear about new leads, bookings and subscribers.
+              </p>
+              <NotificationCenter initialRecipients={initialSiteContent["admin_notify_emails"] || ""} />
+            </motion.div>
+          )}
+
           </div>
 
         </div>
@@ -2174,17 +2187,10 @@ export default function AdminClient({
                       required
                     />
                   </div>
-                  <div>
-                    <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>FONT ICON</label>
-                    <input
-                      type="text"
-                      value={serviceForm.icon}
-                      onChange={(e) => setServiceForm(prev => ({ ...prev, icon: e.target.value }))}
-                      placeholder="fas fa-passport"
-                      style={{ width: "100%", padding: "10px 14px", borderRadius: "5px", border: "1px solid var(--border-color)", outline: "none", fontSize: "0.95rem" }}
-                      required
-                    />
-                  </div>
+                  <IconPicker
+                    value={serviceForm.icon}
+                    onChange={(icon) => setServiceForm(prev => ({ ...prev, icon }))}
+                  />
                 </div>
 
                 <div>
