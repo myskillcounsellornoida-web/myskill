@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -216,6 +216,54 @@ interface AdminClientProps {
   dbConnected: boolean;
   dbError: string | null;
 }
+
+const ImageUploadButton = ({ onUploadSuccess }: { onUploadSuccess: (url: string) => void }) => {
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.success) {
+        onUploadSuccess(data.url);
+      } else {
+        alert("Upload failed: " + data.error);
+      }
+    } catch (err) {
+      alert("Upload failed.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  return (
+    <>
+      <input 
+        type="file" 
+        accept="image/*"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={handleUpload}
+      />
+      <button 
+        type="button" 
+        disabled={uploading}
+        onClick={() => fileInputRef.current?.click()} 
+        style={{ padding: "0 15px", borderRadius: "8px", background: "var(--color-soft-teal)", color: "white", border: "none", cursor: uploading ? "not-allowed" : "pointer", fontSize: "0.8rem", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px" }}
+      >
+        {uploading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-upload"></i>}
+        Upload
+      </button>
+    </>
+  );
+};
 
 export default function AdminClient({
   initialInquiries,
@@ -2188,13 +2236,29 @@ export default function AdminClient({
                                   style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontFamily: "var(--font-body)", fontSize: "0.9rem", outline: "none", lineHeight: 1.6 }}
                                 />
                               ) : (
-                                <input
-                                  type="text"
-                                  defaultValue={item.value}
-                                  onChange={e => handleLivePreviewChange(item.key, e.target.value)}
-                                  onBlur={e => handleUpdateCmsKey(item.key, e.target.value)}
-                                  style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontSize: "0.9rem", outline: "none" }}
-                                />
+                                <div style={{ display: "flex", flex: 1, gap: "10px" }}>
+                                  <input
+                                    type="text"
+                                    defaultValue={item.value}
+                                    value={siteContentList.find(c => c.key === item.key)?.value || item.value}
+                                    onChange={e => {
+                                      const val = e.target.value;
+                                      setSiteContentList(prev => prev.map(c => c.key === item.key ? { ...c, value: val } : c));
+                                      handleLivePreviewChange(item.key, val);
+                                    }}
+                                    onBlur={e => handleUpdateCmsKey(item.key, e.target.value)}
+                                    style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontSize: "0.9rem", outline: "none" }}
+                                  />
+                                  {(item.key.includes("image") || item.key.includes("logo") || item.key.includes("poster") || item.key.includes("bg") || item.key.includes("icon")) && (
+                                    <ImageUploadButton 
+                                      onUploadSuccess={(url) => {
+                                        setSiteContentList(prev => prev.map(c => c.key === item.key ? { ...c, value: url } : c));
+                                        handleLivePreviewChange(item.key, url);
+                                        handleUpdateCmsKey(item.key, url);
+                                      }}
+                                    />
+                                  )}
+                                </div>
                               )}
                             </div>
                           </div>
@@ -2548,13 +2612,16 @@ export default function AdminClient({
                   </div>
                   <div>
                     <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "4px" }}>IMAGE PATH/URL</label>
-                    <input
-                      type="text"
-                      value={blogForm.image}
-                      onChange={(e) => setBlogForm(prev => ({ ...prev, image: e.target.value }))}
-                      placeholder="e.g. /images/img.jpg"
-                      style={{ width: "100%", padding: "10px 14px", borderRadius: "5px", border: "1px solid var(--border-color)", outline: "none", fontSize: "0.9rem" }}
-                    />
+                    <div style={{ display: "flex", gap: "10px" }}>
+                      <input
+                        type="text"
+                        value={blogForm.image}
+                        onChange={(e) => setBlogForm(prev => ({ ...prev, image: e.target.value }))}
+                        placeholder="e.g. /images/img.jpg"
+                        style={{ width: "100%", padding: "10px 14px", borderRadius: "5px", border: "1px solid var(--border-color)", outline: "none", fontSize: "0.9rem" }}
+                      />
+                      <ImageUploadButton onUploadSuccess={(url) => setBlogForm(prev => ({ ...prev, image: url }))} />
+                    </div>
                   </div>
                 </div>
 
