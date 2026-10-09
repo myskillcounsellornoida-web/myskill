@@ -281,14 +281,238 @@ export default function Home() {
               <h2 style={{fontSize:"clamp(1.8rem,3.5vw,2.5rem)",color:"var(--color-deep-teal)",marginBottom:18,fontFamily:"var(--font-heading)",fontWeight:800}}>Guiding You Beyond Borders</h2>
               <p style={{fontSize:"1.05rem",color:"var(--text-secondary)",marginBottom:16,lineHeight:1.8}}>Sometimes, all we need is the right guidance at the right time. That's why My Skill Counsellor was founded in 2023—to be a trusted guide, helping individuals navigate important academic and career decisions with clarity and confidence.</p>
               <p style={{fontSize:"1.05rem",color:"var(--text-secondary)",marginBottom:28,lineHeight:1.8}}>As both a counsellor and a parent of an international student myself, I bring professional expertise and real-world understanding. Every student has a different story, pace, and aspiration.</p>
-              <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:28}}>
-                {["MA English","CCCIS Certified","Since 2023","Parent of Int'l Student"].map((b,i)=>(
-                  <span key={i} style={{padding:"6px 14px",borderRadius:20,background:"rgba(62,159,168,0.1)",color:"var(--color-deep-teal)",fontSize:"0.82rem",fontWeight:700,fontFamily:"var(--font-heading)"}}>{b}</span>
+              <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:28}}>
+                {["MA English Degree","EduMilestones Certified","CCCIS Certified","USA / UK / Canada Visa Certified","Parent of Int'l Student"].map((b,i)=>(
+                  <span key={i} style={{padding:"6px 14px",borderRadius:20,background:"rgba(62,159,168,0.1)",color:"var(--color-deep-teal)",fontSize:"0.82rem",fontWeight:700,fontFamily:"var(--font-heading)",display:"inline-flex",alignItems:"center",gap:6}}>
+                    <i className="fas fa-certificate" style={{color:"var(--color-soft-teal)",fontSize:"0.75rem"}}/>
+                    {b}
+                  </span>
                 ))}
               </div>
-              <Link href="/contact" className="btn btn-outline" style={{display:"inline-flex",alignItems:"center",gap:10}}>Book a Chat <i className="fas fa-arrow-right"/></Link>
+              <div style={{display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
+                <Link href="/contact" className="btn btn-outline" style={{display:"inline-flex",alignItems:"center",gap:10}}>Book a Chat <i className="fas fa-arrow-right"/></Link>
+                <Link href="https://www.linkedin.com/in/riajain26" target="_blank" style={{color:"var(--color-deep-teal)",fontWeight:700,fontSize:"0.9rem",display:"inline-flex",alignItems:"center",gap:6,textDecoration:"none"}}>
+                  <i className="fab fa-linkedin" style={{fontSize:"1.2rem",color:"#0077b5"}}/> Verify on LinkedIn
+                </Link>
+              </div>
             </motion.div>
           </div>
+
+          {/* CERTIFICATIONS GRID */}
+          <motion.div initial={{opacity:0,y:25}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:0.6}} style={{marginTop:60,background:"white",padding:36,borderRadius:20,boxShadow:"var(--shadow-soft)",border:"1px solid var(--border-color)"}}>
+            <div style={{textAlign:"center",marginBottom:30}}>
+              <span className="text-accent">Verified Credentials</span>
+              <h3 style={{fontFamily:"var(--font-heading)",fontWeight:800,color:"var(--color-deep-teal)",margin:"6px 0 0"}}>Certifications & Professional Qualifications</h3>
+            </div>
+            
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:20}}>
+              {[
+                {
+                  title: "Certified Career Counsellor",
+                  org: "EduMilestones",
+                  desc: "Certified in psychometric assessment, career planning & stream selection for Class 9-12 and graduates.",
+                  icon: "fa-certificate"
+                },
+                {
+                  title: "CCCIS Certified",
+                  org: "Career Counselling & Int'l Studies",
+                  desc: "Specialized certification in global university admissions, program mapping, and country-specific guidance.",
+                  icon: "fa-user-check"
+                },
+                {
+                  title: "MA English Degree",
+                  org: "Master's Degree",
+                  desc: "Advanced qualification ensuring high-level SOP/LOR writing, narrative drafting & verbal mentorship.",
+                  icon: "fa-graduation-cap",
+                  link: "https://drive.google.com/file/d/1nCf-64QLptZQfCwG85Z34-1mBKPnfoyx/view?usp=sharing"
+                },
+                {
+                  title: "Visa Training Certifications",
+                  org: "USA, UK, Canada & Global",
+                  desc: "Extensive training in student visa regulations, financial documentation, and embassy mock interviews.",
+                  icon: "fa-passport"
+                }
+              ].map((cert, idx) => (
+                <div key={idx} style={{background:"var(--bg-secondary)",padding:20,borderRadius:14,borderLeft:"4px solid var(--color-deep-teal)"}}>
+                  <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+                    <i className={`fas ${cert.icon}`} style={{color:"var(--color-soft-teal)",fontSize:"1.1rem"}}/>
+                    <h4 style={{margin:0,fontSize:"1rem",color:"var(--color-deep-teal)",fontFamily:"var(--font-heading)",fontWeight:800}}>{cert.title}</h4>
+                  </div>
+                  <span style={{fontSize:"0.75rem",fontWeight:700,color:"var(--color-muted-coral)",textTransform:"uppercase",letterSpacing:"1px"}}>{cert.org}</span>
+                  <p style={{fontSize:"0.85rem",color:"var(--text-secondary)",lineHeight:1.6,margin:"8px 0 0"}}>{cert.desc}</p>
+                  {cert.link && (
+                    <a href={cert.link} target="_blank" rel="noreferrer" style={{display:"inline-flex",alignItems:"center",gap:6,fontSize:"0.8rem",color:"var(--color-soft-teal)",fontWeight:700,marginTop:10,textDecoration:"none"}}>
+                      View Certificate <i className="fas fa-external-link-alt" style={{fontSize:"0.75rem"}}/>
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* VISION & MISSION */}
+      <section style={{background:"var(--bg-secondary)",padding:"80px 0"}}>
+        <div className="container">
+          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade} style={{textAlign:"center",marginBottom:44}}>
+            <span className="text-accent">Our Purpose</span>
+            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>Vision & Mission</h2>
+          </motion.div>
+
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:30}}>
+            <motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:0.5}} style={{background:"white",padding:36,borderRadius:18,borderTop:"4px solid var(--color-deep-teal)",boxShadow:"var(--shadow-soft)"}}>
+              <div style={{width:48,height:48,borderRadius:"50%",background:"rgba(37,95,107,0.1)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--color-deep-teal)",fontSize:"1.4rem",marginBottom:20}}>
+                <i className="fas fa-eye"/>
+              </div>
+              <h3 style={{fontSize:"1.4rem",color:"var(--color-deep-teal)",fontFamily:"var(--font-heading)",fontWeight:800,marginBottom:12}}>Our Vision</h3>
+              <p style={{color:"var(--text-secondary)",lineHeight:1.8,fontSize:"1.02rem",margin:0}}>
+                To inspire individuals to discover their potential, embrace opportunities, and create a future they truly believe in.
+              </p>
+            </motion.div>
+
+            <motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:0.5,delay:0.15}} style={{background:"white",padding:36,borderRadius:18,borderTop:"4px solid var(--color-soft-teal)",boxShadow:"var(--shadow-soft)"}}>
+              <div style={{width:48,height:48,borderRadius:"50%",background:"rgba(62,159,168,0.1)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--color-soft-teal)",fontSize:"1.4rem",marginBottom:20}}>
+                <i className="fas fa-compass"/>
+              </div>
+              <h3 style={{fontSize:"1.4rem",color:"var(--color-deep-teal)",fontFamily:"var(--font-heading)",fontWeight:800,marginBottom:12}}>Our Mission</h3>
+              <p style={{color:"var(--text-secondary)",lineHeight:1.8,fontSize:"1.02rem",margin:0}}>
+                At My Skill Counsellor, we believe guidance doesn't begin in Class 12—it begins much earlier. Our mission is to walk alongside individuals and families at every stage of their journey, helping them discover their strengths, navigate opportunities, and make informed decisions with confidence, honesty, and purpose.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* CORE VALUES */}
+      <section className="bg-sage-section" style={{padding:"80px 0"}}>
+        <div className="container">
+          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade} style={{textAlign:"center",marginBottom:44}}>
+            <span className="text-accent">Principles That Guide Us</span>
+            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>Our Core Values</h2>
+          </motion.div>
+
+          <motion.div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))",gap:24}} initial="hidden" whileInView="visible" viewport={{once:true}} variants={stag}>
+            {[
+              {
+                title: "We Listen Before We Guide",
+                desc: "Every journey is unique. We take the time to understand your aspirations, strengths, and concerns before we advise.",
+                icon: "fa-comments"
+              },
+              {
+                title: "Trust & Transparency",
+                desc: "Honest advice, always in the individual's best interest. If a university isn't the right fit, we believe in being transparent rather than making false promises.",
+                icon: "fa-handshake"
+              },
+              {
+                title: "Beyond Academics",
+                desc: "We believe success is shaped not only by marks, but also by skills, aspirations, values, and personal growth.",
+                icon: "fa-graduation-cap"
+              },
+              {
+                title: "Guidance for Life",
+                desc: "Our role is not just to help people reach a destination, but to help them make confident decisions for their entire future.",
+                icon: "fa-heart"
+              }
+            ].map((v, i) => (
+              <motion.div key={i} variants={fade} style={{background:"white",padding:28,borderRadius:16,boxShadow:"var(--shadow-soft)",border:"1px solid var(--border-color)"}}>
+                <div style={{width:42,height:42,borderRadius:10,background:"rgba(37,95,107,0.1)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--color-deep-teal)",fontSize:"1.2rem",marginBottom:16}}>
+                  <i className={`fas ${v.icon}`}/>
+                </div>
+                <h4 style={{fontSize:"1.15rem",color:"var(--color-deep-teal)",fontFamily:"var(--font-heading)",fontWeight:800,marginBottom:10}}>{v.title}</h4>
+                <p style={{color:"var(--text-secondary)",fontSize:"0.92rem",lineHeight:1.7,margin:0}}>{v.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* WHAT MAKES US UNIQUE */}
+      <section style={{background:"var(--bg-primary)",padding:"80px 0"}}>
+        <div className="container">
+          <div className="flex-section" style={{display:"flex",flexWrap:"wrap",gap:50,alignItems:"center"}}>
+            <motion.div style={{flex:"1 1 400px"}} initial={{opacity:0,x:-30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.6}}>
+              <span className="text-accent">Our Philosophy</span>
+              <h2 style={{fontSize:"clamp(1.8rem,3.5vw,2.5rem)",color:"var(--color-deep-teal)",marginBottom:18,fontFamily:"var(--font-heading)",fontWeight:800}}>What Makes My Skill Counsellor Unique?</h2>
+              <p style={{fontSize:"1.05rem",color:"var(--text-secondary)",marginBottom:16,lineHeight:1.8}}>
+                At My Skill Counsellor, we believe that every individual deserves personalised guidance, not a one-size-fits-all approach. We consciously focus on <strong>quality over quantity</strong>, giving each student and family the time, attention, and support they truly deserve.
+              </p>
+              <p style={{fontSize:"1.05rem",color:"var(--text-secondary)",marginBottom:24,lineHeight:1.8}}>
+                Our relationship doesn't begin with university applications, nor does it end with an admission letter. We walk alongside our students through every stage of their study abroad journey—from profile building, university selection, applications, visas, and pre-departure preparations to helping them settle into a new country.
+              </p>
+              <div style={{background:"rgba(62,159,168,0.08)",padding:20,borderRadius:14,borderLeft:"4px solid var(--color-soft-teal)"}}>
+                <p style={{margin:0,fontSize:"0.95rem",color:"var(--color-deep-teal)",fontWeight:600}}>
+                  <i className="fas fa-quote-left" style={{marginRight:8,color:"var(--color-soft-teal)"}}/>
+                  Whether it's answering questions, easing concerns, or simply being there when guidance is needed, we strive to ensure that every student and parent feels supported, informed, and confident throughout the journey.
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div style={{flex:"1 1 350px"}} initial={{opacity:0,x:30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.6}}>
+              <div style={{background:"var(--color-deep-teal)",color:"white",padding:36,borderRadius:20,boxShadow:"0 20px 40px rgba(0,0,0,0.15)"}}>
+                <h3 style={{color:"#F0C987",fontFamily:"var(--font-heading)",fontWeight:800,marginBottom:20,fontSize:"1.4rem"}}>Guidance That Puts You First</h3>
+                <ul style={{listStyle:"none",padding:0,margin:0,display:"flex",flexDirection:"column",gap:16}}>
+                  {[
+                    "Every recommendation begins with understanding the individual, not just the university.",
+                    "We match aspirations, strengths, academic background, and career goals with right-fit institutions.",
+                    "Every journey begins with an open, honest conversation.",
+                    "No false promises—transparent advice you can depend on."
+                  ].map((item, idx) => (
+                    <li key={idx} style={{display:"flex",alignItems:"flex-start",gap:12,fontSize:"0.95rem",lineHeight:1.6,opacity:0.95}}>
+                      <i className="fas fa-check-circle" style={{color:"#F0C987",fontSize:"1.1rem",flexShrink:0,marginTop:2}}/>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURED CASE STUDY */}
+      <section style={{background:"var(--bg-secondary)",padding:"80px 0"}}>
+        <div className="container">
+          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade} style={{textAlign:"center",marginBottom:44}}>
+            <span className="text-accent">Student Success Story</span>
+            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>Case Study: Navigating Multiple Offers</h2>
+          </motion.div>
+
+          <motion.div initial={{opacity:0,y:25}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{duration:0.6}} style={{background:"white",borderRadius:20,overflow:"hidden",boxShadow:"var(--shadow-soft)",border:"1px solid var(--border-color)",maxWidth:900,margin:"0 auto"}}>
+            <div style={{background:"var(--color-deep-teal)",color:"white",padding:"24px 32px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:12}}>
+              <span style={{background:"rgba(255,255,255,0.15)",padding:"6px 16px",borderRadius:20,fontSize:"0.8rem",fontWeight:700,letterSpacing:"1px",textTransform:"uppercase",fontFamily:"var(--font-heading)"}}>Case Study</span>
+              <h3 style={{margin:0,fontSize:"1.25rem",color:"#F0C987",fontFamily:"var(--font-heading)",fontWeight:800}}>THREE OFFERS → THREE DIFFERENT PROGRAMS → ONE INFORMED DECISION</h3>
+            </div>
+
+            <div style={{padding:36,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:24}}>
+              <div style={{background:"rgba(62,159,168,0.06)",padding:20,borderRadius:12}}>
+                <span style={{fontSize:"0.8rem",fontWeight:800,color:"var(--color-soft-teal)",textTransform:"uppercase",letterSpacing:"1px"}}>The Student Goal</span>
+                <p style={{margin:"8px 0 0",fontWeight:700,color:"var(--color-deep-teal)",fontSize:"1rem"}}>Find the right undergraduate business and marketing program in Dubai.</p>
+              </div>
+
+              <div style={{background:"rgba(240,201,135,0.15)",padding:20,borderRadius:12}}>
+                <span style={{fontSize:"0.8rem",fontWeight:800,color:"#d49017",textTransform:"uppercase",letterSpacing:"1px"}}>The Outcome</span>
+                <p style={{margin:"8px 0 0",fontWeight:700,color:"var(--color-deep-teal)",fontSize:"1rem"}}>3 admissions offers from top international universities.</p>
+              </div>
+
+              <div style={{background:"rgba(37,95,107,0.06)",padding:20,borderRadius:12,gridColumn:"1 / -1"}}>
+                <span style={{fontSize:"0.8rem",fontWeight:800,color:"var(--color-deep-teal)",textTransform:"uppercase",letterSpacing:"1px"}}>Our Role</span>
+                <p style={{margin:"8px 0 0",color:"var(--text-secondary)",lineHeight:1.7,fontSize:"0.95rem"}}>
+                  Comprehensive university and program comparison, personalised counseling, and decision-making support based on the student's profile, career goals, and long-term direction.
+                </p>
+              </div>
+
+              <div style={{background:"var(--bg-secondary)",padding:20,borderRadius:12,gridColumn:"1 / -1",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:16}}>
+                <div>
+                  <span style={{fontSize:"0.8rem",fontWeight:800,color:"var(--text-secondary)",textTransform:"uppercase",letterSpacing:"1px"}}>The Next Step</span>
+                  <p style={{margin:"4px 0 0",fontWeight:700,color:"var(--color-deep-teal)"}}>Choosing the exact university & program that best fits the student's future.</p>
+                </div>
+                <Link href="https://www.linkedin.com/posts/riajain26_studentsuccess-careercounselling-studyabroad-activity-7449459855624441856-BBZH" target="_blank" className="btn btn-outline" style={{fontSize:"0.85rem",padding:"8px 18px"}}>
+                  Read Full Story on LinkedIn <i className="fab fa-linkedin" style={{marginLeft:6}}/>
+                </Link>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
