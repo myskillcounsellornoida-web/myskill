@@ -1,5 +1,3 @@
-import { motion } from "framer-motion";
-
 export default function TermsOfService() {
   return (
     <main>
@@ -16,10 +14,10 @@ export default function TermsOfService() {
           <p style={{ marginBottom: '30px' }}>By accessing our website and using our services, you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.</p>
           
           <h2 style={{ color: 'var(--color-deep-teal)', marginBottom: '20px' }}>2. Use License</h2>
-          <p style={{ marginBottom: '30px' }}>Permission is granted to temporarily download one copy of the materials (information or software) on My Skill Counsellor's website for personal, non-commercial transitory viewing only.</p>
-          
+          <p style={{ marginBottom: '30px' }}>Permission is granted to temporarily download one copy of the materials (information or software) on My Skill Counsellor&apos;s website for personal, non-commercial transitory viewing only.</p>
+
           <h2 style={{ color: 'var(--color-deep-teal)', marginBottom: '20px' }}>3. Disclaimer</h2>
-          <p style={{ marginBottom: '30px' }}>The materials on My Skill Counsellor's website are provided on an 'as is' basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+          <p style={{ marginBottom: '30px' }}>The materials on My Skill Counsellor&apos;s website are provided on an &apos;as is&apos; basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
 
           <h2 style={{ color: 'var(--color-deep-teal)', marginBottom: '20px' }}>4. Limitations</h2>
           <p style={{ marginBottom: '30px' }}>In no event shall My Skill Counsellor or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on our website.</p>

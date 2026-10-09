@@ -9,7 +9,7 @@ export default async function Home() {
     fetchFaqs()
   ]);
 
-  let cmsData: Record<string, string> = {};
+  const cmsData: Record<string, string> = {};
   if (siteContentRes.success && siteContentRes.data) {
     siteContentRes.data.forEach((item: any) => {
       cmsData[item.key] = item.value;

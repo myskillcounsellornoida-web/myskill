@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
 const fadeUp = {
@@ -32,7 +32,7 @@ export default function BlogClient({ blogsList }: BlogClientProps) {
     { q: "Can I suggest a topic for the blog?", a: "Yes! If you have specific questions about a country, university, or test prep, reach out via the Contact page and we may feature it in our next guide." }
   ];
 
-  const [blogs, setBlogs] = useState<any[]>(blogsList);
+  const [blogs] = useState<any[]>(blogsList);
 
 
 

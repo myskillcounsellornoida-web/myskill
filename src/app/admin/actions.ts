@@ -6,16 +6,26 @@ import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getLocalData, saveLocalData } from "@/db/localStore";
 import { Resend } from "resend";
+import { isAdminAuthenticated } from "@/lib/adminAuth";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_key");
 
 export type ActionResult<T = any> = { success: boolean; data: T; error?: string };
+
+const UNAUTHORIZED_ERROR = "Unauthorized. Please sign in as an administrator.";
+
+// Every action below is reachable directly (Server Actions are public endpoints),
+// so the proxy's cookie check alone is not sufficient — see docs/app/guides/authentication.
+async function requireAdmin(): Promise<boolean> {
+  return isAdminAuthenticated();
+}
 
 /* ==========================================
    INQUIRIES ACTIONS
    ========================================== */
 
 export async function fetchInquiries(): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: [], error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.select().from(inquiries).orderBy(desc(inquiries.createdAt));
@@ -30,6 +40,7 @@ export async function fetchInquiries(): Promise<ActionResult> {
 }
 
 export async function toggleInquiryContacted(id: number, isContacted: boolean): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.update(inquiries)
@@ -52,6 +63,7 @@ export async function toggleInquiryContacted(id: number, isContacted: boolean): 
 }
 
 export async function deleteInquiry(id: number): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.delete(inquiries)
@@ -91,6 +103,7 @@ export async function fetchTestimonials(): Promise<ActionResult> {
 }
 
 export async function createTestimonial(name: string, role: string, text: string): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.insert(testimonials)
@@ -117,6 +130,7 @@ export async function createTestimonial(name: string, role: string, text: string
 }
 
 export async function updateTestimonial(id: number, name: string, role: string, text: string): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.update(testimonials)
@@ -143,6 +157,7 @@ export async function updateTestimonial(id: number, name: string, role: string, 
 }
 
 export async function deleteTestimonial(id: number): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.delete(testimonials)
@@ -186,6 +201,7 @@ export async function fetchServices(): Promise<ActionResult> {
 }
 
 export async function createService(title: string, description: string, icon: string): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.insert(services)
@@ -212,6 +228,7 @@ export async function createService(title: string, description: string, icon: st
 }
 
 export async function updateService(id: number, title: string, description: string, icon: string): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.update(services)
@@ -238,6 +255,7 @@ export async function updateService(id: number, title: string, description: stri
 }
 
 export async function deleteService(id: number): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.delete(services)
@@ -281,6 +299,7 @@ export async function fetchBlogs(): Promise<ActionResult> {
 }
 
 export async function createBlog(title: string, slug: string, content: string, image: string, tag: string, readTime: string): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.insert(blogs)
@@ -307,6 +326,7 @@ export async function createBlog(title: string, slug: string, content: string, i
 }
 
 export async function updateBlog(id: number, title: string, slug: string, content: string, image: string, tag: string, readTime: string): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.update(blogs)
@@ -333,6 +353,7 @@ export async function updateBlog(id: number, title: string, slug: string, conten
 }
 
 export async function deleteBlog(id: number): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.delete(blogs)
@@ -377,6 +398,7 @@ export async function fetchSiteContent(): Promise<ActionResult> {
 }
 
 export async function updateSiteContent(key: string, value: string): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const existing = await db.select().from(siteContent).where(eq(siteContent.key, key)).limit(1);
@@ -413,6 +435,7 @@ export async function updateSiteContent(key: string, value: string): Promise<Act
    ========================================== */
 
 export async function fetchBookings(): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: [], error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.select().from(bookings).orderBy(desc(bookings.createdAt));
@@ -427,6 +450,7 @@ export async function fetchBookings(): Promise<ActionResult> {
 }
 
 export async function updateBookingStatus(id: number, status: string): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.update(bookings)
@@ -452,6 +476,7 @@ export async function updateBookingStatus(id: number, status: string): Promise<A
 }
 
 export async function deleteBooking(id: number): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.delete(bookings)
@@ -480,6 +505,7 @@ export async function deleteBooking(id: number): Promise<ActionResult> {
    ========================================== */
 
 export async function fetchSubscribers(): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: [], error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.select().from(subscribers).orderBy(desc(subscribers.createdAt));
@@ -494,6 +520,7 @@ export async function fetchSubscribers(): Promise<ActionResult> {
 }
 
 export async function deleteSubscriber(id: number): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.delete(subscribers)
@@ -527,6 +554,9 @@ export async function sendBroadcastEmail(
   targetAudience: "subscribers" | "bookings" | "inquiries" | "all" | "custom",
   customEmail?: string
 ): Promise<ActionResult<{ total: number; sent: number; failed: number }>> {
+  if (!(await requireAdmin())) {
+    return { success: false, data: { total: 0, sent: 0, failed: 0 }, error: UNAUTHORIZED_ERROR };
+  }
   if (!subject.trim() || !bodyHtml.trim()) {
     return { success: false, data: { total: 0, sent: 0, failed: 0 }, error: "Subject and Body content are required." };
   }
@@ -639,6 +669,7 @@ export async function fetchFaqs(): Promise<ActionResult> {
 }
 
 export async function saveFaq(data: any): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       if (data.id) {
@@ -666,6 +697,7 @@ export async function saveFaq(data: any): Promise<ActionResult> {
 }
 
 export async function deleteFaq(id: number): Promise<ActionResult> {
+  if (!(await requireAdmin())) return { success: false, data: null, error: UNAUTHORIZED_ERROR };
   if (process.env.DATABASE_URL) {
     try {
       const res = await db.delete(faqs)

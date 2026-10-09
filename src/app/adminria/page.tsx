@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import {
   fetchInquiries,
   fetchTestimonials,
@@ -9,11 +10,17 @@ import {
   fetchFaqs
 } from "../admin/actions";
 import AdminClient from "../admin/AdminClient";
+import { isAdminAuthenticated } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
 // Secret admin route — accessible at /adminria
 export default async function AdminRiaPage() {
+  // Belt-and-braces check alongside the proxy — see docs/app/guides/authentication.
+  if (!(await isAdminAuthenticated())) {
+    redirect("/admin/login?redirect=%2Fadminria");
+  }
+
   const [
     inquiriesRes,
     testimonialsRes,

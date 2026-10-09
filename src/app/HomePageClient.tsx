@@ -18,7 +18,7 @@ export default function HomePageClient({
   initialTestimonials?: any[];
   initialFaqs?: any[];
 }) {
-  const [cmsData, setCmsData] = useState(initialCmsData);
+  const [cmsData] = useState(initialCmsData);
   const [slide, setSlide] = useState(0);
   const [faq, setFaq] = useState<number | null>(0);
   
@@ -27,7 +27,7 @@ export default function HomePageClient({
     { name: "Mrs. Kapoor", role: "Parent", text: "We were overwhelmed with the UK visa process. Ria handled everything smoothly and professionally." },
     { name: "Simran Kaur", role: "IELTS Band 8", text: "The structured mock interviews and writing evaluations helped me score far above my target." },
   ];
-  const [testimonials, setTestimonials] = useState<any[]>(initialTestimonials.length > 0 ? initialTestimonials : defaultTestimonials);
+  const [testimonials] = useState<any[]>(initialTestimonials.length > 0 ? initialTestimonials : defaultTestimonials);
 
   useEffect(()=>{
     const timer=setInterval(()=>setSlide(p=>(p+1)%5),4500);
@@ -113,7 +113,7 @@ export default function HomePageClient({
     points: s.description ? s.description.split('\n').filter((p:string) => p.trim()) : []
   });
 
-  const [services, setServices] = useState<any[]>(
+  const [services] = useState<any[]>(
     initialServices.length > 0 ? initialServices : defaultServices
   );
 
@@ -126,7 +126,7 @@ export default function HomePageClient({
     {q:t("faq4_q", "How do I start the process?"),a:t("faq4_a", "You can start by booking a free initial consultation through our contact page. We will assess your profile and discuss a personalized roadmap.")},
   ];
 
-  const [faqs, setFaqs] = useState<any[]>(
+  const [faqs] = useState<any[]>(
     initialFaqs.length > 0 ? initialFaqs : defaultFaqs
   );
 
@@ -255,7 +255,7 @@ export default function HomePageClient({
             {testimonials.slice(0, 3).map((t_item, i)=>(
               <motion.div key={i} variants={fade} style={{background:"white",padding:30,borderRadius:16,borderLeft:"4px solid var(--color-soft-teal)",boxShadow:"var(--shadow-soft)"}}>
                 <i className="fas fa-quote-left" style={{fontSize:"1.8rem",color:"rgba(62,159,168,0.18)"}}/>
-                <p style={{marginTop:12,fontStyle:"italic",color:"var(--text-secondary)",lineHeight:1.75,fontSize:"0.95rem"}}>"{t_item.text}"</p>
+                <p style={{marginTop:12,fontStyle:"italic",color:"var(--text-secondary)",lineHeight:1.75,fontSize:"0.95rem"}}>&quot;{t_item.text}&quot;</p>
                 <h4 style={{marginTop:18,color:"var(--color-deep-teal)",marginBottom:4,fontFamily:"var(--font-heading)",fontWeight:800}}>{t_item.name}</h4>
                 <span style={{fontSize:"0.8rem",color:"var(--text-secondary)"}}>{t_item.role}</span>
               </motion.div>
