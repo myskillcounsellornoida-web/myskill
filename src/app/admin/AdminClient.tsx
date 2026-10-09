@@ -2210,22 +2210,24 @@ export default function AdminClient({
           </div>
 
           {/* GLOBAL RIGHT PANE: Live Preview */}
-          <div style={{ flex: "1.1", position: "relative", borderLeft: "2px solid var(--border-color)", background: "white", display: "flex", flexDirection: "column", boxShadow: "-5px 0 15px rgba(0,0,0,0.03)" }}>
-            <div style={{ background: "var(--color-deep-teal)", padding: "12px 16px", color: "white", fontSize: "0.85rem", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <i className="fas fa-desktop"></i> Live Website Preview
+          {["cms", "testimonials", "blogs", "services", "faqs"].includes(activeTab) && (
+            <div style={{ flex: "1.1", position: "relative", borderLeft: "2px solid var(--border-color)", background: "white", display: "flex", flexDirection: "column", boxShadow: "-5px 0 15px rgba(0,0,0,0.03)" }}>
+              <div style={{ background: "var(--color-deep-teal)", padding: "12px 16px", color: "white", fontSize: "0.85rem", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <i className="fas fa-desktop"></i> Live Website Preview
+                </div>
+                <button 
+                  onClick={() => { const f = document.getElementById("live-preview-iframe") as HTMLIFrameElement; if(f) f.src = f.src; }}
+                  style={{ background: "rgba(255,255,255,0.2)", border: "none", color: "white", padding: "6px 12px", borderRadius: "5px", cursor: "pointer", fontSize: "0.75rem", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px", transition: "all 0.2s" }}
+                  onMouseOver={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.3)"}
+                  onMouseOut={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
+                >
+                  <i className="fas fa-sync-alt"></i> Refresh Preview
+                </button>
               </div>
-              <button 
-                onClick={() => { const f = document.getElementById("live-preview-iframe") as HTMLIFrameElement; if(f) f.src = f.src; }}
-                style={{ background: "rgba(255,255,255,0.2)", border: "none", color: "white", padding: "6px 12px", borderRadius: "5px", cursor: "pointer", fontSize: "0.75rem", fontWeight: 600, display: "flex", alignItems: "center", gap: "6px", transition: "all 0.2s" }}
-                onMouseOver={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.3)"}
-                onMouseOut={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
-              >
-                <i className="fas fa-sync-alt"></i> Refresh Preview
-              </button>
+              <iframe id="live-preview-iframe" src={activeTab === "blogs" ? "/blog" : activeTab === "services" ? "/services" : activeTab === "testimonials" ? "/testimonials" : "/"} style={{ width: "100%", flex: 1, border: "none" }} />
             </div>
-            <iframe id="live-preview-iframe" src={activeTab === "blogs" ? "/blog" : activeTab === "services" ? "/services" : "/"} style={{ width: "100%", flex: 1, border: "none" }} />
-          </div>
+          )}
 
         </div>
       </main>
