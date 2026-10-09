@@ -1116,7 +1116,7 @@ export default function AdminClient({
               { id: "blogs", label: "Counselling Blogs", icon: <BookOpen size={20} /> },
               { id: "services", label: "Services", icon: <Briefcase size={20} /> },
               { id: "faqs", label: "FAQ Manager", icon: <FileText size={20} /> },
-              { id: "cms", label: "Site Content (CMS)", icon: <Settings size={20} /> }
+              { id: "cms", label: "Edit Website", icon: <Settings size={20} /> }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -1201,7 +1201,7 @@ export default function AdminClient({
         }}>
           <div>
             <h1 style={{ fontSize: "1.4rem", margin: 0, textTransform: "capitalize", color: "var(--color-deep-teal)" }}>
-              {activeTab === "cms" ? "Site Content Editor" : `${activeTab} Management`}
+              {activeTab === "cms" ? "Edit Website Content" : `${activeTab} Management`}
             </h1>
           </div>
 
