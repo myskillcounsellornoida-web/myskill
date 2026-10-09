@@ -24,7 +24,8 @@
     "resend": "^6.17.1",
     "server-only": "^0.0.1",
     "three": "^0.185.1",
-    "web-push": "^3.6.7"
+    "web-push": "^3.6.7",
+    "sharp": "^0.35.3"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -34,7 +35,6 @@
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
-    "sharp": "^0.35.3",
     "typescript": "^5"
   }
 }

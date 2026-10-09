@@ -12,7 +12,7 @@ export const getDb = () => {
     if (!connectionString) {
       throw new Error("DATABASE_URL is not defined in the environment.");
     }
-    const client = postgres(connectionString, { prepare: false });
+    const client = postgres(connectionString, { prepare: false, max: 2, idle_timeout: 20, connect_timeout: 10 });
     dbInstance = drizzle(client, { schema });
   }
   return dbInstance;

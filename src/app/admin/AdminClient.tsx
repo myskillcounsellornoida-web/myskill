@@ -143,6 +143,7 @@ export default function AdminClient({
   const [testimonialCategoryMap, setTestimonialCategoryMap] = useState<Record<string, string>>(() => parseCategoryMap(initialSiteContent[TESTIMONIAL_CATEGORY_MAP_KEY]));
 
   const [showBlogModal, setShowBlogModal] = useState(false);
+  const [blogImageUploading, setBlogImageUploading] = useState(false);
   const [editingBlog, setEditingBlog] = useState<any | null>(null);
   const [blogForm, setBlogForm] = useState({ title: "", slug: "", tag: "", readTime: "", image: "", content: "" });
 
@@ -384,6 +385,7 @@ export default function AdminClient({
 
   const handleSaveBlog = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (blogImageUploading) return;
     const { title, slug, content, image, tag, readTime } = blogForm;
     if (!title || !slug || !content) {
       showNotify("Title, slug, and content are required.", "error");
@@ -2103,7 +2105,7 @@ export default function AdminClient({
                         placeholder="e.g. /images/img.jpg"
                         style={{ width: "100%", padding: "10px 14px", borderRadius: "5px", border: "1px solid var(--border-color)", outline: "none", fontSize: "0.9rem" }}
                       />
-                      <ImageUploadButton onUploadSuccess={(url) => setBlogForm(prev => ({ ...prev, image: url }))} />
+                      <ImageUploadButton onUploadingChange={setBlogImageUploading} onError={(message) => showNotify(message, "error")} onUploadSuccess={(url) => setBlogForm(prev => ({ ...prev, image: url }))} />
                     </div>
                   </div>
                 </div>
@@ -2121,11 +2123,11 @@ export default function AdminClient({
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px" }}>
-                  <button type="button" onClick={() => setShowBlogModal(false)} style={{ padding: "10px 20px", border: "1px solid var(--border-color)", background: "none", borderRadius: "5px", cursor: "pointer", fontSize: "0.9rem" }}>
+                  <button type="button" disabled={blogImageUploading} onClick={() => setShowBlogModal(false)} style={{ padding: "10px 20px", border: "1px solid var(--border-color)", background: "none", borderRadius: "5px", cursor: "pointer", fontSize: "0.9rem" }}>
                     Cancel
                   </button>
-                  <button type="submit" className="btn btn-primary" style={{ padding: "10px 20px", fontSize: "0.9rem", borderRadius: "5px" }}>
-                    Save Article
+                  <button type="submit" disabled={blogImageUploading} className="btn btn-primary" style={{ padding: "10px 20px", fontSize: "0.9rem", borderRadius: "5px" }}>
+                    {blogImageUploading ? "Uploading image…" : "Save Article"}
                   </button>
                 </div>
               </form>

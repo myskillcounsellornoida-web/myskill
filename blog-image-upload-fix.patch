@@ -1,0 +1,734 @@
+diff --git a/README.md b/README.md
+index e215bc4..bbfe9c8 100644
+--- a/README.md
++++ b/README.md
+@@ -34,3 +34,24 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
+ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+ 
+ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
++
++## Admin image uploads on Vercel / Neon
++
++Uploads no longer write to `public/uploads`: that directory is not durable writable storage on Vercel. The existing authenticated Upload button prepares a static WebP in the browser (maximum 1280 pixels on the longest edge and 150 KiB), then the server verifies and re-encodes it with Sharp. Animated GIFs become a still image. Original files may be up to 20 MiB; the HTTP upload body is limited to 200 KiB, including multipart overhead.
++
++Set `DATABASE_URL` to the existing Neon database in Vercel. The first authenticated upload creates `uploaded_images` automatically, so the database role must have CREATE TABLE permission. Image bytes are stored once in that table; blogs and CMS records retain short `/api/images/<sha256>` URLs. Identical processed images share a URL. No additional storage account or secret is needed. Sharp is a production dependency.
++
++The application caps stored image payloads at **20 MiB total** with a transaction lock to prevent simultaneous uploads exceeding the budget. When full, uploads stop with a clear message; externally hosted image URLs remain available. This cap includes unused uploads. Images are retained when posts are edited/deleted because CMS content may share them. Database indexes, row overhead, backups/history and unrelated tables consume additional storage. Existing `/uploads/` files lost in a previous Vercel deployment must be uploaded again from their originals.
++
++Image URLs are public and immutable, with one-year browser and Vercel CDN caching to reduce database reads and function invocations. The PostgreSQL client uses at most two connections per instance and closes idle connections after 20 seconds. Existing Next.js image optimization remains disabled, avoiding image transformation usage.
++
++These safeguards reduce usage; they cannot guarantee total Neon/Vercel free allowances under unlimited traffic or with other applications sharing the account. Check storage, transfer, compute and request usage in the provider dashboards. On a paid plan, use the provider's spending controls separately. To inspect image storage:
++
++```sql
++SELECT count(*) AS images,
++       coalesce(sum(octet_length(data)), 0) AS image_payload_bytes,
++       pg_total_relation_size('uploaded_images') AS table_bytes
++FROM uploaded_images;
++```
++
++Validation: `node scripts/test-image-upload.cjs`, `npx tsc --noEmit`, and `npm run build`. The image test uses isolated authentication/storage mocks and real Sharp encoding, without connecting to a database.
+diff --git a/package-lock.json b/package-lock.json
+index 6438223..373b711 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -22,6 +22,7 @@
+         "react-dom": "19.2.4",
+         "resend": "^6.17.1",
+         "server-only": "^0.0.1",
++        "sharp": "^0.35.3",
+         "three": "^0.185.1",
+         "web-push": "^3.6.7"
+       },
+@@ -33,7 +34,6 @@
+         "drizzle-kit": "^0.31.10",
+         "eslint": "^9",
+         "eslint-config-next": "16.2.10",
+-        "sharp": "^0.35.3",
+         "typescript": "^5"
+       }
+     },
+@@ -1424,7 +1424,6 @@
+       "version": "1.1.0",
+       "resolved": "https://registry.npmjs.org/@img/colour/-/colour-1.1.0.tgz",
+       "integrity": "sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==",
+-      "devOptional": true,
+       "license": "MIT",
+       "engines": {
+         "node": ">=18"
+@@ -1437,7 +1436,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1460,7 +1458,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1480,7 +1477,6 @@
+       "version": "0.35.3",
+       "resolved": "https://registry.npmjs.org/@img/sharp-freebsd-wasm32/-/sharp-freebsd-wasm32-0.35.3.tgz",
+       "integrity": "sha512-lUxcqWIj2wMQ9BrwNjngcr1gWUr5xgaGThBRqPPalIC2n67Cqj1uPh8NnA/ZhAg8hUbKl+kVHKwgUIwe6ZYPrg==",
+-      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1503,7 +1499,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1520,7 +1515,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1537,7 +1531,6 @@
+       "cpu": [
+         "arm"
+       ],
+-      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1554,7 +1547,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1571,7 +1563,6 @@
+       "cpu": [
+         "ppc64"
+       ],
+-      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1588,7 +1579,6 @@
+       "cpu": [
+         "riscv64"
+       ],
+-      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1605,7 +1595,6 @@
+       "cpu": [
+         "s390x"
+       ],
+-      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1622,7 +1611,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1639,7 +1627,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1656,7 +1643,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "dev": true,
+       "license": "LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1673,7 +1659,6 @@
+       "cpu": [
+         "arm"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1696,7 +1681,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1719,7 +1703,6 @@
+       "cpu": [
+         "ppc64"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1742,7 +1725,6 @@
+       "cpu": [
+         "riscv64"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1765,7 +1747,6 @@
+       "cpu": [
+         "s390x"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1788,7 +1769,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1811,7 +1791,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1834,7 +1813,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "os": [
+@@ -1854,7 +1832,6 @@
+       "version": "0.35.3",
+       "resolved": "https://registry.npmjs.org/@img/sharp-wasm32/-/sharp-wasm32-0.35.3.tgz",
+       "integrity": "sha512-cZ0XkcYGpHZkqW6iCkqTcmUC0CD9DhD5d/qeZlZkfRBn6GnHniZXLUo5+9xw8Iv76YE6LQFN9YNBlKREcCG76w==",
+-      "dev": true,
+       "license": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
+       "optional": true,
+       "dependencies": {
+@@ -1874,7 +1851,6 @@
+       "cpu": [
+         "wasm32"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0",
+       "optional": true,
+       "dependencies": {
+@@ -1894,7 +1870,6 @@
+       "cpu": [
+         "arm64"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0 AND LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1914,7 +1889,6 @@
+       "cpu": [
+         "ia32"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0 AND LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -1934,7 +1908,6 @@
+       "cpu": [
+         "x64"
+       ],
+-      "dev": true,
+       "license": "Apache-2.0 AND LGPL-3.0-or-later",
+       "optional": true,
+       "os": [
+@@ -3885,7 +3858,6 @@
+       "version": "2.1.2",
+       "resolved": "https://registry.npmjs.org/detect-libc/-/detect-libc-2.1.2.tgz",
+       "integrity": "sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==",
+-      "devOptional": true,
+       "license": "Apache-2.0",
+       "engines": {
+         "node": ">=8"
+@@ -7687,7 +7659,6 @@
+       "version": "0.35.3",
+       "resolved": "https://registry.npmjs.org/sharp/-/sharp-0.35.3.tgz",
+       "integrity": "sha512-ej0zVHuZGHCiABXcNxeYhpRnPNPAcvbG8RMdBAhDAxLKkCRVSpK3Iyu7qbqw3JMzoj0REeM6f3tJLtVwl0023Q==",
+-      "dev": true,
+       "license": "Apache-2.0",
+       "dependencies": {
+         "@img/colour": "^1.1.0",
+@@ -7737,7 +7708,6 @@
+       "version": "7.8.5",
+       "resolved": "https://registry.npmjs.org/semver/-/semver-7.8.5.tgz",
+       "integrity": "sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==",
+-      "dev": true,
+       "license": "ISC",
+       "bin": {
+         "semver": "bin/semver.js"
+diff --git a/package.json b/package.json
+index eff90d5..eab580a 100644
+--- a/package.json
++++ b/package.json
+@@ -24,7 +24,8 @@
+     "resend": "^6.17.1",
+     "server-only": "^0.0.1",
+     "three": "^0.185.1",
+-    "web-push": "^3.6.7"
++    "web-push": "^3.6.7",
++    "sharp": "^0.35.3"
+   },
+   "devDependencies": {
+     "@types/node": "^20",
+@@ -34,7 +35,6 @@
+     "drizzle-kit": "^0.31.10",
+     "eslint": "^9",
+     "eslint-config-next": "16.2.10",
+-    "sharp": "^0.35.3",
+     "typescript": "^5"
+   }
+ }
+diff --git a/scripts/test-image-upload.cjs b/scripts/test-image-upload.cjs
+new file mode 100644
+index 0000000..61958b5
+--- /dev/null
++++ b/scripts/test-image-upload.cjs
+@@ -0,0 +1,88 @@
++// Exercise actual handlers with real image encoding and isolated storage/auth mocks.
++const { readFileSync } = require('node:fs');
++const vm = require('node:vm');
++const assert = require('node:assert/strict');
++const ts = require('typescript');
++const sharp = require('sharp');
++function load(file, mocks = {}) {
++  const exports = {};
++  const code = ts.transpileModule(readFileSync(file, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true } }).outputText;
++  vm.runInThisContext(`(function(require, exports) { ${code}\n})`, { filename: file })(name => name in mocks ? mocks[name] : require(name), exports);
++  return exports;
++}
++(async () => {
++  const limits = load('src/lib/imageUpload.ts');
++  let authenticated = false;
++  let calls = 0;
++  let full = false;
++  let stored;
++  const { POST } = load('src/app/api/upload/route.ts', {
++    'next/server': { NextResponse: { json: (body, init) => Response.json(body, init) } },
++    '@/lib/adminAuth': { isAdminAuthenticated: async () => authenticated },
++    '@/lib/imageUpload': limits,
++    '@/lib/imageStorage': { storeImage: async buffer => { calls++; if (full) throw new Error('IMAGE_STORAGE_FULL'); stored = buffer; return '/api/images/' + 'a'.repeat(64); } },
++  });
++  process.env.DATABASE_URL = 'mock-only';
++  const request = (data, type = 'image/png') => {
++    const form = new FormData();
++    form.set('file', new File([data], 'test.png', { type }));
++    return new Request('http://localhost/api/upload', { method: 'POST', body: form });
++  };
++  assert.equal((await POST(request('x'))).status, 401);
++  assert.equal(calls, 0);
++  authenticated = true;
++  delete process.env.DATABASE_URL;
++  assert.equal((await POST(request('x'))).status, 503);
++  process.env.DATABASE_URL = 'mock-only';
++  assert.equal((await POST(request('x', 'text/plain'))).status, 400);
++  assert.equal((await POST(request('not an image'))).status, 400);
++  assert.equal((await POST(request(Buffer.alloc(limits.MAX_IMAGE_BYTES + 1)))).status, 413);
++  assert.equal((await POST(new Request('http://localhost/api/upload', { method: 'POST', body: Buffer.alloc(limits.MAX_UPLOAD_BODY_BYTES + 1) }))).status, 413);
++  assert.equal((await POST(new Request('http://localhost/api/upload', { method: 'POST', body: 'invalid' }))).status, 400);
++  const png = await sharp({ create: { width: 1600, height: 900, channels: 3, background: '#498b93' } }).png().toBuffer();
++  const response = await POST(request(png));
++  assert.equal(response.status, 200);
++  assert.equal((await response.json()).url, '/api/images/' + 'a'.repeat(64));
++  const metadata = await sharp(stored).metadata();
++  assert.equal(metadata.format, 'webp');
++  assert.equal(metadata.width, 1280);
++  assert.ok(stored.length <= limits.MAX_IMAGE_BYTES);
++  full = true;
++  assert.equal((await POST(request(png))).status, 409);
++  let reads = 0;
++  const { GET } = load('src/app/api/images/[id]/route.ts', { '@/lib/imageStorage': { readImage: async () => { reads++; return stored; } } });
++  const context = id => ({ params: Promise.resolve({ id }) });
++  assert.equal((await GET(new Request('http://localhost'), context('bad'))).status, 404);
++  assert.equal(reads, 0);
++  const image = await GET(new Request('http://localhost'), context('a'.repeat(64)));
++  assert.equal(image.headers.get('content-type'), 'image/webp');
++  assert.match(image.headers.get('vercel-cdn-cache-control'), /s-maxage=31536000/);
++  assert.deepEqual(Buffer.from(await image.arrayBuffer()), stored);
++  assert.equal((await GET(new Request('http://localhost', { headers: { 'if-none-match': '"' + 'a'.repeat(64) + '"' } }), context('a'.repeat(64)))).status, 304);
++  // Verify storage deduplication and quota rejection without touching a database.
++  let existing = false;
++  let used = 0;
++  let inserts = 0;
++  const execute = async query => {
++    const chunks = query.queryChunks.map(x => x.value ?? '').flat().join('');
++    if (chunks.includes('SELECT id')) return existing ? [{ id: 'existing' }] : [];
++    if (chunks.includes('AS used')) return [{ used }];
++    if (chunks.includes('INSERT INTO')) inserts++;
++    return [];
++  };
++  const storage = load('src/lib/imageStorage.ts', {
++    'server-only': {}, './imageUpload': limits,
++    '@/db': { db: { execute, transaction: fn => fn({ execute }) } },
++  });
++  const first = await storage.storeImage(stored);
++  assert.match(first, /^\/api\/images\/[a-f0-9]{64}$/);
++  assert.equal(inserts, 1);
++  existing = true;
++  used = limits.MAX_IMAGE_STORAGE_BYTES;
++  assert.equal(await storage.storeImage(stored), first);
++  assert.equal(inserts, 1);
++  existing = false;
++  await assert.rejects(storage.storeImage(stored), /IMAGE_STORAGE_FULL/);
++  assert.equal(inserts, 1);
++  console.log('Passed: auth, input/body limits, invalid images, WebP resizing, quota, deduplication, image serving and cache headers.');
++})().catch(error => { console.error(error); process.exitCode = 1; });
+diff --git a/src/app/admin/AdminClient.tsx b/src/app/admin/AdminClient.tsx
+index a124b53..356daca 100644
+--- a/src/app/admin/AdminClient.tsx
++++ b/src/app/admin/AdminClient.tsx
+@@ -143,6 +143,7 @@ export default function AdminClient({
+   const [testimonialCategoryMap, setTestimonialCategoryMap] = useState<Record<string, string>>(() => parseCategoryMap(initialSiteContent[TESTIMONIAL_CATEGORY_MAP_KEY]));
+ 
+   const [showBlogModal, setShowBlogModal] = useState(false);
++  const [blogImageUploading, setBlogImageUploading] = useState(false);
+   const [editingBlog, setEditingBlog] = useState<any | null>(null);
+   const [blogForm, setBlogForm] = useState({ title: "", slug: "", tag: "", readTime: "", image: "", content: "" });
+ 
+@@ -384,6 +385,7 @@ export default function AdminClient({
+ 
+   const handleSaveBlog = async (e: React.FormEvent) => {
+     e.preventDefault();
++    if (blogImageUploading) return;
+     const { title, slug, content, image, tag, readTime } = blogForm;
+     if (!title || !slug || !content) {
+       showNotify("Title, slug, and content are required.", "error");
+@@ -2103,7 +2105,7 @@ export default function AdminClient({
+                         placeholder="e.g. /images/img.jpg"
+                         style={{ width: "100%", padding: "10px 14px", borderRadius: "5px", border: "1px solid var(--border-color)", outline: "none", fontSize: "0.9rem" }}
+                       />
+-                      <ImageUploadButton onUploadSuccess={(url) => setBlogForm(prev => ({ ...prev, image: url }))} />
++                      <ImageUploadButton onUploadingChange={setBlogImageUploading} onError={(message) => showNotify(message, "error")} onUploadSuccess={(url) => setBlogForm(prev => ({ ...prev, image: url }))} />
+                     </div>
+                   </div>
+                 </div>
+@@ -2121,11 +2123,11 @@ export default function AdminClient({
+                 </div>
+ 
+                 <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px" }}>
+-                  <button type="button" onClick={() => setShowBlogModal(false)} style={{ padding: "10px 20px", border: "1px solid var(--border-color)", background: "none", borderRadius: "5px", cursor: "pointer", fontSize: "0.9rem" }}>
++                  <button type="button" disabled={blogImageUploading} onClick={() => setShowBlogModal(false)} style={{ padding: "10px 20px", border: "1px solid var(--border-color)", background: "none", borderRadius: "5px", cursor: "pointer", fontSize: "0.9rem" }}>
+                     Cancel
+                   </button>
+-                  <button type="submit" className="btn btn-primary" style={{ padding: "10px 20px", fontSize: "0.9rem", borderRadius: "5px" }}>
+-                    Save Article
++                  <button type="submit" disabled={blogImageUploading} className="btn btn-primary" style={{ padding: "10px 20px", fontSize: "0.9rem", borderRadius: "5px" }}>
++                    {blogImageUploading ? "Uploading image…" : "Save Article"}
+                   </button>
+                 </div>
+               </form>
+diff --git a/src/app/admin/ImageUploadButton.tsx b/src/app/admin/ImageUploadButton.tsx
+index 8a41851..81ada18 100644
+--- a/src/app/admin/ImageUploadButton.tsx
++++ b/src/app/admin/ImageUploadButton.tsx
+@@ -1,13 +1,16 @@
+ "use client";
+ 
+ import { useRef, useState } from "react";
++import { compressUpload } from "@/lib/imageUpload";
+ 
+ export default function ImageUploadButton({
+   onUploadSuccess,
++  onUploadingChange,
+   onError = (msg) => alert(msg),
+ }: {
+   onUploadSuccess: (url: string) => void;
+   onError?: (message: string) => void;
++  onUploadingChange?: (uploading: boolean) => void;
+ }) {
+   const [uploading, setUploading] = useState(false);
+   const fileInputRef = useRef<HTMLInputElement>(null);
+@@ -16,20 +19,23 @@ export default function ImageUploadButton({
+     const file = e.target.files?.[0];
+     if (!file) return;
+     setUploading(true);
+-    const formData = new FormData();
+-    formData.append("file", file);
++    onUploadingChange?.(true);
+     try {
++      const compressed = await compressUpload(file);
++      const formData = new FormData();
++      formData.append("file", compressed);
+       const res = await fetch("/api/upload", { method: "POST", body: formData });
+-      const data = await res.json();
+-      if (data.success) {
++      const data = await res.json().catch(() => ({ error: res.status === 413 ? "Image is too large." : "Server unavailable. Please try again." }));
++      if (res.ok && data.success) {
+         onUploadSuccess(data.url);
+       } else {
+         onError("Upload failed: " + data.error);
+       }
+-    } catch {
+-      onError("Upload failed. Please check your connection and try again.");
++    } catch (error) {
++      onError(error instanceof Error ? error.message : "Upload failed. Please try again.");
+     } finally {
+       setUploading(false);
++      onUploadingChange?.(false);
+       if (fileInputRef.current) fileInputRef.current.value = "";
+     }
+   };
+diff --git a/src/app/api/images/[id]/route.ts b/src/app/api/images/[id]/route.ts
+new file mode 100644
+index 0000000..6fc59a5
+--- /dev/null
++++ b/src/app/api/images/[id]/route.ts
+@@ -0,0 +1,24 @@
++import { readImage } from "@/lib/imageStorage";
++
++export const runtime = "nodejs";
++
++export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
++  const { id } = await params;
++  if (!/^[a-f0-9]{64}$/.test(id)) return new Response(null, { status: 404 });
++  try {
++    const data = await readImage(id);
++    if (!data) return new Response(null, { status: 404 });
++    const headers = {
++      "Content-Type": "image/webp",
++      "Cache-Control": "public, max-age=31536000, immutable",
++      "Vercel-CDN-Cache-Control": "public, s-maxage=31536000, immutable",
++      "X-Content-Type-Options": "nosniff",
++      ETag: `"${id}"`,
++    };
++    if (request.headers.get("if-none-match") === headers.ETag) return new Response(null, { status: 304, headers });
++    return new Response(new Uint8Array(data), { headers });
++  } catch (error) {
++    console.error("Image read failed:", error);
++    return new Response(null, { status: 503, headers: { "Cache-Control": "no-store" } });
++  }
++}
+diff --git a/src/app/api/upload/route.ts b/src/app/api/upload/route.ts
+index 9ecb962..ec73899 100644
+--- a/src/app/api/upload/route.ts
++++ b/src/app/api/upload/route.ts
+@@ -1,58 +1,54 @@
+ import { NextResponse } from "next/server";
+-import { mkdir, writeFile } from "fs/promises";
+-import { join } from "path";
+-import crypto from "crypto";
++import sharp from "sharp";
+ import { isAdminAuthenticated } from "@/lib/adminAuth";
++import { IMAGE_TYPES, IMAGE_MAX_EDGE, MAX_IMAGE_BYTES, MAX_UPLOAD_BODY_BYTES } from "@/lib/imageUpload";
++import { storeImage } from "@/lib/imageStorage";
+ 
+-const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+-const ALLOWED_MIME_TO_EXTENSION: Record<string, string> = {
+-  "image/png": "png",
+-  "image/jpeg": "jpg",
+-  "image/webp": "webp",
+-  "image/gif": "gif",
+-  "image/avif": "avif",
+-};
++export const runtime = "nodejs";
+ 
+ export async function POST(request: Request) {
+-  if (!(await isAdminAuthenticated())) {
+-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+-  }
+-
++  if (!(await isAdminAuthenticated())) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
++  if (!process.env.DATABASE_URL) return NextResponse.json({ error: "Image storage is unavailable. Configure DATABASE_URL or use an image URL." }, { status: 503 });
++  if (Number(request.headers.get("content-length")) > MAX_UPLOAD_BODY_BYTES) return NextResponse.json({ error: "Image is too large. Use the Upload button to compress it." }, { status: 413 });
+   try {
+-    const formData = await request.formData();
+-    const file = formData.get("file") as File | null;
+-
+-    if (!file) {
+-      return NextResponse.json({ error: "No file received." }, { status: 400 });
++    // Enforce the limit even when Content-Length is omitted or inaccurate.
++    const reader = request.body?.getReader();
++    if (!reader) return NextResponse.json({ error: "No file received." }, { status: 400 });
++    const chunks: Uint8Array[] = [];
++    let size = 0;
++    while (true) {
++      const { done, value } = await reader.read();
++      if (done) break;
++      size += value.length;
++      if (size > MAX_UPLOAD_BODY_BYTES) {
++        await reader.cancel();
++        return NextResponse.json({ error: "Image is too large. Use the Upload button to compress it." }, { status: 413 });
++      }
++      chunks.push(value);
+     }
+-
+-    const extension = ALLOWED_MIME_TO_EXTENSION[file.type];
+-    if (!extension) {
+-      return NextResponse.json({ error: "Unsupported file type. Please upload a PNG, JPEG, WEBP, GIF, or AVIF image." }, { status: 400 });
++    let formData: FormData;
++    try {
++      formData = await new Response(Buffer.concat(chunks), { headers: { "Content-Type": request.headers.get("content-type") || "" } }).formData();
++    } catch {
++      return NextResponse.json({ error: "Invalid upload form." }, { status: 400 });
+     }
+-
+-    if (file.size > MAX_FILE_SIZE_BYTES) {
+-      return NextResponse.json({ error: "File is too large. Maximum size is 5MB." }, { status: 400 });
++    const file = formData.get("file");
++    if (!(file instanceof File) || !file.size || !IMAGE_TYPES.includes(file.type)) return NextResponse.json({ error: "Choose a valid image." }, { status: 400 });
++    if (file.size > MAX_IMAGE_BYTES) return NextResponse.json({ error: "Compressed images must be under 150 KB." }, { status: 413 });
++    let buffer: Buffer;
++    try {
++      // Decode real image bytes, strip metadata, and produce a safe static WebP.
++      buffer = await sharp(Buffer.from(await file.arrayBuffer()), { limitInputPixels: 40_000_000 })
++        .rotate().resize({ width: IMAGE_MAX_EDGE, height: IMAGE_MAX_EDGE, fit: "inside", withoutEnlargement: true })
++        .webp({ quality: 78 }).toBuffer();
++    } catch {
++      return NextResponse.json({ error: "Unable to read this image. Try a JPEG or PNG version." }, { status: 400 });
+     }
+-
+-    const bytes = await file.arrayBuffer();
+-    const buffer = Buffer.from(bytes);
+-
+-    // Filename is fully server-generated — the original name is never used for
+-    // path construction, which rules out path traversal via a crafted file.name.
+-    const fileName = `${crypto.randomUUID()}.${extension}`;
+-
+-    const uploadDir = join(process.cwd(), "public/uploads");
+-    await mkdir(uploadDir, { recursive: true });
+-    const filePath = join(uploadDir, fileName);
+-
+-    await writeFile(filePath, buffer);
+-
+-    const fileUrl = `/uploads/${fileName}`;
+-
+-    return NextResponse.json({ success: true, url: fileUrl });
++    if (buffer.length > MAX_IMAGE_BYTES) return NextResponse.json({ error: "Please choose a smaller image." }, { status: 413 });
++    return NextResponse.json({ success: true, url: await storeImage(buffer) });
+   } catch (error) {
+-    console.error("Error uploading file:", error);
+-    return NextResponse.json({ error: "Failed to upload file." }, { status: 500 });
++    if (error instanceof Error && error.message === "IMAGE_STORAGE_FULL") return NextResponse.json({ error: "The 20 MB image storage budget is full. Use an externally hosted image URL." }, { status: 409 });
++    console.error("Image upload failed:", error);
++    return NextResponse.json({ error: "Unable to save the image. Please try again." }, { status: 500 });
+   }
+ }
+diff --git a/src/db/index.ts b/src/db/index.ts
+index 485a21a..c306619 100644
+--- a/src/db/index.ts
++++ b/src/db/index.ts
+@@ -12,7 +12,7 @@ export const getDb = () => {
+     if (!connectionString) {
+       throw new Error("DATABASE_URL is not defined in the environment.");
+     }
+-    const client = postgres(connectionString, { prepare: false });
++    const client = postgres(connectionString, { prepare: false, max: 2, idle_timeout: 20, connect_timeout: 10 });
+     dbInstance = drizzle(client, { schema });
+   }
+   return dbInstance;
+diff --git a/src/lib/imageStorage.ts b/src/lib/imageStorage.ts
+new file mode 100644
+index 0000000..004e757
+--- /dev/null
++++ b/src/lib/imageStorage.ts
+@@ -0,0 +1,37 @@
++import "server-only";
++import { sql } from "drizzle-orm";
++import { createHash } from "crypto";
++import { db } from "@/db";
++import { MAX_IMAGE_STORAGE_BYTES } from "./imageUpload";
++
++let ready: Promise<unknown> | undefined;
++function ensureTable() {
++  ready ??= db.execute(sql`CREATE TABLE IF NOT EXISTS uploaded_images (
++    id varchar(64) PRIMARY KEY,
++    data bytea NOT NULL CHECK (octet_length(data) <= 153600),
++    created_at timestamptz NOT NULL DEFAULT now()
++  )`).catch((error: unknown) => { ready = undefined; throw error; });
++  return ready;
++}
++
++export async function storeImage(buffer: Buffer): Promise<string> {
++  await ensureTable();
++  const id = createHash("sha256").update(buffer).digest("hex");
++  await db.transaction(async (tx) => {
++    // Serialize quota checks across concurrent uploads and server instances.
++    await tx.execute(sql`SELECT pg_advisory_xact_lock(7364201)`);
++    const existing = await tx.execute(sql`SELECT id FROM uploaded_images WHERE id = ${id}`);
++    if (existing.length) return;
++    const totals = await tx.execute(sql`SELECT coalesce(sum(octet_length(data)), 0) AS used FROM uploaded_images`);
++    if (Number(totals[0].used) + buffer.length > MAX_IMAGE_STORAGE_BYTES) {
++      throw new Error("IMAGE_STORAGE_FULL");
++    }
++    await tx.execute(sql`INSERT INTO uploaded_images (id, data) VALUES (${id}, decode(${buffer.toString("base64")}, 'base64'))`);
++  });
++  return `/api/images/${id}`;
++}
++
++export async function readImage(id: string): Promise<Buffer | null> {
++  const rows = await db.execute(sql`SELECT data FROM uploaded_images WHERE id = ${id}`);
++  return rows.length ? Buffer.from(rows[0].data as Uint8Array) : null;
++}
+diff --git a/src/lib/imageUpload.ts b/src/lib/imageUpload.ts
+new file mode 100644
+index 0000000..b9bf574
+--- /dev/null
++++ b/src/lib/imageUpload.ts
+@@ -0,0 +1,37 @@
++// Shared limits keep uploads well below Vercel's function payload limit.
++export const MAX_IMAGE_BYTES = 150 * 1024;
++export const MAX_UPLOAD_BODY_BYTES = 200 * 1024;
++export const MAX_IMAGE_STORAGE_BYTES = 20 * 1024 * 1024;
++export const IMAGE_MAX_EDGE = 1280;
++export const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
++
++export async function compressUpload(file: File): Promise<File> {
++  if (!IMAGE_TYPES.includes(file.type)) throw new Error("Choose a JPEG, PNG, WebP, GIF or AVIF image.");
++  if (file.size > 20 * 1024 * 1024) throw new Error("Choose an image smaller than 20 MB.");
++  const url = URL.createObjectURL(file);
++  try {
++    const image = new Image();
++    image.src = url;
++    await image.decode();
++    if (image.naturalWidth * image.naturalHeight > 40_000_000) throw new Error("This image is too large. Choose an image under 40 megapixels.");
++    const canvas = document.createElement("canvas");
++    const context = canvas.getContext("2d");
++    if (!context) throw new Error("Your browser cannot prepare images for upload.");
++    const scale = Math.min(1, IMAGE_MAX_EDGE / Math.max(image.naturalWidth, image.naturalHeight));
++    for (const reduction of [1, 0.8, 0.6, 0.4]) {
++      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale * reduction));
++      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale * reduction));
++      context.drawImage(image, 0, 0, canvas.width, canvas.height);
++      for (const quality of [0.82, 0.68, 0.5]) {
++        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", quality));
++        if (blob && blob.size <= MAX_IMAGE_BYTES) return new File([blob], "image.webp", { type: blob.type });
++      }
++    }
++    throw new Error("This image could not be compressed enough. Please choose a smaller image.");
++  } catch (error) {
++    if (error instanceof Error && error.name !== "EncodingError") throw error;
++    throw new Error("Unable to read this image. Try a JPEG or PNG version.");
++  } finally {
++    URL.revokeObjectURL(url);
++  }
++}
