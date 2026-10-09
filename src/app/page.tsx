@@ -102,30 +102,15 @@ export default function Home() {
             }}
           >
             <motion.div
+              className="hero-image-card"
               style={{
-                width: '100%',
-                height: '400px',
-                borderRadius: '20px',
                 backgroundImage: 'url(/images/img_5289_1.jpg)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
                 rotateX,
                 rotateY,
-                transformStyle: "preserve-3d"
               }}
             >
               <motion.div 
-                style={{
-                  position: 'absolute',
-                  bottom: -20,
-                  right: -20,
-                  background: 'white',
-                  padding: '15px 25px',
-                  borderRadius: '12px',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                  transform: 'translateZ(50px)'
-                }}
+                className="hero-image-badge"
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <i className="fas fa-star text-accent"></i>
@@ -180,16 +165,16 @@ export default function Home() {
       <section className="bg-white-section" style={{ padding: '80px 0' }}>
         <div className="container">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '50px', alignItems: 'center' }}>
-            <motion.div style={{ flex: '1 1 400px' }} initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <motion.div style={{ flex: '1 1 300px' }} initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
                <div style={{ position: 'relative' }}>
                  <img src="/images/ria_portrait.jpg" alt="Ria Jain - Founder" style={{ width: '100%', borderRadius: '20px', boxShadow: '0 25px 50px rgba(0,0,0,0.15)' }} />
-                 <div style={{ position: 'absolute', bottom: -20, right: -20, background: 'var(--color-sage-green)', color: 'white', padding: '20px', borderRadius: '15px', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}>
+                 <div className="founder-badge" style={{ position: 'absolute', background: 'var(--color-sage-green)', color: 'white', padding: '20px', borderRadius: '15px', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}>
                    <h4 style={{ margin: 0, fontSize: '1.2rem' }}>Ria Jain</h4>
                    <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.9 }}>Lead Counsellor & Founder</p>
                  </div>
                </div>
             </motion.div>
-            <motion.div style={{ flex: '1 1 400px' }} initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <motion.div style={{ flex: '1 1 300px' }} initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
                <span className="text-accent">About Us</span>
                <h2 style={{ fontSize: '2.5rem', color: 'var(--color-deep-teal)', marginBottom: '20px' }}>Guiding You Beyond Borders</h2>
                <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '20px', lineHeight: '1.7' }}>
@@ -250,10 +235,10 @@ export default function Home() {
       <section className="bg-white-section" style={{ padding: '80px 0' }}>
         <div className="container">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', alignItems: 'center' }}>
-            <motion.div style={{ flex: '1 1 400px' }} initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <motion.div style={{ flex: '1 1 300px' }} initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
                <img src="/images/whatsapp_image_2024-03-20_at_10.27.00_2_1.jpeg" alt="Workshop" style={{ width: '100%', borderRadius: '15px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} />
             </motion.div>
-            <motion.div style={{ flex: '1 1 400px' }} initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <motion.div style={{ flex: '1 1 300px' }} initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
                <span className="text-accent">Live Events</span>
                <h2 style={{ fontSize: '2.5rem', color: 'var(--color-deep-teal)', marginBottom: '20px' }}>Upcoming Masterclasses</h2>
                <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '30px' }}>
@@ -338,7 +323,7 @@ export default function Home() {
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '30px' }}
           >
             {[
               { name: "Aarav Sharma", role: "Admitted to NYU", text: "Ria completely transformed my application. Her insights on my SOP made all the difference." },
@@ -367,8 +352,8 @@ export default function Home() {
             <h2>Hear From Our Students</h2>
           </motion.div>
           <div style={{ display: 'flex', gap: '30px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <iframe width="400" height="250" src="https://www.youtube.com/embed/I9BAN9l69TU?si=Csheaq7O03RStyQO" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen style={{ borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}></iframe>
-            <iframe width="400" height="250" src="https://www.youtube.com/embed/NcWqUKWeGfk?si=Lz1J9K3mUjwg2lpf" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen style={{ borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}></iframe>
+            <iframe src="https://www.youtube.com/embed/I9BAN9l69TU?si=Csheaq7O03RStyQO" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen style={{ width: '100%', maxWidth: '400px', aspectRatio: '16/9', height: 'auto', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', border: 'none' }}></iframe>
+            <iframe src="https://www.youtube.com/embed/NcWqUKWeGfk?si=Lz1J9K3mUjwg2lpf" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen style={{ width: '100%', maxWidth: '400px', aspectRatio: '16/9', height: 'auto', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', border: 'none' }}></iframe>
           </div>
         </div>
       </section>

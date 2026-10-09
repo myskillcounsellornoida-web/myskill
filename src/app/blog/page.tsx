@@ -109,7 +109,7 @@ export default function Blog() {
             <i className="far fa-envelope" style={{ fontSize: '3rem', color: 'var(--color-soft-teal)', marginBottom: '20px' }}></i>
             <h2 style={{ fontSize: '2.5rem', marginBottom: '15px', color: 'white' }}>Subscribe to Our Newsletter</h2>
             <p style={{ fontSize: '1.1rem', marginBottom: '30px', opacity: 0.9 }}>Get the latest admission trends, scholarship alerts, and test prep tips delivered straight to your inbox every month.</p>
-            <form style={{ display: 'flex', gap: '10px', justifyContent: 'center' }} onSubmit={(e) => e.preventDefault()}>
+            <form className="newsletter-form" style={{ display: 'flex', gap: '10px', justifyContent: 'center', alignItems: 'center' }} onSubmit={(e) => e.preventDefault()}>
               <input type="email" placeholder="Enter your email address" style={{ padding: '15px 25px', borderRadius: '50px', border: 'none', width: '100%', maxWidth: '350px', outline: 'none', fontSize: '1rem', color: '#333' }} />
               <button type="submit" className="btn btn-primary" style={{ padding: '15px 30px', borderRadius: '50px', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>Subscribe</button>
             </form>
