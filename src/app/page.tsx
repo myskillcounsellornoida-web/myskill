@@ -1,11 +1,12 @@
-import { fetchSiteContent, fetchServices, fetchTestimonials } from "@/app/admin/actions";
+import { fetchSiteContent, fetchServices, fetchTestimonials, fetchFaqs } from "@/app/admin/actions";
 import HomePageClient from "./HomePageClient";
 
 export default async function Home() {
-  const [siteContentRes, servicesRes, testimonialsRes] = await Promise.all([
+  const [siteContentRes, servicesRes, testimonialsRes, faqsRes] = await Promise.all([
     fetchSiteContent(),
     fetchServices(),
-    fetchTestimonials()
+    fetchTestimonials(),
+    fetchFaqs()
   ]);
 
   let cmsData: Record<string, string> = {};
@@ -17,12 +18,14 @@ export default async function Home() {
 
   const initialServices = servicesRes.success && servicesRes.data ? servicesRes.data : [];
   const initialTestimonials = testimonialsRes.success && testimonialsRes.data ? testimonialsRes.data : [];
+  const initialFaqs = faqsRes.success && faqsRes.data ? faqsRes.data : [];
 
   return (
     <HomePageClient 
       initialCmsData={cmsData} 
       initialServices={initialServices} 
       initialTestimonials={initialTestimonials} 
+      initialFaqs={initialFaqs}
     />
   );
 }
