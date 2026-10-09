@@ -85,8 +85,8 @@ export const PAGE_SECTIONS: Record<PreviewPage, SectionDef[]> = {
   ],
   "/testimonials": [
     { id: "stats", label: "Statistics" },
+    { id: "videos", label: "Video reviews" },
     { id: "stories", label: "Testimonial wall" },
-    { id: "videos", label: "Videos" },
     { id: "press", label: "Press feature" },
     { id: "faq", label: "FAQs" },
     { id: "cta", label: "Call-to-action banner" },
@@ -110,7 +110,6 @@ const HIDDEN_BY_DEFAULT: Partial<Record<PreviewPage, string[]>> = {
   // The specialised-services grid replaced the 4-step journey on the home page;
   // "steps" stays available so it can be switched back on from the editor.
   "/": ["steps"],
-  "/testimonials": ["videos"],
   "/blog": ["videos"],
 };
 
@@ -215,19 +214,19 @@ export const CONTENT_GROUPS: ContentGroup[] = [
       text("hero_badge_label", "Badge above headline", "We Turn Confusion into Career Fusion"),
       text("hero_slide1_caption", "Slide 1 · Headline", "Your Gateway to Top Global Universities"),
       para("hero_slide1_sub", "Slide 1 · Description", "Don't leave your future to chance. Get admitted to elite institutions in the UK, USA, Canada, Dubai, and Europe with our proven admission strategies."),
-      image("hero_slide1_image", "Slide 1 · Background image", "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1600&auto=format&fit=crop"),
+      image("hero_slide1_image", "Slide 1 · Background image", "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1920&auto=format&fit=crop"),
       text("hero_slide2_caption", "Slide 2 · Headline", "Stop Guessing, Start Building."),
       para("hero_slide2_sub", "Slide 2 · Description", "Transform confusion into absolute clarity. We help you map out a high-demand career path tailored to your unique strengths and aspirations."),
-      image("hero_slide2_image", "Slide 2 · Background image", "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1600&auto=format&fit=crop"),
+      image("hero_slide2_image", "Slide 2 · Background image", "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1920&auto=format&fit=crop"),
       text("hero_slide3_caption", "Slide 3 · Headline", "Stand Out in a Sea of Applicants"),
       para("hero_slide3_sub", "Slide 3 · Description", "Grades aren't enough. We craft compelling Statements of Purpose and build Ivy-league-worthy portfolios that make admissions officers take notice."),
-      image("hero_slide3_image", "Slide 3 · Background image", "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1600&auto=format&fit=crop"),
+      image("hero_slide3_image", "Slide 3 · Background image", "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=1920&auto=format&fit=crop"),
       text("hero_slide4_caption", "Slide 4 · Headline", "Nail Your Target IELTS Score & Visa"),
       para("hero_slide4_sub", "Slide 4 · Description", "Achieve Band 8+ with our expert coaching. Once you're admitted, we handle the complex visa and financial paperwork so you don't have to."),
-      image("hero_slide4_image", "Slide 4 · Background image", "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?q=80&w=1600&auto=format&fit=crop"),
+      image("hero_slide4_image", "Slide 4 · Background image", "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1920&auto=format&fit=crop"),
       text("hero_slide5_caption", "Slide 5 · Headline", "We Walk With You — Every Step"),
       para("hero_slide5_sub", "Slide 5 · Description", "From the first profile evaluation to your first day on campus. We provide end-to-end support so you never walk alone."),
-      image("hero_slide5_image", "Slide 5 · Background image", "https://images.unsplash.com/photo-1498243691581-b145c3f54a5c?q=80&w=1600&auto=format&fit=crop"),
+      image("hero_slide5_image", "Slide 5 · Background image", "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?q=80&w=1920&auto=format&fit=crop"),
       text("hero_cta_primary", "Primary button", "Book a Free Consultation"),
       text("hero_cta_secondary", "Secondary button", "Explore Services"),
     ],
