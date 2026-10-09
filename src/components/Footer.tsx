@@ -11,7 +11,7 @@ export default function Footer() {
   }
   return (
     <footer style={{ background: 'var(--color-deep-teal)', color: 'white', paddingTop: '80px', paddingBottom: '30px' }}>
-      <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '50px', marginBottom: '50px' }}>
+      <div className="container footer-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '50px', marginBottom: '50px' }}>
         
         {/* Brand & Newsletter */}
         <div className="footer-brand">

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { submitContactForm } from "../actions";
 import { useState } from "react";
 
@@ -61,9 +62,8 @@ export default function Contact() {
               <h2>Start a Conversation</h2>
               <p style={{ marginBottom: '20px' }}>Whether you are a parent exploring study abroad options or a student looking for profile building and career clarity, we are here to support you at every stage.</p>
               
-              <div style={{ borderRadius: '15px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
-                 {/* Using the unused img_5288_1.jpg */}
-                 <img src="/images/img_5288_1.jpg" alt="Office Environment" style={{ width: '100%', display: 'block' }} />
+              <div style={{ borderRadius: '15px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', position: 'relative', height: '400px' }}>
+                 <Image src="/images/img_5288_1.jpg" alt="Office Environment" fill sizes="(max-width: 768px) 100vw, 50vw" style={{ objectFit: 'cover' }} />
               </div>
             </div>
           </motion.div>

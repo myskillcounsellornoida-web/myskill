@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
+import Image from "next/image";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -49,11 +50,20 @@ export default function TestimonialsClient({ testimonialsList }: { testimonialsL
         }}
       />
 
-      <section className="inner-hero">
-        <div className="container">
+      <section style={{ position: "relative", minHeight: "50vh", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", paddingTop: "80px" }}>
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "url(/images/hero_testimonials_page.png)", backgroundSize: "cover", backgroundPosition: "center" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(37,95,107,0.85) 0%, rgba(37,95,107,0.5) 100%)" }} />
+        <div className="container" style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
           <motion.div initial="hidden" animate="visible" variants={fadeUp}>
-            <span className="text-accent">Our Impact</span>
-            <h1>Success Stories</h1>
+            <span style={{ display: "inline-block", background: "rgba(255,255,255,0.15)", color: "#fff", fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "0.85rem", letterSpacing: "3px", textTransform: "uppercase", padding: "8px 20px", borderRadius: 30, marginBottom: 24, border: "1px solid rgba(255,255,255,0.3)", backdropFilter: "blur(5px)" }}>
+              Our Impact
+            </span>
+            <h1 style={{ color: "#fff", fontSize: "clamp(2.5rem,5vw,4rem)", marginBottom: 20, textShadow: "0 4px 20px rgba(0,0,0,0.3)", fontFamily: "var(--font-heading)", fontWeight: 800 }}>
+              Success Stories
+            </h1>
+            <p style={{ color: "rgba(255,255,255,0.9)", fontSize: "1.15rem", maxWidth: 600, margin: "0 auto", lineHeight: 1.6 }}>
+              Hear directly from students and parents who turned their global education dreams into reality with our guidance.
+            </p>
           </motion.div>
         </div>
       </section>
@@ -70,7 +80,7 @@ export default function TestimonialsClient({ testimonialsList }: { testimonialsL
           >
             {[
               { label: 'Successful Admits', value: '500+' },
-              { label: 'Scholarships Secured', value: '$2M+' },
+              { label: 'Programs Mapped', value: '250+' },
               { label: 'Partner Universities', value: '50+' },
               { label: 'Years of Experience', value: '10+' }
             ].map((stat, i) => (
@@ -86,7 +96,7 @@ export default function TestimonialsClient({ testimonialsList }: { testimonialsL
       {/* NEW SECTION: MEDIA FEATURE */}
       <section className="bg-white-section" style={{ padding: '60px 0' }}>
         <div className="container">
-           <motion.div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', alignItems: 'center' }} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+           <motion.div className="flex-section" style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', alignItems: 'center' }} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
              <div style={{ flex: '1 1 400px' }}>
                 <span className="text-accent">Press Recognition</span>
                 <h2 style={{ fontSize: '2.5rem', color: 'var(--color-deep-teal)', marginBottom: '20px' }}>Featured in Shah Times</h2>
@@ -95,7 +105,7 @@ export default function TestimonialsClient({ testimonialsList }: { testimonialsL
                 </p>
              </div>
              <div style={{ flex: '1 1 400px' }}>
-                <img src="/images/shah_times_article.jpg" alt="Featured in Shah Times" style={{ width: '100%', borderRadius: '15px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} />
+                <Image src="/images/shah_times_article_cropped.jpg" alt="Featured in Shah Times" width={630} height={350} style={{ width: '100%', height: 'auto', borderRadius: '15px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', display: 'block' }} />
              </div>
            </motion.div>
         </div>
@@ -109,7 +119,7 @@ export default function TestimonialsClient({ testimonialsList }: { testimonialsL
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px' }}
           >
             {testimonialsList.map((t, i) => (
               <motion.div key={i} className="testimonial-card" variants={fadeUp} style={{ background: 'white', padding: '30px', borderRadius: '12px', borderTop: '4px solid var(--color-deep-teal)', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -41,9 +42,14 @@ export default function Navbar() {
   return (
     <header className={isScrolled ? "scrolled" : ""}>
       <div className="container navbar">
-        <Link href="/" className="logo" onClick={() => setIsMenuOpen(false)}>
-          <img src="/assets/logo.png" alt="My Skill Counsellor" />
-          <span>My Skill<br />Counsellor</span>
+        <Link href="/" className="logo" onClick={() => setIsMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+          <div style={{ position: 'relative', width: '40px', height: '40px', marginRight: '12px' }}>
+            <Image src="/assets/logo.png" alt="My Skill Counsellor" fill sizes="40px" style={{ objectFit: 'contain' }} />
+          </div>
+          <span style={{ fontFamily: 'var(--font-heading)', lineHeight: 1.15 }}>
+            <span style={{ display: 'block', fontWeight: 800, fontSize: '1.1rem', color: 'var(--color-deep-teal)', letterSpacing: '-0.3px' }}>My Skill</span>
+            <span style={{ display: 'block', fontWeight: 600, fontSize: '0.85rem', color: 'var(--color-muted-coral)', letterSpacing: '1.5px', textTransform: 'uppercase' }}>Counsellor</span>
+          </span>
         </Link>
 
         <nav>

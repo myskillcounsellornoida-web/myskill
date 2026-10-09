@@ -1,388 +1,344 @@
 "use client";
-
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
-import { useState } from "react";
+import Image from "next/image";
+import { useState, useEffect } from "react";
 
-// Animation Variants
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" as const } },
-};
+const fade = { hidden:{opacity:0,y:25}, visible:{opacity:1,y:0,transition:{duration:0.7}} };
+const stag = { hidden:{}, visible:{transition:{staggerChildren:0.15}} };
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-    },
+const slides = [
+  { 
+    img: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1600&auto=format&fit=crop",   
+    caption: "Your Gateway to Top Global Universities", 
+    sub: "Don't leave your future to chance. Get admitted to elite institutions in the UK, USA, Canada, Dubai, and Europe with our proven admission strategies." 
   },
-};
+  { 
+    img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1600&auto=format&fit=crop",  
+    caption: "Stop Guessing, Start Building.", 
+    sub: "Transform confusion into absolute clarity. We help you map out a high-demand career path tailored to your unique strengths and aspirations." 
+  },
+  { 
+    img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1600&auto=format&fit=crop",     
+    caption: "Stand Out in a Sea of Applicants", 
+    sub: "Grades aren't enough. We craft compelling Statements of Purpose and build Ivy-league-worthy portfolios that make admissions officers take notice." 
+  },
+  { 
+    img: "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?q=80&w=1600&auto=format&fit=crop",      
+    caption: "Nail Your Target IELTS Score & Visa", 
+    sub: "Achieve Band 8+ with our expert coaching. Once you're admitted, we handle the complex visa and financial paperwork so you don't have to." 
+  },
+  { 
+    img: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5c?q=80&w=1600&auto=format&fit=crop",         
+    caption: "We Walk With You — Every Step", 
+    sub: "From the first profile evaluation to your first day on campus. We provide end-to-end support so you never walk alone." 
+  }
+];
+
+const services = [
+  {
+    title: "Before the Offer Letter",
+    subtitle: "Building the Right Foundation",
+    icon: "fa-seedling",
+    image: "/images/service_card_before_offer.png",
+    points: [
+      "Career & Profile Assessment",
+      "Course & University Selection",
+      "SOP & LOR Guidance",
+      "IELTS / TOEFL Preparation"
+    ]
+  },
+  {
+    title: "After the Offer Letter",
+    subtitle: "Preparing for the Move",
+    icon: "fa-file-contract",
+    image: "/images/service_card_after_offer.png",
+    points: [
+      "Final University Selection",
+      "Comprehensive Visa Support",
+      "Financial Documentation",
+      "Pre-Departure Guidance"
+    ]
+  },
+  {
+    title: "After Departure",
+    subtitle: "Settling into Your New Life",
+    icon: "fa-globe-americas",
+    image: "/images/service_card_after_departure.png",
+    points: [
+      "Arrival & Settling-In Support",
+      "Local Transport Navigation",
+      "SIM & Banking Setup",
+      "Campus Orientation"
+    ]
+  }
+];
 
 export default function Home() {
-  // 3D Tilt Effect State
-  const x = useMotionValue(200);
-  const y = useMotionValue(200);
-  const rotateX = useTransform(y, [0, 400], [15, -15]);
-  const rotateY = useTransform(x, [0, 400], [-15, 15]);
+  const [slide,setSlide]=useState(0);
+  const [faq,setFaq]=useState<number|null>(0);
+  useEffect(()=>{const t=setInterval(()=>setSlide(p=>(p+1)%slides.length),4500);return()=>clearInterval(t);},[]);
 
-  function handleMouse(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    x.set(event.clientX - rect.left);
-    y.set(event.clientY - rect.top);
-  }
-
-  // FAQ State
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
-
-  const faqs = [
-    { q: "When is the right time to start planning for study abroad?", a: "We highly recommend starting as early as Class 9. This gives us ample time to build a robust profile, select the right subjects, and plan extracurricular activities without rushing." },
-    { q: "Do you guarantee university admissions?", a: "While no consultant can guarantee admission to ivy-league or top-tier universities, our track record speaks for itself. We maximize your chances by perfectly aligning your profile with university expectations." },
-    { q: "Do you help with scholarships and financial aid?", a: "Yes, absolutely. We actively map out merit-based, need-based, and country-specific scholarships to help reduce the financial burden on parents." },
-    { q: "How is My Skill Counsellor different from other agencies?", a: "We don't do 'cookie-cutter' applications. Every student gets 1-on-1 personalized mentorship, ensuring their Statement of Purpose and portfolio is uniquely theirs." }
+  const faqs=[
+    {q:"When is the right time to start planning for study abroad?",a:"We recommend starting as early as Class 9. This gives ample time to build a robust profile and plan extracurriculars without rushing."},
+    {q:"Do you guarantee university admissions?",a:"While no consultant can guarantee admission to ivy-league universities, our track record speaks for itself. We maximise your chances by aligning your profile with university expectations."},
+    {q:"Do you assist with selecting the right major or course?",a:"Yes. We use detailed psychometric evaluations and industry insights to help you choose a course that aligns with both your passions and future market demand."},
+    {q:"How do I start the process?",a:"You can start by booking a free initial consultation through our contact page. We will assess your profile and discuss a personalized roadmap."},
   ];
 
   return (
     <main>
-      {/* AEO FAQ Schema */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: faqs.map((faq) => ({
-              "@type": "Question",
-              name: faq.q,
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: faq.a,
-              },
-            })),
-          }),
-        }}
-      />
-      {/* HERO SECTION */}
-      <section className="hero">
-        <div className="container hero-grid">
-          <motion.div
-            className="hero-content"
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-          >
-            <span className="text-accent" style={{ fontWeight: 600 }}>We Turn Confusion into Career Fusion</span>
-            <h1>Building Bridges to <br />Your Global Future.</h1>
-            <p className="hero-subtitle">
-              Guiding Careers, Defining Destinies Together. We are the architects of dreams, sculpting careers and shaping global journeys.
+      <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({"@context":"https://schema.org","@type":"FAQPage",mainEntity:faqs.map(f=>({"@type":"Question",name:f.q,acceptedAnswer:{"@type":"Answer",text:f.a}}))})}} />
+
+      {/* HERO CAROUSEL */}
+      <section className="hero" style={{position:"relative",display:"flex",alignItems:"center",overflow:"hidden",justifyContent:"center"}}>
+        {slides.map((s,i)=>(
+          <div key={i} style={{position:"absolute",inset:0,transition:"opacity 1.2s ease",opacity:slide===i?1:0,backgroundImage:`url(${s.img})`,backgroundSize:"cover",backgroundPosition:"center top"}} />
+        ))}
+        {/* Cleaner, more premium gradient overlay */}
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom, rgba(37,95,107,0.85) 0%, rgba(37,95,107,0.4) 50%, rgba(10,20,25,0.7) 100%)"}} />
+        
+        <div className="container" style={{position:"relative",zIndex:2,textAlign:"center"}}>
+          <motion.div initial="hidden" animate="visible" variants={fade} style={{maxWidth:800,margin:"0 auto"}}>
+            <span style={{display:"inline-block",background:"rgba(255,255,255,0.15)",color:"#fff",fontFamily:"var(--font-heading)",fontWeight:700,fontSize:"0.85rem",letterSpacing:"3px",textTransform:"uppercase",padding:"8px 20px",borderRadius:30,marginBottom:24,border:"1px solid rgba(255,255,255,0.3)",backdropFilter:"blur(5px)"}}>
+              We Turn Confusion into Career Fusion
+            </span>
+            <h1 style={{color:"#fff",fontSize:"clamp(2.5rem,6vw,4.5rem)",lineHeight:1.15,marginBottom:20,fontFamily:"var(--font-heading)",fontWeight:800,textShadow:"0 4px 20px rgba(0,0,0,0.3)"}}>
+              {slides[slide].caption}
+            </h1>
+            <p style={{color:"rgba(255,255,255,0.9)",fontSize:"1.2rem",marginBottom:40,lineHeight:1.6,maxWidth:600,margin:"0 auto 40px"}}>
+              {slides[slide].sub}
             </p>
-            <div className="hero-buttons">
-              <Link href="/contact" className="btn btn-primary trigger-booking">Book a Free Consultation</Link>
-              <Link href="/services" className="btn btn-outline">Explore Services</Link>
-            </div>
-            
-            <div className="trust-badges" style={{ marginTop: '20px', display: 'flex', gap: '15px', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}><i className="fas fa-check-circle" style={{ color: 'var(--color-sage-green)' }}></i> 500+ Students Placed</span>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}><i className="fas fa-check-circle" style={{ color: 'var(--color-sage-green)' }}></i> Certified CCCIS Counsellor</span>
+            <div className="hero-buttons" style={{display:"flex",gap:16,justifyContent:"center"}}>
+              <Link href="/contact" className="btn btn-primary" style={{padding:"14px 32px",fontSize:"1.05rem",borderRadius:"30px"}}>Book a Free Consultation</Link>
+              <Link href="/services" className="btn btn-outline" style={{color:"#fff",borderColor:"rgba(255,255,255,0.6)",padding:"14px 32px",fontSize:"1.05rem",borderRadius:"30px",backdropFilter:"blur(5px)"}}>Explore Services</Link>
             </div>
           </motion.div>
           
-          {/* 3D Interactive Hero Element */}
-          <motion.div
-            className="hero-image"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1 }}
-            style={{ perspective: 1000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-            onMouseMove={handleMouse}
-            onMouseLeave={() => {
-              x.set(200);
-              y.set(200);
-            }}
-          >
-            <motion.div
-              className="hero-image-card"
-              style={{
-                backgroundImage: 'url(/images/img_5289_1.jpg)',
-                rotateX,
-                rotateY,
-              }}
-            >
-              <motion.div 
-                className="hero-image-badge"
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <i className="fas fa-star text-accent"></i>
-                  <span style={{ fontWeight: 600, color: 'var(--color-deep-teal)' }}>#1 Global Admit Rate</span>
-                </div>
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* NEW SECTION: TRUSTED UNIVERSITIES */}
-      <section style={{ padding: '40px 0', background: 'var(--color-soft-ivory)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-        <div className="container">
-          <p style={{ textAlign: 'center', color: 'var(--text-secondary)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '30px', fontSize: '0.9rem' }}>Students Placed At Top Universities</p>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '40px', flexWrap: 'wrap', opacity: 0.7 }}>
-             <img src="/assets/u1.png" alt="University" style={{ height: '50px', objectFit: 'contain' }} />
-             <img src="/assets/u2.png" alt="University" style={{ height: '50px', objectFit: 'contain' }} />
-             <img src="/assets/u3.png" alt="University" style={{ height: '50px', objectFit: 'contain' }} />
-             <img src="/assets/u4.png" alt="University" style={{ height: '50px', objectFit: 'contain' }} />
-             <img src="/assets/u5.png" alt="University" style={{ height: '50px', objectFit: 'contain' }} />
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:16,marginTop:60}}>
+            <button onClick={()=>setSlide(p=>(p-1+slides.length)%slides.length)} style={{background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:"50%",width:44,height:44,cursor:"pointer",color:"#fff",fontSize:"1.2rem",backdropFilter:"blur(5px)",transition:"all 0.3s"}} className="hero-nav-btn">‹</button>
+            <div style={{display:"flex",gap:10}}>
+              {slides.map((_,i)=>(
+                <button key={i} onClick={()=>setSlide(i)} style={{width:slide===i?36:10,height:10,borderRadius:5,background:slide===i?"#F0C987":"rgba(255,255,255,0.4)",border:"none",cursor:"pointer",transition:"all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"}} />
+              ))}
+            </div>
+            <button onClick={()=>setSlide(p=>(p+1)%slides.length)} style={{background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:"50%",width:44,height:44,cursor:"pointer",color:"#fff",fontSize:"1.2rem",backdropFilter:"blur(5px)",transition:"all 0.3s"}} className="hero-nav-btn">›</button>
           </div>
         </div>
       </section>
 
-      {/* NEW SECTION: IMPACT STATISTICS */}
-      <section style={{ background: 'var(--color-deep-teal)', color: 'white', padding: '60px 0' }}>
-        <div className="container">
-          <motion.div 
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '30px', textAlign: 'center' }}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            {[
-              { value: "160+", label: "Career Paths" },
-              { value: "1500+", label: "Top Universities" },
-              { value: "500+", label: "Companies" },
-              { value: "98%", label: "Success Rate" }
-            ].map((stat, i) => (
-              <motion.div key={i} variants={fadeUp}>
-                <h2 style={{ fontSize: '3rem', color: 'var(--color-soft-teal)', marginBottom: '5px' }}>{stat.value}</h2>
-                <p style={{ fontSize: '1.1rem', opacity: 0.9 }}>{stat.label}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
 
-      {/* NEW SECTION: ABOUT THE FOUNDER */}
-      <section className="bg-white-section" style={{ padding: '80px 0' }}>
-        <div className="container">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '50px', alignItems: 'center' }}>
-            <motion.div style={{ flex: '1 1 300px' }} initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-               <div style={{ position: 'relative' }}>
-                 <img src="/images/ria_portrait.jpg" alt="Ria Jain - Founder" style={{ width: '100%', borderRadius: '20px', boxShadow: '0 25px 50px rgba(0,0,0,0.15)' }} />
-                 <div className="founder-badge" style={{ position: 'absolute', background: 'var(--color-sage-green)', color: 'white', padding: '20px', borderRadius: '15px', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}>
-                   <h4 style={{ margin: 0, fontSize: '1.2rem' }}>Ria Jain</h4>
-                   <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.9 }}>Lead Counsellor & Founder</p>
-                 </div>
-               </div>
-            </motion.div>
-            <motion.div style={{ flex: '1 1 300px' }} initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-               <span className="text-accent">About Us</span>
-               <h2 style={{ fontSize: '2.5rem', color: 'var(--color-deep-teal)', marginBottom: '20px' }}>Guiding You Beyond Borders</h2>
-               <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '20px', lineHeight: '1.7' }}>
-                 I work closely with students and families through important academic, career, and study abroad decisions, helping them navigate higher education pathways with greater clarity, confidence, and direction.
-               </p>
-               <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '30px', lineHeight: '1.7' }}>
-                 As both a counsellor and a parent of an international student myself, I bring a balance of professional experience and real-world understanding. Every student has a different story, pace, and aspiration, and my approach focuses on personalised, student-first support rather than one-size-fits-all counselling.
-               </p>
-               <Link href="/contact" className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
-                 Book a Chat <i className="fas fa-arrow-right"></i>
-               </Link>
-            </motion.div>
-          </div>
-        </div>
-      </section>
 
-      {/* SERVICES PREVIEW */}
-      <section className="bg-sage-section" style={{ padding: '80px 0' }}>
+      {/* 3 SERVICES */}
+      <section className="bg-sage-section" style={{padding:"80px 0"}}>
         <div className="container">
-          <motion.div
-            className="section-title"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={fadeUp}
-          >
-            <span className="text-accent">Expertise</span>
-            <h2>Our Core Services</h2>
+          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade}>
+            <span className="text-accent">Our Services</span>
+            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>How We Support Your Journey</h2>
+            <p style={{color:"var(--text-secondary)",fontSize:"1.05rem",marginTop:8}}>End-to-end support across every stage of your study abroad journey.</p>
           </motion.div>
-
-          <motion.div
-            className="services-grid"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={staggerContainer}
-          >
-            {[
-              { title: "Study Abroad", icon: "fa-globe-americas", desc: "Comprehensive university admissions mapping for UK, USA, Dubai." },
-              { title: "Career Counselling", icon: "fa-compass", desc: "Psychometric analysis and course selection for Class 9-12." },
-              { title: "SOP Building", icon: "fa-file-signature", desc: "Crafting unique, compelling personal statements and portfolios." },
-            ].map((srv, i) => (
-              <motion.div key={i} className="service-card" variants={fadeUp}>
-                <div className="service-icon"><i className={`fas ${srv.icon}`}></i></div>
-                <h3>{srv.title}</h3>
-                <p>{srv.desc}</p>
-                <Link href={`/services`} className="service-link">Read More <i className="fas fa-arrow-right"></i></Link>
-              </motion.div>
-            ))}
-          </motion.div>
-          <div style={{ textAlign: 'center', marginTop: '40px' }}>
-            <Link href="/services" className="btn btn-outline">View All 6 Services</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* NEW SECTION: UPCOMING WORKSHOPS */}
-      <section className="bg-white-section" style={{ padding: '80px 0' }}>
-        <div className="container">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', alignItems: 'center' }}>
-            <motion.div style={{ flex: '1 1 300px' }} initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-               <img src="/images/whatsapp_image_2024-03-20_at_10.27.00_2_1.jpeg" alt="Workshop" style={{ width: '100%', borderRadius: '15px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} />
-            </motion.div>
-            <motion.div style={{ flex: '1 1 300px' }} initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-               <span className="text-accent">Live Events</span>
-               <h2 style={{ fontSize: '2.5rem', color: 'var(--color-deep-teal)', marginBottom: '20px' }}>Upcoming Masterclasses</h2>
-               <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '30px' }}>
-                 Join our free online masterclasses where we break down the Ivy League admission process, IELTS writing strategies, and profile building secrets.
-               </p>
-               <div style={{ background: 'var(--color-soft-ivory)', padding: '20px', borderRadius: '10px', marginBottom: '20px', borderLeft: '4px solid var(--color-soft-teal)' }}>
-                  <h4 style={{ color: 'var(--color-deep-teal)' }}>Mastering the Common App</h4>
-                  <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '5px' }}><i className="far fa-calendar-alt"></i> August 15th, 2026 | <i className="far fa-clock"></i> 6:00 PM IST</p>
-               </div>
-               <Link href="/contact" className="btn btn-primary">Register for Free</Link>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* NEW SECTION: MEDIA RECOGNITION */}
-      <section className="bg-deep-teal-section" style={{ padding: '80px 0', background: 'var(--color-deep-teal)', color: 'white' }}>
-        <div className="container">
-          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ textAlign: 'center', marginBottom: '50px' }}>
-            <span className="text-accent" style={{ color: 'var(--color-soft-teal)' }}>In The Media</span>
-            <h2 style={{ color: 'white' }}>Recognized for Excellence</h2>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }} style={{ textAlign: 'center' }}>
-            <img src="/images/shah_times_article.jpg" alt="Shah Times Article Feature" style={{ maxWidth: '100%', height: 'auto', borderRadius: '15px', boxShadow: '0 25px 50px rgba(0,0,0,0.3)', border: '5px solid rgba(255,255,255,0.1)' }} />
-          </motion.div>
-        </div>
-      </section>
-      {/* NEW SECTION: OUR PROCESS TIMELINE */}
-      <section className="bg-sage-section" style={{ padding: '80px 0' }}>
-        <div className="container">
-          <motion.div
-            className="section-title"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={fadeUp}
-          >
-            <span className="text-accent">How It Works</span>
-            <h2>The 4-Step Process</h2>
-          </motion.div>
-
-          <motion.div 
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginTop: '40px' }}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-             {[
-               { step: "01", title: "Discovery Profile", desc: "We evaluate your academic background and aspirations." },
-               { step: "02", title: "Strategic Roadmap", desc: "We shortlist universities and map out required tests (IELTS)." },
-               { step: "03", title: "Application & SOP", desc: "We meticulously build your portfolio and draft essays." },
-               { step: "04", title: "Visa & Pre-Departure", desc: "We secure your visa and prepare you for global success." }
-             ].map((proc, i) => (
-                <motion.div key={i} variants={fadeUp} style={{ background: 'white', padding: '30px', borderRadius: '12px', position: 'relative', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
-                  <div style={{ position: 'absolute', top: -15, left: 30, background: 'var(--color-deep-teal)', color: 'white', padding: '5px 15px', borderRadius: '20px', fontWeight: 'bold' }}>Step {proc.step}</div>
-                  <h3 style={{ marginTop: '10px', fontSize: '1.2rem', color: 'var(--color-deep-teal)' }}>{proc.title}</h3>
-                  <p style={{ marginTop: '10px', color: 'var(--text-secondary)' }}>{proc.desc}</p>
+          <motion.div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:28,marginTop:40}} initial="hidden" whileInView="visible" viewport={{once:true}} variants={stag}>
+            {services.map((s,i)=>(
+              <Link key={i} href={i === 0 ? "/services#before-offer" : i === 1 ? "/services#after-offer" : "/services#after-departure"} style={{textDecoration:"none",color:"inherit",display:"block"}}>
+                <motion.div variants={fade} className="service-card-interactive" style={{background:"white",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-soft)",border:"1px solid var(--border-color)",position:"relative",height:"100%"}}>
+                  {/* Image Section */}
+                  <div className="svc-card-img" style={{height:220,position:"relative",overflow:"hidden"}}>
+                    <Image src={s.image} alt={s.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" style={{objectFit:"cover",transition:"transform 0.6s ease"}} className="svc-img" />
+                    <div style={{position:"absolute",inset:0,background:"linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)"}} />
+                    <div style={{position:"absolute",bottom:16,left:24,width:48,height:48,borderRadius:"50%",background:"rgba(255,255,255,0.2)",backdropFilter:"blur(5px)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:"1.2rem",border:"1px solid rgba(255,255,255,0.3)"}}>
+                      <i className={`fas ${s.icon}`}/>
+                    </div>
+                  </div>
+                  {/* Text Content */}
+                  <div style={{padding:"28px 24px",position:"relative",zIndex:2,background:"white"}} className="svc-content">
+                    <span style={{fontSize:"0.75rem",fontWeight:800,color:"var(--color-muted-coral)",textTransform:"uppercase",letterSpacing:"1.5px",fontFamily:"var(--font-heading)"}}>{s.subtitle}</span>
+                    <h3 style={{fontSize:"1.4rem",color:"var(--color-deep-teal)",margin:"8px 0 16px",fontFamily:"var(--font-heading)",fontWeight:800}}>{s.title}</h3>
+                    
+                    <div className="svc-details-visible" style={{marginTop:"15px"}}>
+                      <ul style={{listStyle:"none",padding:0,margin:0,display:"flex",flexDirection:"column",gap:10}}>
+                        {s.points.map((p,j)=>(
+                          <li key={j} style={{display:"flex",alignItems:"flex-start",gap:10,fontSize:"0.9rem",color:"var(--text-secondary)"}}>
+                            <i className="fas fa-check-circle" style={{color:"var(--color-soft-teal)",fontSize:"1rem",flexShrink:0,marginTop:2}}/>
+                            {p}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
                 </motion.div>
-             ))}
+              </Link>
+            ))}
+
+          </motion.div>
+          <div style={{textAlign:"center",marginTop:40}}>
+            <Link href="/services" className="btn btn-outline">View Full Service Details</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section style={{background:"var(--bg-secondary)",padding:"80px 0"}}>
+        <div className="container">
+          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade}>
+            <span className="text-accent">How It Works</span>
+            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>The 4-Step Journey</h2>
+          </motion.div>
+          <motion.div className="steps-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:24,marginTop:40}} initial="hidden" whileInView="visible" viewport={{once:true}} variants={stag}>
+            {[
+              {step:"01",title:"Discovery Profile",desc:"We evaluate your academic background, interests and aspirations.",icon:"fa-user-graduate"},
+              {step:"02",title:"Strategic Roadmap",desc:"We shortlist universities and map required tests like IELTS/TOEFL.",icon:"fa-map-marked-alt"},
+              {step:"03",title:"Application & SOP",desc:"We meticulously build your portfolio and craft compelling essays.",icon:"fa-pen-fancy"},
+              {step:"04",title:"Visa & Pre-Departure",desc:"We secure your visa and prepare you for life in a new country.",icon:"fa-passport"},
+            ].map((p,i)=>(
+              <motion.div key={i} variants={fade} style={{background:"var(--bg-primary)",padding:30,borderRadius:16,position:"relative",boxShadow:"var(--shadow-soft)",border:"1px solid var(--border-color)"}}>
+                <div style={{position:"absolute",top:-14,left:22,background:"var(--color-deep-teal)",color:"white",padding:"4px 14px",borderRadius:20,fontWeight:800,fontSize:"0.8rem",fontFamily:"var(--font-heading)"}}>Step {p.step}</div>
+                <div style={{width:44,height:44,borderRadius:"50%",background:"rgba(62,159,168,0.12)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--color-deep-teal)",fontSize:"1.2rem",marginTop:12,marginBottom:14}}>
+                  <i className={`fas ${p.icon}`}/>
+                </div>
+                <h3 style={{marginTop:0,fontSize:"1.1rem",color:"var(--color-deep-teal)",fontFamily:"var(--font-heading)",fontWeight:800}}>{p.title}</h3>
+                <p style={{color:"var(--text-secondary)",margin:0,lineHeight:1.7,fontSize:"0.92rem"}}>{p.desc}</p>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>
 
-      {/* ENHANCED TESTIMONIALS SECTION */}
-      <section className="bg-white-section" style={{ padding: '80px 0' }}>
+      {/* TESTIMONIALS */}
+      <section className="bg-sage-section" style={{padding:"80px 0"}}>
         <div className="container">
-          <motion.div
-            className="section-title"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={fadeUp}
-          >
+          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade}>
             <span className="text-accent">Success Stories</span>
-            <h2>What Parents & Students Say</h2>
+            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>What Parents & Students Say</h2>
           </motion.div>
-
-          <motion.div
-            className="testimonial-grid"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '30px' }}
-          >
+          <motion.div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:28,marginTop:32}} initial="hidden" whileInView="visible" viewport={{once:true}} variants={stag}>
             {[
-              { name: "Aarav Sharma", role: "Admitted to NYU", text: "Ria completely transformed my application. Her insights on my SOP made all the difference." },
-              { name: "Mrs. Kapoor", role: "Parent", text: "We were overwhelmed with the visa process for the UK. Ria handled everything smoothly and professionally." },
-              { name: "Simran Kaur", role: "IELTS Student (Band 8)", text: "The structured mock interviews and writing evaluations helped me score far above my target." }
-            ].map((t, i) => (
-              <motion.div key={i} className="testimonial-card" variants={fadeUp} style={{ background: 'var(--color-soft-ivory)', padding: '30px', borderRadius: '12px', borderLeft: '4px solid var(--color-soft-teal)' }}>
-                <i className="fas fa-quote-left text-accent" style={{ fontSize: '2rem', opacity: 0.2 }}></i>
-                <p style={{ marginTop: '15px', fontStyle: 'italic' }}>"{t.text}"</p>
-                <h4 style={{ marginTop: '20px', color: 'var(--color-deep-teal)' }}>{t.name}</h4>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{t.role}</span>
+              {name:"Aarav Sharma",role:"Admitted to NYU",text:"Ria completely transformed my application. Her insights on my SOP made all the difference."},
+              {name:"Mrs. Kapoor",role:"Parent",text:"We were overwhelmed with the UK visa process. Ria handled everything smoothly and professionally."},
+              {name:"Simran Kaur",role:"IELTS Band 8",text:"The structured mock interviews and writing evaluations helped me score far above my target."},
+            ].map((t,i)=>(
+              <motion.div key={i} variants={fade} style={{background:"white",padding:30,borderRadius:16,borderLeft:"4px solid var(--color-soft-teal)",boxShadow:"var(--shadow-soft)"}}>
+                <i className="fas fa-quote-left" style={{fontSize:"1.8rem",color:"rgba(62,159,168,0.18)"}}/>
+                <p style={{marginTop:12,fontStyle:"italic",color:"var(--text-secondary)",lineHeight:1.75,fontSize:"0.95rem"}}>"{t.text}"</p>
+                <h4 style={{marginTop:18,color:"var(--color-deep-teal)",marginBottom:4,fontFamily:"var(--font-heading)",fontWeight:800}}>{t.name}</h4>
+                <span style={{fontSize:"0.8rem",color:"var(--text-secondary)"}}>{t.role}</span>
               </motion.div>
             ))}
           </motion.div>
-          <div style={{ textAlign: 'center', marginTop: '40px' }}>
+          <div style={{textAlign:"center",marginTop:36}}>
             <Link href="/testimonials" className="btn btn-outline">Read All Success Stories</Link>
           </div>
         </div>
       </section>
 
-      {/* NEW SECTION: VIDEOS FROM ORIGINAL SITE */}
-      <section className="bg-sage-section" style={{ padding: '80px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+      {/* WORKSHOP */}
+      <section style={{background:"var(--bg-secondary)",padding:"80px 0"}}>
         <div className="container">
-          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} style={{ textAlign: 'center', marginBottom: '50px' }}>
-            <span className="text-accent">Our Impact</span>
-            <h2>Hear From Our Students</h2>
-          </motion.div>
-          <div style={{ display: 'flex', gap: '30px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <iframe src="https://www.youtube.com/embed/I9BAN9l69TU?si=Csheaq7O03RStyQO" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen style={{ width: '100%', maxWidth: '400px', aspectRatio: '16/9', height: 'auto', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', border: 'none' }}></iframe>
-            <iframe src="https://www.youtube.com/embed/NcWqUKWeGfk?si=Lz1J9K3mUjwg2lpf" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen style={{ width: '100%', maxWidth: '400px', aspectRatio: '16/9', height: 'auto', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', border: 'none' }}></iframe>
+          <div className="flex-section" style={{display:"flex",flexWrap:"wrap",gap:50,alignItems:"center"}}>
+            <motion.div style={{flex:"1 1 300px"}} initial={{opacity:0,x:-30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.6}}>
+              <Image src="/images/whatsapp_image_2024-03-20_at_10.27.00_2_1.jpeg" alt="Workshop event" width={600} height={400} style={{width:"100%",height:"auto",borderRadius:18,boxShadow:"0 20px 40px rgba(0,0,0,0.1)"}}/>
+            </motion.div>
+            <motion.div style={{flex:"1 1 300px"}} initial={{opacity:0,x:30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.6}}>
+              <span className="text-accent">Live Events</span>
+              <h2 style={{fontSize:"clamp(1.8rem,3vw,2.3rem)",color:"var(--color-deep-teal)",marginBottom:18,fontFamily:"var(--font-heading)",fontWeight:800}}>Upcoming Masterclasses</h2>
+              <p style={{fontSize:"1.05rem",color:"var(--text-secondary)",marginBottom:26,lineHeight:1.8}}>Join our free online masterclasses where we break down the Ivy League admission process, IELTS strategies, and profile-building secrets.</p>
+              <div style={{background:"var(--bg-primary)",padding:20,borderRadius:12,marginBottom:22,borderLeft:"4px solid var(--color-soft-teal)"}}>
+                <h4 style={{color:"var(--color-deep-teal)",marginBottom:6,fontFamily:"var(--font-heading)",fontWeight:800}}>Mastering the Common App</h4>
+                <p style={{fontSize:"0.9rem",color:"#666",margin:0}}><i className="far fa-calendar-alt"/> August 15th, 2026 &nbsp;|&nbsp; <i className="far fa-clock"/> 6:00 PM IST</p>
+              </div>
+              <Link href="/contact" className="btn btn-primary">Register for Free</Link>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* NEW SECTION: FAQ (Great for SEO/AEO) */}
-      <section className="bg-sage-section" style={{ padding: '80px 0' }}>
-        <div className="container" style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <span className="text-accent">Clarifications</span>
-            <h2>Frequently Asked Questions</h2>
+      {/* STATS (Moved here) */}
+      <section style={{background:"var(--color-deep-teal)",color:"white",padding:"60px 0"}}>
+        <div className="container">
+          <motion.div className="stats-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:30,textAlign:"center"}} initial="hidden" whileInView="visible" viewport={{once:true}} variants={stag}>
+            {[{v:"500+",l:"Students Placed"},{v:"1500+",l:"Top Universities"},{v:"160+",l:"Career Paths"},{v:"98%",l:"Success Rate"}].map((s,i)=>(
+              <motion.div key={i} variants={fade}>
+                <h2 style={{fontSize:"clamp(2rem,4vw,3rem)",color:"#F0C987",margin:"0 0 6px",fontFamily:"var(--font-heading)",fontWeight:800}}>{s.v}</h2>
+                <p style={{fontSize:"1rem",opacity:0.9,margin:0}}>{s.l}</p>
+              </motion.div>
+            ))}
           </motion.div>
+        </div>
+      </section>
 
-          <div style={{ marginTop: '40px' }}>
-             {faqs.map((faq, i) => (
-                <div key={i} style={{ marginBottom: '15px', background: 'white', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
-                  <button 
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    style={{ width: '100%', padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--color-deep-teal)' }}
-                  >
-                    {faq.q}
-                    <i className={`fas fa-chevron-${openFaq === i ? 'up' : 'down'}`} style={{ color: 'var(--color-soft-teal)' }}></i>
-                  </button>
-                  {openFaq === i && (
-                    <div style={{ padding: '0 20px 20px 20px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                      <p>{faq.a}</p>
-                    </div>
-                  )}
-                </div>
-             ))}
+      {/* ABOUT FOUNDER (Moved here) */}
+      <section style={{background:"var(--bg-primary)",padding:"80px 0"}}>
+        <div className="container">
+          <div className="flex-section" style={{display:"flex",flexWrap:"wrap",gap:50,alignItems:"center"}}>
+            <motion.div style={{flex:"1 1 300px",position:"relative"}} initial={{opacity:0,x:-30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.6}}>
+              <Image src="/images/ria_portrait.jpg" alt="Ria Jain – Founder & Lead Counsellor" width={500} height={600} style={{width:"100%",height:"auto",borderRadius:20,boxShadow:"0 25px 50px rgba(0,0,0,0.15)"}} />
+              <div className="founder-badge" style={{position:"absolute",bottom:-20,right:-20,background:"var(--color-sage-green)",color:"white",padding:"18px 22px",borderRadius:15,boxShadow:"0 10px 20px rgba(0,0,0,0.12)"}}>
+                <h4 style={{margin:0,fontSize:"1.1rem",fontFamily:"var(--font-heading)",fontWeight:800}}>Ria Jain</h4>
+                <p style={{margin:0,fontSize:"0.82rem",opacity:0.92}}>Lead Counsellor & Founder</p>
+              </div>
+            </motion.div>
+            <motion.div style={{flex:"1 1 300px"}} initial={{opacity:0,x:30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.6}}>
+              <span className="text-accent">About Us</span>
+              <h2 style={{fontSize:"clamp(1.8rem,3.5vw,2.5rem)",color:"var(--color-deep-teal)",marginBottom:18,fontFamily:"var(--font-heading)",fontWeight:800}}>Guiding You Beyond Borders</h2>
+              <p style={{fontSize:"1.05rem",color:"var(--text-secondary)",marginBottom:16,lineHeight:1.8}}>Sometimes, all we need is the right guidance at the right time. That's why My Skill Counsellor was founded in 2023—to be a trusted guide, helping individuals navigate important academic and career decisions with clarity and confidence.</p>
+              <p style={{fontSize:"1.05rem",color:"var(--text-secondary)",marginBottom:28,lineHeight:1.8}}>As both a counsellor and a parent of an international student myself, I bring professional expertise and real-world understanding. Every student has a different story, pace, and aspiration.</p>
+              <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:28}}>
+                {["MA English","CCCIS Certified","Since 2023","Parent of Int'l Student"].map((b,i)=>(
+                  <span key={i} style={{padding:"6px 14px",borderRadius:20,background:"rgba(62,159,168,0.1)",color:"var(--color-deep-teal)",fontSize:"0.82rem",fontWeight:700,fontFamily:"var(--font-heading)"}}>{b}</span>
+                ))}
+              </div>
+              <Link href="/contact" className="btn btn-outline" style={{display:"inline-flex",alignItems:"center",gap:10}}>Book a Chat <i className="fas fa-arrow-right"/></Link>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* MEDIA */}
+      <section style={{padding:"80px 0",background:"var(--bg-secondary)"}}>
+        <div className="container">
+          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade} style={{textAlign:"center",marginBottom:44}}>
+            <span className="text-accent" style={{color:"var(--color-soft-teal)"}}>In The Media</span>
+            <h2 style={{color:"var(--color-deep-teal)",fontFamily:"var(--font-heading)",fontWeight:800}}>Recognized for Excellence</h2>
+          </motion.div>
+          <motion.div initial={{opacity:0,scale:0.96}} whileInView={{opacity:1,scale:1}} viewport={{once:true}} style={{textAlign:"center",maxWidth:"800px",margin:"0 auto"}}>
+            <div style={{width:"100%",position:"relative",borderRadius:16,boxShadow:"0 25px 50px rgba(0,0,0,0.15)",overflow:"hidden"}}>
+              <Image src="/images/shah_times_article_cropped.jpg" alt="Shah Times Media Feature" width={630} height={350} style={{width:"100%",height:"auto",display:"block"}}/>
+            </div>
+            <p style={{marginTop:20,color:"var(--text-secondary)",fontStyle:"italic"}}>Shah Times Feature on Teenage Independence and Restrictions</p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* VIDEOS */}
+      <section className="bg-sage-section" style={{padding:"80px 0"}}>
+        <div className="container">
+          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade} style={{textAlign:"center",marginBottom:44}}>
+            <span className="text-accent">Our Impact</span>
+            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>Hear From Our Students</h2>
+          </motion.div>
+          <div style={{display:"flex",gap:28,justifyContent:"center",flexWrap:"wrap"}}>
+            <iframe src="https://www.youtube.com/embed/I9BAN9l69TU?si=Csheaq7O03RStyQO" title="Student testimonial 1" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",maxWidth:420,aspectRatio:"16/9",borderRadius:14,boxShadow:"0 10px 30px rgba(0,0,0,0.1)",border:"none"}}/>
+            <iframe src="https://www.youtube.com/embed/NcWqUKWeGfk?si=Lz1J9K3mUjwg2lpf" title="Student testimonial 2" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",maxWidth:420,aspectRatio:"16/9",borderRadius:14,boxShadow:"0 10px 30px rgba(0,0,0,0.1)",border:"none"}}/>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section style={{padding:"80px 0",background:"var(--bg-secondary)"}}>
+        <div className="container" style={{maxWidth:780,margin:"0 auto"}}>
+          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade}>
+            <span className="text-accent">Clarifications</span>
+            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>Frequently Asked Questions</h2>
+          </motion.div>
+          <div style={{marginTop:36}}>
+            {faqs.map((f,i)=>(
+              <div key={i} style={{marginBottom:12,background:"var(--bg-primary)",borderRadius:14,overflow:"hidden",boxShadow:"var(--shadow-soft)",border:"1px solid var(--border-color)"}}>
+                <button onClick={()=>setFaq(faq===i?null:i)} style={{width:"100%",padding:"18px 22px",display:"flex",justifyContent:"space-between",alignItems:"center",background:"none",border:"none",cursor:"pointer",textAlign:"left",fontWeight:700,fontSize:"1rem",color:"var(--color-deep-teal)",fontFamily:"var(--font-heading)"}}>
+                  {f.q}
+                  <i className={`fas fa-chevron-${faq===i?"up":"down"}`} style={{color:"var(--color-soft-teal)",flexShrink:0,marginLeft:12}}/>
+                </button>
+                {faq===i&&<div style={{padding:"0 22px 18px",color:"var(--text-secondary)",lineHeight:1.75,fontSize:"0.95rem"}}><p style={{margin:0}}>{f.a}</p></div>}
+              </div>
+            ))}
           </div>
         </div>
       </section>

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, DM_Sans } from "next/font/google";
+import { Nunito, Lato } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
+const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito", weight: ["300","400","600","700","800"] });
+const lato = Lato({ subsets: ["latin"], variable: "--font-lato", weight: ["300","400","700"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://myskillcounsellor.com"),
@@ -90,7 +90,7 @@ export default function RootLayout({
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
       </head>
-      <body className={`${inter.variable} ${dmSans.variable}`}>
+      <body className={`${nunito.variable} ${lato.variable}`}>
         <Navbar />
         {children}
         <WhatsAppWidget />

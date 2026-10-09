@@ -69,11 +69,128 @@ const initialDummyServices = [
 ];
 
 const initialDummySiteContent = [
-  { key: "hero_title", value: "Empowering Students to Study Globally", updatedAt: new Date() },
-  { key: "hero_subtitle", value: "Expert career guidance, IELTS coaching, SOP building, and visa assistance under one roof.", updatedAt: new Date() },
-  { key: "contact_email", value: "ria.myskillcounsellor@gmail.com", updatedAt: new Date() },
+  // ── Hero Carousel ──────────────────────────────────────────
+  { key: "hero_badge_label", value: "We Turn Confusion into Career Fusion", updatedAt: new Date() },
+  { key: "hero_slide1_caption", value: "Your Gateway to Top Global Universities", updatedAt: new Date() },
+  { key: "hero_slide1_sub", value: "Don't leave your future to chance. Get admitted to elite institutions in the UK, USA, Canada, Dubai, and Europe with our proven admission strategies.", updatedAt: new Date() },
+  { key: "hero_slide2_caption", value: "Stop Guessing, Start Building.", updatedAt: new Date() },
+  { key: "hero_slide2_sub", value: "Transform confusion into absolute clarity. We help you map out a high-demand career path tailored to your unique strengths and aspirations.", updatedAt: new Date() },
+  { key: "hero_slide3_caption", value: "Stand Out in a Sea of Applicants", updatedAt: new Date() },
+  { key: "hero_slide3_sub", value: "Grades aren't enough. We craft compelling Statements of Purpose and build Ivy-league-worthy portfolios that make admissions officers take notice.", updatedAt: new Date() },
+  { key: "hero_slide4_caption", value: "Nail Your Target IELTS Score & Visa", updatedAt: new Date() },
+  { key: "hero_slide4_sub", value: "Achieve Band 8+ with our expert coaching. Once you're admitted, we handle the complex visa and financial paperwork so you don't have to.", updatedAt: new Date() },
+  { key: "hero_slide5_caption", value: "We Walk With You — Every Step", updatedAt: new Date() },
+  { key: "hero_slide5_sub", value: "From the first profile evaluation to your first day on campus. We provide end-to-end support so you never walk alone.", updatedAt: new Date() },
+  { key: "hero_cta_primary", value: "Book a Free Consultation", updatedAt: new Date() },
+  { key: "hero_cta_secondary", value: "Explore Services", updatedAt: new Date() },
+
+  // ── Services Section (Homepage) ───────────────────────────
+  { key: "services_section_title", value: "How We Support Your Journey", updatedAt: new Date() },
+  { key: "services_section_subtitle", value: "End-to-end support across every stage of your study abroad journey.", updatedAt: new Date() },
+  { key: "service1_title", value: "Before the Offer Letter", updatedAt: new Date() },
+  { key: "service1_subtitle", value: "Building the Right Foundation", updatedAt: new Date() },
+  { key: "service1_point1", value: "Career & Profile Assessment", updatedAt: new Date() },
+  { key: "service1_point2", value: "Course & University Selection", updatedAt: new Date() },
+  { key: "service1_point3", value: "SOP & LOR Guidance", updatedAt: new Date() },
+  { key: "service1_point4", value: "IELTS / TOEFL Preparation", updatedAt: new Date() },
+  { key: "service2_title", value: "After the Offer Letter", updatedAt: new Date() },
+  { key: "service2_subtitle", value: "Preparing for the Move", updatedAt: new Date() },
+  { key: "service2_point1", value: "Final University Selection", updatedAt: new Date() },
+  { key: "service2_point2", value: "Comprehensive Visa Support", updatedAt: new Date() },
+  { key: "service2_point3", value: "Financial Documentation", updatedAt: new Date() },
+  { key: "service2_point4", value: "Pre-Departure Guidance", updatedAt: new Date() },
+  { key: "service3_title", value: "After Departure", updatedAt: new Date() },
+  { key: "service3_subtitle", value: "Settling into Your New Life", updatedAt: new Date() },
+  { key: "service3_point1", value: "Arrival & Settling-In Support", updatedAt: new Date() },
+  { key: "service3_point2", value: "Local Transport Navigation", updatedAt: new Date() },
+  { key: "service3_point3", value: "SIM & Banking Setup", updatedAt: new Date() },
+  { key: "service3_point4", value: "Campus Orientation", updatedAt: new Date() },
+
+  // ── How It Works ──────────────────────────────────────────
+  { key: "steps_section_title", value: "The 4-Step Journey", updatedAt: new Date() },
+  { key: "step1_title", value: "Discovery Profile", updatedAt: new Date() },
+  { key: "step1_desc", value: "We evaluate your academic background, interests and aspirations.", updatedAt: new Date() },
+  { key: "step2_title", value: "Strategic Roadmap", updatedAt: new Date() },
+  { key: "step2_desc", value: "We shortlist universities and map required tests like IELTS/TOEFL.", updatedAt: new Date() },
+  { key: "step3_title", value: "Application & SOP", updatedAt: new Date() },
+  { key: "step3_desc", value: "We meticulously build your portfolio and craft compelling essays.", updatedAt: new Date() },
+  { key: "step4_title", value: "Visa & Pre-Departure", updatedAt: new Date() },
+  { key: "step4_desc", value: "We secure your visa and prepare you for life in a new country.", updatedAt: new Date() },
+
+  // ── About / Founder ───────────────────────────────────────
+  { key: "about_heading", value: "Guiding You Beyond Borders", updatedAt: new Date() },
+  { key: "about_para1", value: "Sometimes, all we need is the right guidance at the right time. That's why My Skill Counsellor was founded in 2023—to be a trusted guide, helping individuals navigate important academic and career decisions with clarity and confidence.", updatedAt: new Date() },
+  { key: "about_para2", value: "As both a counsellor and a parent of an international student myself, I bring professional expertise and real-world understanding. Every student has a different story, pace, and aspiration.", updatedAt: new Date() },
+  { key: "about_cta", value: "Book a Chat", updatedAt: new Date() },
+  { key: "founder_name", value: "Ria Jain", updatedAt: new Date() },
+  { key: "founder_title", value: "Lead Counsellor & Founder", updatedAt: new Date() },
+  { key: "founder_badge1", value: "MA English", updatedAt: new Date() },
+  { key: "founder_badge2", value: "CCCIS Certified", updatedAt: new Date() },
+  { key: "founder_badge3", value: "Since 2023", updatedAt: new Date() },
+  { key: "founder_badge4", value: "Parent of Int'l Student", updatedAt: new Date() },
+
+  // ── Impact Statistics ─────────────────────────────────────
+  { key: "stat_students", value: "500+", updatedAt: new Date() },
+  { key: "stat_students_label", value: "Students Placed", updatedAt: new Date() },
+  { key: "stat_universities", value: "1500+", updatedAt: new Date() },
+  { key: "stat_universities_label", value: "Top Universities", updatedAt: new Date() },
+  { key: "stat_career_paths", value: "160+", updatedAt: new Date() },
+  { key: "stat_career_paths_label", value: "Career Paths", updatedAt: new Date() },
+  { key: "stat_success_rate", value: "98%", updatedAt: new Date() },
+  { key: "stat_success_rate_label", value: "Success Rate", updatedAt: new Date() },
+
+  // ── Workshop / Masterclass ────────────────────────────────
+  { key: "workshop_section_label", value: "Live Events", updatedAt: new Date() },
+  { key: "workshop_section_heading", value: "Upcoming Masterclasses", updatedAt: new Date() },
+  { key: "workshop_section_desc", value: "Join our free online masterclasses where we break down the Ivy League admission process, IELTS strategies, and profile-building secrets.", updatedAt: new Date() },
+  { key: "workshop_title", value: "Mastering the Common App", updatedAt: new Date() },
+  { key: "workshop_date", value: "August 15th, 2026 | 6:00 PM IST", updatedAt: new Date() },
+  { key: "workshop_cta", value: "Register for Free", updatedAt: new Date() },
+
+  // ── Testimonials ──────────────────────────────────────────
+  { key: "testimonials_section_label", value: "Success Stories", updatedAt: new Date() },
+  { key: "testimonials_section_title", value: "What Parents & Students Say", updatedAt: new Date() },
+  { key: "testimonials_cta", value: "Read All Success Stories", updatedAt: new Date() },
+
+  // ── Media / Recognition ───────────────────────────────────
+  { key: "media_section_label", value: "In The Media", updatedAt: new Date() },
+  { key: "media_section_title", value: "Recognized for Excellence", updatedAt: new Date() },
+  { key: "media_article_caption", value: "Shah Times Feature on Teenage Independence and Restrictions", updatedAt: new Date() },
+
+  // ── FAQs ──────────────────────────────────────────────────
+  { key: "faq_section_label", value: "Clarifications", updatedAt: new Date() },
+  { key: "faq_section_title", value: "Frequently Asked Questions", updatedAt: new Date() },
+  { key: "faq1_q", value: "When is the right time to start planning for study abroad?", updatedAt: new Date() },
+  { key: "faq1_a", value: "We recommend starting as early as Class 9. This gives ample time to build a robust profile and plan extracurriculars without rushing.", updatedAt: new Date() },
+  { key: "faq2_q", value: "Do you guarantee university admissions?", updatedAt: new Date() },
+  { key: "faq2_a", value: "While no consultant can guarantee admission to ivy-league universities, our track record speaks for itself. We maximise your chances by aligning your profile with university expectations.", updatedAt: new Date() },
+  { key: "faq3_q", value: "Do you assist with selecting the right major or course?", updatedAt: new Date() },
+  { key: "faq3_a", value: "Yes. We use detailed psychometric evaluations and industry insights to help you choose a course that aligns with both your passions and future market demand.", updatedAt: new Date() },
+  { key: "faq4_q", value: "How do I start the process?", updatedAt: new Date() },
+  { key: "faq4_a", value: "You can start by booking a free initial consultation through our contact page. We will assess your profile and discuss a personalized roadmap.", updatedAt: new Date() },
+
+  // ── Contact Details ───────────────────────────────────────
+  { key: "contact_phone", value: "+91 9990004878", updatedAt: new Date() },
+  { key: "contact_email", value: "info@myskillcounsellor.com", updatedAt: new Date() },
+  { key: "contact_location", value: "Noida, India", updatedAt: new Date() },
   { key: "whatsapp_number", value: "+91 9990004878", updatedAt: new Date() },
-  { key: "featured_headline", value: "As Featured in Top Education Journals", updatedAt: new Date() }
+  { key: "instagram_url", value: "https://instagram.com/myskillcounsellor", updatedAt: new Date() },
+  { key: "linkedin_url", value: "https://linkedin.com/in/riajain26", updatedAt: new Date() },
+
+  // ── Footer ────────────────────────────────────────────────
+  { key: "footer_tagline", value: "Empowering students with clarity, strategy, and confidence to achieve global university admissions.", updatedAt: new Date() },
+  { key: "footer_copyright", value: "My Skill Counsellor. All Rights Reserved.", updatedAt: new Date() },
+
+  // ── Page Meta ─────────────────────────────────────────────
+  { key: "meta_title", value: "My Skill Counsellor | Career & Study Abroad Guidance by Ria Jain", updatedAt: new Date() },
+  { key: "meta_description", value: "Expert career counselling, study abroad admissions, IELTS preparation, SOP building, and visa support by Ria Jain.", updatedAt: new Date() },
+];
+
+const initialDummyFaqs = [
+  { id: 1, question: "When is the right time to start planning for study abroad?", answer: "We recommend starting as early as Class 9. This gives ample time to build a robust profile and plan extracurriculars without rushing." },
+  { id: 2, question: "Do you guarantee university admissions?", answer: "While no consultant can guarantee admission to ivy-league universities, our track record speaks for itself. We maximise your chances by aligning your profile with university expectations." },
+  { id: 3, question: "When is the right time to start the application process?", answer: "We recommend starting as early as Class 9 or 10. This gives ample time to build a robust profile and plan extracurriculars without rushing." },
+  { id: 4, question: "How is My Skill Counsellor different from other agencies?", answer: "We don't do cookie-cutter applications. Every student gets 1-on-1 personalised mentorship ensuring their SOP and portfolio is uniquely theirs." },
 ];
 
 interface AdminClientProps {
@@ -97,12 +214,19 @@ export default function AdminClient({
 }: AdminClientProps) {
   // Authorization State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState("");
 
   // Tab State
-  const [activeTab, setActiveTab] = useState<"dashboard" | "inquiries" | "testimonials" | "blogs" | "services" | "cms">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "inquiries" | "testimonials" | "blogs" | "services" | "cms" | "faqs">("dashboard");
+
+  // FAQ State
+  const [faqsList, setFaqsList] = useState<any[]>(initialDummyFaqs);
+  const [showFaqModal, setShowFaqModal] = useState(false);
+  const [editingFaq, setEditingFaq] = useState<any | null>(null);
+  const [faqForm, setFaqForm] = useState({ question: "", answer: "" });
 
   // Mode state: If DB is not connected, use Memory state
   const [isDemoMode, setIsDemoMode] = useState(!dbConnected);
@@ -180,8 +304,8 @@ export default function AdminClient({
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Premium Admin Passkey check
-    if (password === "admin123") {
+    // Secure Admin Passkey check
+    if (username === "admin" && password === "RiaAdmin@2026") {
       setIsAuthenticated(true);
       localStorage.setItem("msc_admin_auth", "true");
       showNotify("Authorized successfully", "success");
@@ -480,6 +604,43 @@ export default function AdminClient({
   };
 
   /* ====================================================
+     FAQ BUSINESS LOGIC
+     ==================================================== */
+  const openAddFaq = () => {
+    setEditingFaq(null);
+    setFaqForm({ question: "", answer: "" });
+    setShowFaqModal(true);
+  };
+
+  const openEditFaq = (f: any) => {
+    setEditingFaq(f);
+    setFaqForm({ question: f.question, answer: f.answer });
+    setShowFaqModal(true);
+  };
+
+  const handleSaveFaq = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!faqForm.question || !faqForm.answer) {
+      showNotify("Both question and answer are required.", "error");
+      return;
+    }
+    if (editingFaq) {
+      setFaqsList(prev => prev.map(f => f.id === editingFaq.id ? { ...f, ...faqForm } : f));
+      showNotify("FAQ updated successfully.", "success");
+    } else {
+      setFaqsList(prev => [{ id: Date.now(), ...faqForm }, ...prev]);
+      showNotify("FAQ added successfully.", "success");
+    }
+    setShowFaqModal(false);
+  };
+
+  const handleDeleteFaq = (id: number) => {
+    if (!confirm("Delete this FAQ?")) return;
+    setFaqsList(prev => prev.filter(f => f.id !== id));
+    showNotify("FAQ deleted.", "success");
+  };
+
+  /* ====================================================
      CMS / SITE SETTINGS BUSINESS LOGIC
      ==================================================== */
   const handleUpdateCmsKey = async (key: string, value: string) => {
@@ -580,7 +741,31 @@ export default function AdminClient({
           <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             <div style={{ position: "relative", textAlign: "left" }}>
               <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>
-                SECRET PASSKEY
+                ADMIN USERNAME
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter admin username..."
+                style={{
+                  width: "100%",
+                  padding: "14px 16px",
+                  borderRadius: "var(--radius-sm)",
+                  border: "1px solid var(--border-color)",
+                  outline: "none",
+                  fontSize: "1rem",
+                  color: "var(--text-primary)",
+                  backgroundColor: "#FCFAF6",
+                  transition: "var(--transition-smooth)"
+                }}
+                autoFocus
+              />
+            </div>
+
+            <div style={{ position: "relative", textAlign: "left" }}>
+              <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>
+                ADMIN PASSWORD
               </label>
               <input
                 type={showPassword ? "text" : "password"}
@@ -598,7 +783,6 @@ export default function AdminClient({
                   backgroundColor: "#FCFAF6",
                   transition: "var(--transition-smooth)"
                 }}
-                autoFocus
               />
               <button
                 type="button"
@@ -745,6 +929,7 @@ export default function AdminClient({
               { id: "testimonials", label: "Testimonials", icon: <User size={20} /> },
               { id: "blogs", label: "Counselling Blogs", icon: <BookOpen size={20} /> },
               { id: "services", label: "Services", icon: <Briefcase size={20} /> },
+              { id: "faqs", label: "FAQ Manager", icon: <FileText size={20} /> },
               { id: "cms", label: "Site Content (CMS)", icon: <Settings size={20} /> }
             ].map(tab => (
               <button
@@ -1482,75 +1667,94 @@ export default function AdminClient({
           )}
 
           {/* ====================================================
-             TAB 6: SITE CONTENT (CMS)
+             TAB: FAQ MANAGER
              ==================================================== */}
-          {activeTab === "cms" && (
+          {activeTab === "faqs" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <p style={{ color: "var(--text-secondary)", marginBottom: "35px" }}>
-                Instantly rewrite values and copy across main components on the homepage without touching code templates.
-              </p>
-
-              <div style={{
-                backgroundColor: "white",
-                borderRadius: "var(--radius-md)",
-                boxShadow: "var(--shadow-soft)",
-                border: "1px solid var(--border-color)",
-                padding: "30px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "24px"
-              }}>
-                {siteContentList.map((item) => (
-                  <div key={item.key} style={{
-                    display: "grid",
-                    gridTemplateColumns: "0.3fr 1.7fr",
-                    gap: "20px",
-                    alignItems: "center",
-                    borderBottom: "1px solid var(--border-color)",
-                    paddingBottom: "24px"
-                  }}>
-                    <div>
-                      <strong style={{ color: "var(--color-deep-teal)", fontSize: "0.85rem", textTransform: "uppercase" }}>{item.key.replace(/_/g, " ")}</strong>
-                      <span style={{ display: "block", fontSize: "0.7rem", color: "#888", marginTop: "4px" }}>
-                        Updated: {new Date(item.updatedAt || Date.now()).toLocaleDateString()}
-                      </span>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
+                <p style={{ color: "var(--text-secondary)", margin: 0 }}>Manage the Frequently Asked Questions shown on the homepage.</p>
+                <button onClick={openAddFaq} className="btn btn-primary" style={{ padding: "10px 20px", fontSize: "0.9rem", borderRadius: "var(--radius-sm)" }}>
+                  <Plus size={16} /> Add FAQ
+                </button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                {faqsList.map((faq, idx) => (
+                  <div key={faq.id} style={{ backgroundColor: "white", borderRadius: "var(--radius-md)", padding: "24px 28px", boxShadow: "var(--shadow-soft)", border: "1px solid var(--border-color)", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "20px" }}>
+                    <div style={{ flex: 1 }}>
+                      <span style={{ fontSize: "0.75rem", color: "var(--color-soft-teal)", fontWeight: 700, textTransform: "uppercase" }}>Q{idx + 1}</span>
+                      <h4 style={{ margin: "6px 0 10px", color: "var(--color-deep-teal)", fontSize: "1rem" }}>{faq.question}</h4>
+                      <p style={{ margin: 0, color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.65 }}>{faq.answer}</p>
                     </div>
-
-                    <div style={{ display: "flex", gap: "10px" }}>
-                      {item.value.length > 80 ? (
-                        <textarea
-                          defaultValue={item.value}
-                          onBlur={(e) => handleUpdateCmsKey(item.key, e.target.value)}
-                          rows={3}
-                          style={{
-                            flex: 1,
-                            padding: "12px",
-                            borderRadius: "5px",
-                            border: "1px solid var(--border-color)",
-                            fontFamily: "var(--font-body)",
-                            fontSize: "0.9rem",
-                            outline: "none"
-                          }}
-                        />
-                      ) : (
-                        <input
-                          type="text"
-                          defaultValue={item.value}
-                          onBlur={(e) => handleUpdateCmsKey(item.key, e.target.value)}
-                          style={{
-                            flex: 1,
-                            padding: "12px",
-                            borderRadius: "5px",
-                            border: "1px solid var(--border-color)",
-                            fontSize: "0.9rem",
-                            outline: "none"
-                          }}
-                        />
-                      )}
+                    <div style={{ display: "flex", gap: "8px", flexShrink: 0 }}>
+                      <button onClick={() => openEditFaq(faq)} style={{ border: "1px solid var(--border-color)", padding: "7px", borderRadius: "6px", background: "none", cursor: "pointer", color: "var(--color-soft-teal)" }}><Edit2 size={15} /></button>
+                      <button onClick={() => handleDeleteFaq(faq.id)} style={{ border: "none", padding: "7px", borderRadius: "6px", backgroundColor: "rgba(239,68,68,0.08)", cursor: "pointer", color: "#EF4444" }}><Trash2 size={15} /></button>
                     </div>
                   </div>
                 ))}
               </div>
+            </motion.div>
+          )}
+
+          {/* ====================================================
+             TAB 6: SITE CONTENT (CMS)
+             ==================================================== */}
+          {activeTab === "cms" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <p style={{ color: "var(--text-secondary)", marginBottom: "30px", lineHeight: 1.7 }}>
+                ✏️ <strong>Full-site content editor.</strong> Every text block visible on the website is listed below — from hero headings and service descriptions to FAQs, footer taglines, and SEO meta tags. Click any field and blur (click away) to save changes instantly.
+              </p>
+
+              {/* Group CMS keys by section */}
+              {[
+                { section: "🎯 Hero Carousel", keys: ["hero_badge_label","hero_slide1_caption","hero_slide1_sub","hero_slide2_caption","hero_slide2_sub","hero_slide3_caption","hero_slide3_sub","hero_slide4_caption","hero_slide4_sub","hero_slide5_caption","hero_slide5_sub","hero_cta_primary","hero_cta_secondary"] },
+                { section: "🎓 Services Cards", keys: ["services_section_title","services_section_subtitle","service1_title","service1_subtitle","service1_point1","service1_point2","service1_point3","service1_point4","service2_title","service2_subtitle","service2_point1","service2_point2","service2_point3","service2_point4","service3_title","service3_subtitle","service3_point1","service3_point2","service3_point3","service3_point4"] },
+                { section: "🔢 How It Works Steps", keys: ["steps_section_title","step1_title","step1_desc","step2_title","step2_desc","step3_title","step3_desc","step4_title","step4_desc"] },
+                { section: "👤 About / Founder", keys: ["about_heading","about_para1","about_para2","about_cta","founder_name","founder_title","founder_badge1","founder_badge2","founder_badge3","founder_badge4"] },
+                { section: "📊 Impact Statistics", keys: ["stat_students","stat_students_label","stat_universities","stat_universities_label","stat_career_paths","stat_career_paths_label","stat_success_rate","stat_success_rate_label"] },
+                { section: "🎤 Workshop / Masterclass", keys: ["workshop_section_label","workshop_section_heading","workshop_section_desc","workshop_title","workshop_date","workshop_cta"] },
+                { section: "⭐ Testimonials", keys: ["testimonials_section_label","testimonials_section_title","testimonials_cta"] },
+                { section: "📰 Media / Recognition", keys: ["media_section_label","media_section_title","media_article_caption"] },
+                { section: "❓ Homepage FAQs", keys: ["faq_section_label","faq_section_title","faq1_q","faq1_a","faq2_q","faq2_a","faq3_q","faq3_a","faq4_q","faq4_a"] },
+                { section: "📞 Contact Details", keys: ["contact_phone","contact_email","contact_location","whatsapp_number","instagram_url","linkedin_url"] },
+                { section: "🦶 Footer", keys: ["footer_tagline","footer_copyright"] },
+                { section: "🔍 Page Meta (SEO)", keys: ["meta_title","meta_description"] },
+              ].map(group => {
+                const items = siteContentList.filter(i => group.keys.includes(i.key));
+                if (!items.length) return null;
+                return (
+                  <div key={group.section} style={{ marginBottom: "28px", backgroundColor: "white", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-soft)", border: "1px solid var(--border-color)", overflow: "hidden" }}>
+                    <div style={{ padding: "14px 24px", backgroundColor: "rgba(37,95,107,0.05)", borderBottom: "1px solid var(--border-color)" }}>
+                      <h4 style={{ margin: 0, color: "var(--color-deep-teal)", fontSize: "0.95rem", fontWeight: 700 }}>{group.section}</h4>
+                    </div>
+                    <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
+                      {items.map(item => (
+                        <div key={item.key}>
+                          <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>
+                            {item.key.replace(/_/g, " ")}
+                          </label>
+                          <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                            {item.value.length > 60 ? (
+                              <textarea
+                                defaultValue={item.value}
+                                onBlur={e => handleUpdateCmsKey(item.key, e.target.value)}
+                                rows={3}
+                                style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontFamily: "var(--font-body)", fontSize: "0.9rem", outline: "none", lineHeight: 1.6 }}
+                              />
+                            ) : (
+                              <input
+                                type="text"
+                                defaultValue={item.value}
+                                onBlur={e => handleUpdateCmsKey(item.key, e.target.value)}
+                                style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontSize: "0.9rem", outline: "none" }}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </motion.div>
           )}
 
@@ -1994,6 +2198,36 @@ export default function AdminClient({
                   <button type="submit" className="btn btn-primary" style={{ padding: "10px 20px", fontSize: "0.9rem", borderRadius: "5px" }}>
                     Save Service
                   </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ====================================================
+         MODAL: FAQ FORM
+         ==================================================== */}
+      <AnimatePresence>
+        {showFaqModal && (
+          <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(37,95,107,0.4)", backdropFilter: "blur(5px)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }}>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} style={{ backgroundColor: "white", borderRadius: "var(--radius-md)", width: "90%", maxWidth: "560px", padding: "35px", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px" }}>
+                <h3 style={{ fontSize: "1.25rem", margin: 0, color: "var(--color-deep-teal)" }}>{editingFaq ? "Edit FAQ" : "Add FAQ"}</h3>
+                <button onClick={() => setShowFaqModal(false)} style={{ border: "none", background: "none", cursor: "pointer", color: "var(--text-secondary)" }}><X size={20} /></button>
+              </div>
+              <form onSubmit={handleSaveFaq} style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>QUESTION</label>
+                  <input type="text" value={faqForm.question} onChange={e => setFaqForm(p => ({ ...p, question: e.target.value }))} placeholder="e.g. When should I start planning study abroad?" style={{ width: "100%", padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", outline: "none", fontSize: "0.95rem" }} required />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>ANSWER</label>
+                  <textarea value={faqForm.answer} onChange={e => setFaqForm(p => ({ ...p, answer: e.target.value }))} placeholder="Write a clear, helpful answer..." rows={5} style={{ width: "100%", padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", outline: "none", fontSize: "0.95rem", fontFamily: "var(--font-body)", lineHeight: 1.6 }} required />
+                </div>
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                  <button type="button" onClick={() => setShowFaqModal(false)} style={{ padding: "10px 20px", border: "1px solid var(--border-color)", background: "none", borderRadius: "8px", cursor: "pointer", fontSize: "0.9rem" }}>Cancel</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "10px 20px", fontSize: "0.9rem", borderRadius: "8px" }}>Save FAQ</button>
                 </div>
               </form>
             </motion.div>
