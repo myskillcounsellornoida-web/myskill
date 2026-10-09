@@ -68,7 +68,7 @@ export default function BlogClient({ blogsList: blogs }: { blogsList: Blog[] }) 
         <div className="container">
           <motion.div className="author-card" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
             <div className="author-card-photo">
-              <Image src={t("founder_image")} alt={t("founder_name")} fill sizes="140px" style={{ objectFit: "cover" }} />
+              <Image src={t("founder_image")} alt={t("founder_name")} fill sizes="140px" style={{ objectFit: "cover", objectPosition: "center 15%" }} />
             </div>
             <div className="author-card-body">
               <Txt k="blog_author_label" className="eyebrow" />
