@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Ria Jain | My Skill Counsellor</title>
+    <meta name="description" content="Reach out to Ria Jain at My Skill Counsellor. Submit your enquiry form, book a Calendly call, or chat directly on WhatsApp.">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Global Styling -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ==========================================================================
+       HEADER & NAVIGATION
+       ========================================================================== */ -->
+    <header>
+        <div class="container navbar">
+            <a href="index.html" class="logo">
+                <img src="images/logo.png" alt="My Skill Counsellor Logo">
+                <span>My Skill<br>Counsellor</span>
+            </a>
+            <button class="menu-toggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Me</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="contact.html" class="active">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="nav-cta">
+                <button class="btn btn-primary trigger-booking">Let's Connect</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==========================================================================
+       INNER HERO SECTION
+       ========================================================================== */ -->
+    <section class="inner-hero">
+        <div class="container">
+            <span class="text-accent">Get in Touch</span>
+            <h1>Contact Us</h1>
+            <ul class="breadcrumbs">
+                <li><a href="index.html">Home</a></li>
+                <li>Contact</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+       CONTACT GRID SECTION
+       ========================================================================== */ -->
+    <section class="bg-white-section">
+        <div class="container contact-grid">
+            
+            <!-- Left Column: Contact Info -->
+            <div class="contact-info">
+                <div class="contact-info-block">
+                    <span class="text-accent">Reach Out</span>
+                    <h2>Start a Conversation</h2>
+                    <p>“Feel free to reach out for guidance or simply to start a conversation.”</p>
+                    <p>Whether you are a parent exploring study abroad options or a student looking for profile building and career clarity, we are here to support you at every stage.</p>
+                </div>
+                
+                <div class="contact-details">
+                    <div class="contact-detail-item">
+                        <i class="fab fa-whatsapp"></i>
+                        <div>
+                            <span style="display:block; font-size:0.85rem; color:var(--text-secondary);">WhatsApp Us</span>
+                            <a href="https://wa.me/message/24XQYF3LERXWA1" target="_blank">Chat on WhatsApp</a>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-detail-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <div>
+                            <span style="display:block; font-size:0.85rem; color:var(--text-secondary);">Call Us</span>
+                            <a href="tel:+919990004878">+91 99900 04878</a>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-detail-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <span style="display:block; font-size:0.85rem; color:var(--text-secondary);">Email Address</span>
+                            <a href="mailto:ria.myskillcounsellor@gmail.com">ria.myskillcounsellor@gmail.com</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-info-block" style="margin-top: 40px; margin-bottom: 0;">
+                    <h3 style="font-size: 1.15rem; margin-bottom: 15px;">Connect on Social Media</h3>
+                    <div class="social-links" style="margin-top: 10px;">
+                        <a href="https://www.linkedin.com/in/riajain26" target="_blank" class="social-link" title="LinkedIn Profile"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://wa.me/message/24XQYF3LERXWA1" target="_blank" class="social-link" title="WhatsApp Message"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#" class="social-link" title="Instagram Profile"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Enquiry Form -->
+            <div class="contact-form-container">
+                <h3 style="margin-bottom: 25px; color: var(--color-deep-teal);">Submit an Enquiry</h3>
+                <form id="enquiryForm">
+                    <!-- 1. Full Name -->
+                    <div class="form-group">
+                        <label for="formName">Full Name *</label>
+                        <input type="text" id="formName" class="form-control" placeholder="Enter your full name" required>
+                    </div>
+                    
+                    <!-- 2. Phone Number -->
+                    <div class="form-group">
+                        <label for="formPhone">Phone Number *</label>
+                        <input type="tel" id="formPhone" class="form-control" placeholder="Enter your contact number" required>
+                    </div>
+                    
+                    <!-- 3. Email Address -->
+                    <div class="form-group">
+                        <label for="formEmail">Email Address *</label>
+                        <input type="email" id="formEmail" class="form-control" placeholder="Enter your email address" required>
+                    </div>
+                    
+                    <!-- 4. Student's Current Class / Qualification (Dropdown) -->
+                    <div class="form-group">
+                        <label for="formQualification">Current Class / Qualification *</label>
+                        <select id="formQualification" class="form-control" required>
+                            <option value="" disabled selected>Select your current stage</option>
+                            <option value="Class 9">Class 9</option>
+                            <option value="Class 10">Class 10</option>
+                            <option value="Class 11">Class 11</option>
+                            <option value="Class 12">Class 12</option>
+                            <option value="Undergraduate">Undergraduate Student</option>
+                            <option value="Graduate">Graduate Student</option>
+                            <option value="Working Professional">Working Professional</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 5. Interested Service (Dropdown) -->
+                    <div class="form-group">
+                        <label for="formService">Interested Service *</label>
+                        <select id="formService" class="form-control" required>
+                            <option value="" disabled selected>Select service of interest</option>
+                            <option value="Study Abroad Counselling">Study Abroad Counselling</option>
+                            <option value="Career Counselling">Career Counselling</option>
+                            <option value="SOP/Profile Building">SOP / Profile Building</option>
+                            <option value="University Applications">University Applications</option>
+                            <option value="IELTS Preparation">IELTS Preparation</option>
+                            <option value="Visa Support">Visa Support</option>
+                            <option value="Interview Preparation">Interview Preparation</option>
+                            <option value="Other">Other Query</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 7. Message Box -->
+                    <div class="form-group">
+                        <label for="formMessage">How can I help you? *</label>
+                        <textarea id="formMessage" class="form-control" placeholder="Tell me briefly how I can help you." required></textarea>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary" style="width: 100%; border-radius: var(--radius-sm); padding: 15px;">Send Enquiry & Connect <i class="fab fa-whatsapp"></i></button>
+                </form>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+       CALENDLY CONNECT BANNER
+       ========================================================================== */ -->
+    <section class="bg-sage-section">
+        <div class="container" style="text-align: center; max-width: 800px;">
+            <h2 style="margin-bottom: 15px;">Prefer to Book a Call Directly?</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 30px; font-size: 1.05rem;">Schedule a dedicated 1-on-1 career or study abroad consultation at a time that works best for you and your family.</p>
+            <button class="btn btn-primary trigger-booking" style="padding: 16px 36px;"><i class="far fa-calendar-alt"></i> Book via Calendly</button>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+       FOOTER
+       ========================================================================== */ -->
+    <footer>
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <img src="images/logo.png" alt="My Skill Counsellor Logo">
+                <p>Helping students and families navigate higher education and study abroad journeys with clarity, confidence, and direction.</p>
+                <div class="social-links" style="margin-top: 20px;">
+                    <a href="https://www.linkedin.com/in/riajain26" target="_blank" class="social-link" style="border-color: rgba(255,255,255,0.3); color: #FFF;"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://wa.me/message/24XQYF3LERXWA1" target="_blank" class="social-link" style="border-color: rgba(255,255,255,0.3); color: #FFF;"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4 class="footer-links-title">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Me</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-links-title">Our Services</h4>
+                <ul class="footer-links">
+                    <li><a href="services.html#study-abroad">Study Abroad Guidance</a></li>
+                    <li><a href="services.html#career-counselling">Career Counselling</a></li>
+                    <li><a href="services.html#sop-building">SOP & Profile Building</a></li>
+                    <li><a href="services.html#ielts-prep">IELTS Coaching</a></li>
+                    <li><a href="services.html#visa-support">Visa Assistance</a></li>
+                    <li><a href="services.html#interview-prep">Interview Prep</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-links-title">Contact Info</h4>
+                <div class="footer-contact">
+                    <div class="footer-contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>+91 99900 04878</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:ria.myskillcounsellor@gmail.com">ria.myskillcounsellor@gmail.com</a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Delhi NCR & Online Globally</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>&copy; 2026 My Skill Counsellor. All Rights Reserved.</p>
+            <p>Designed with Care for Families & Students</p>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/message/24XQYF3LERXWA1" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i> Let's Connect
+    </a>
+
+    <!-- Global Javascript -->
+    <script src="script.js"></script>
+</body>
+</html>

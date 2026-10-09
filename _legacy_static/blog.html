@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog | My Skill Counsellor</title>
+    <meta name="description" content="Explore higher education advice, SOP writing guidelines, country visa steps, and profile building advice by Ria Jain.">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Global Styling -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ==========================================================================
+       HEADER & NAVIGATION
+       ========================================================================== */ -->
+    <header>
+        <div class="container navbar">
+            <a href="index.html" class="logo">
+                <img src="images/logo.png" alt="My Skill Counsellor Logo">
+                <span>My Skill<br>Counsellor</span>
+            </a>
+            <button class="menu-toggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Me</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="blog.html" class="active">Blog</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="nav-cta">
+                <button class="btn btn-primary trigger-booking">Let's Connect</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==========================================================================
+       INNER HERO SECTION
+       ========================================================================== */ -->
+    <section class="inner-hero">
+        <div class="container">
+            <span class="text-accent">Insights & Advice</span>
+            <h1>Counselling Blog</h1>
+            <ul class="breadcrumbs">
+                <li><a href="index.html">Home</a></li>
+                <li>Blog</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+       BLOG ARTICLES GRID
+       ========================================================================== */ -->
+    <section class="bg-white-section">
+        <div class="container">
+            <div class="blog-grid">
+                <!-- Blog Post 1 -->
+                <div class="blog-card">
+                    <div class="blog-card-img">
+                        <img src="images/whatsapp_image_2024-12-24_at_14.13.32.jpeg" alt="Study Abroad Student Guidance">
+                        <span class="blog-card-tag">Study Abroad</span>
+                    </div>
+                    <div class="blog-card-content">
+                        <div class="blog-card-meta">
+                            <span><i class="far fa-calendar"></i> July 5, 2026</span>
+                            <span><i class="far fa-clock"></i> 5 min read</span>
+                        </div>
+                        <h3>Demystifying Study Abroad: A Parent's Guide to International Admissions</h3>
+                        <p>Essential advice, financial checkpoints, and emotional transitions for parents planning to send their children to universities abroad.</p>
+                        <a href="blog-single-1.html" class="btn btn-text">Read Article <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                <!-- Blog Post 2 -->
+                <div class="blog-card">
+                    <div class="blog-card-img">
+                        <img src="images/img_5289_1.jpg" alt="Profile Building Advice">
+                        <span class="blog-card-tag">Profile Building</span>
+                    </div>
+                    <div class="blog-card-content">
+                        <div class="blog-card-meta">
+                            <span><i class="far fa-calendar"></i> June 28, 2026</span>
+                            <span><i class="far fa-clock"></i> 4 min read</span>
+                        </div>
+                        <h3>How Profile Building Can Set Your University Application Apart</h3>
+                        <p>Why academic grades alone are no longer enough, and how portfolios, extracurricular activities, and projects help you stand out.</p>
+                        <a href="blog-single-2.html" class="btn btn-text">Read Article <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                <!-- Blog Post 3 -->
+                <div class="blog-card">
+                    <div class="blog-card-img">
+                        <img src="images/whatsapp_image_2024-01-03_at_4.39.54_pm_2.jpeg" alt="SOP Writing Tips">
+                        <span class="blog-card-tag">University SOP</span>
+                    </div>
+                    <div class="blog-card-content">
+                        <div class="blog-card-meta">
+                            <span><i class="far fa-calendar"></i> June 15, 2026</span>
+                            <span><i class="far fa-clock"></i> 6 min read</span>
+                        </div>
+                        <h3>Cracking the SOP: What Admissions Officers Are Really Looking For</h3>
+                        <p>Common writing errors to avoid and structure pointers to build a compelling narrative that reflects your authentic voice.</p>
+                        <a href="blog-single-3.html" class="btn btn-text">Read Article <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+       NEWSLETTER SUBSCRIBE
+       ========================================================================== */ -->
+    <section class="bg-sage-section" style="padding: 60px 0;">
+        <div class="container" style="max-width: 650px; text-align: center;">
+            <span class="text-accent" style="margin-bottom: 5px;">Stay Informed</span>
+            <h3 style="margin-bottom: 10px;">Subscribe to Our Newsletter</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 0.95rem;">Receive monthly updates on application deadlines, country-specific visa updates, and university profile guides.</p>
+            <form onsubmit="event.preventDefault(); document.getElementById('toastSuccess').classList.add('active'); setTimeout(()=>document.getElementById('toastSuccess').classList.remove('active'), 3000);" style="display: flex; gap: 10px; width: 100%;">
+                <input type="email" placeholder="Your Email Address" class="form-control" required style="border-radius: 30px; padding: 12px 24px;">
+                <button type="submit" class="btn btn-primary" style="border-radius: 30px; flex-shrink: 0; padding: 12px 28px;">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- ==========================================================================
+       FOOTER
+       ========================================================================== */ -->
+    <footer>
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <img src="images/logo.png" alt="My Skill Counsellor Logo">
+                <p>Helping students and families navigate higher education and study abroad journeys with clarity, confidence, and direction.</p>
+                <div class="social-links" style="margin-top: 20px;">
+                    <a href="https://www.linkedin.com/in/riajain26" target="_blank" class="social-link" style="border-color: rgba(255,255,255,0.3); color: #FFF;"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="https://wa.me/message/24XQYF3LERXWA1" target="_blank" class="social-link" style="border-color: rgba(255,255,255,0.3); color: #FFF;"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div>
+                <h4 class="footer-links-title">Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Me</a></li>
+                    <li><a href="services.html">Services</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-links-title">Our Services</h4>
+                <ul class="footer-links">
+                    <li><a href="services.html#study-abroad">Study Abroad Guidance</a></li>
+                    <li><a href="services.html#career-counselling">Career Counselling</a></li>
+                    <li><a href="services.html#sop-building">SOP & Profile Building</a></li>
+                    <li><a href="services.html#ielts-prep">IELTS Coaching</a></li>
+                    <li><a href="services.html#visa-support">Visa Assistance</a></li>
+                    <li><a href="services.html#interview-prep">Interview Prep</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-links-title">Contact Info</h4>
+                <div class="footer-contact">
+                    <div class="footer-contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>+91 99900 04878</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:ria.myskillcounsellor@gmail.com">ria.myskillcounsellor@gmail.com</a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Delhi NCR & Online Globally</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <p>&copy; 2026 My Skill Counsellor. All Rights Reserved.</p>
+            <p>Designed with Care for Families & Students</p>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/message/24XQYF3LERXWA1" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i> Let's Connect
+    </a>
+
+    <!-- Global Javascript -->
+    <script src="script.js"></script>
+</body>
+</html>
