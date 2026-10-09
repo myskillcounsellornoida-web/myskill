@@ -2170,24 +2170,33 @@ export default function AdminClient({
                   { section: "🦶 Footer", keys: ["footer_tagline","footer_copyright"] },
                   { section: "🔍 Page Meta (SEO)", keys: ["meta_title","meta_description"] },
                 ].map(group => {
-                  const items = siteContentList.filter(i => group.keys.includes(i.key));
-                  if (!items.length) return null;
                   return (
                     <div key={group.section} style={{ marginBottom: "28px", backgroundColor: "white", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-soft)", border: "1px solid var(--border-color)", overflow: "hidden" }}>
                       <div style={{ padding: "14px 24px", backgroundColor: "rgba(37,95,107,0.05)", borderBottom: "1px solid var(--border-color)" }}>
                         <h4 style={{ margin: 0, color: "var(--color-deep-teal)", fontSize: "0.95rem", fontWeight: 700 }}>{group.section}</h4>
                       </div>
                       <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
-                        {items.map(item => (
-                          <div key={item.key}>
+                        {group.keys.map(key => {
+                          const itemValue = siteContentList.find(c => c.key === key)?.value || "";
+                          const isLongText = itemValue.length > 60 || key.includes("desc") || key.includes("para") || key.includes("sub") || key.includes("point");
+                          return (
+                          <div key={key}>
                             <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>
-                              {item.key.replace(/_/g, " ")}
+                              {key.replace(/_/g, " ")}
                             </label>
                             <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
-                              {item.value.length > 60 ? (
+                              {isLongText ? (
                                 <textarea
-                                  defaultValue={item.value}
-                                  onBlur={e => handleUpdateCmsKey(item.key, e.target.value)}
+                                  value={itemValue}
+                                  onChange={e => {
+                                    const val = e.target.value;
+                                    setSiteContentList(prev => {
+                                      const exists = prev.find(c => c.key === key);
+                                      if (exists) return prev.map(c => c.key === key ? { ...c, value: val } : c);
+                                      return [...prev, { key, value: val }];
+                                    });
+                                  }}
+                                  onBlur={e => handleUpdateCmsKey(key, e.target.value)}
                                   rows={3}
                                   style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontFamily: "var(--font-body)", fontSize: "0.9rem", outline: "none", lineHeight: 1.6 }}
                                 />
@@ -2195,20 +2204,27 @@ export default function AdminClient({
                                 <div style={{ display: "flex", flex: 1, gap: "10px" }}>
                                   <input
                                     type="text"
-                                    defaultValue={item.value}
-                                    value={siteContentList.find(c => c.key === item.key)?.value || item.value}
+                                    value={itemValue}
                                     onChange={e => {
                                       const val = e.target.value;
-                                      setSiteContentList(prev => prev.map(c => c.key === item.key ? { ...c, value: val } : c));
+                                      setSiteContentList(prev => {
+                                        const exists = prev.find(c => c.key === key);
+                                        if (exists) return prev.map(c => c.key === key ? { ...c, value: val } : c);
+                                        return [...prev, { key, value: val }];
+                                      });
                                     }}
-                                    onBlur={e => handleUpdateCmsKey(item.key, e.target.value)}
+                                    onBlur={e => handleUpdateCmsKey(key, e.target.value)}
                                     style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontSize: "0.9rem", outline: "none" }}
                                   />
-                                  {(item.key.includes("image") || item.key.includes("logo") || item.key.includes("poster") || item.key.includes("bg") || item.key.includes("icon")) && (
+                                  {(key.includes("image") || key.includes("logo") || key.includes("poster") || key.includes("bg") || key.includes("icon")) && (
                                     <ImageUploadButton 
                                       onUploadSuccess={(url) => {
-                                        setSiteContentList(prev => prev.map(c => c.key === item.key ? { ...c, value: url } : c));
-                                        handleUpdateCmsKey(item.key, url);
+                                        setSiteContentList(prev => {
+                                          const exists = prev.find(c => c.key === key);
+                                          if (exists) return prev.map(c => c.key === key ? { ...c, value: url } : c);
+                                          return [...prev, { key, value: url }];
+                                        });
+                                        handleUpdateCmsKey(key, url);
                                       }}
                                     />
                                   )}
@@ -2216,7 +2232,7 @@ export default function AdminClient({
                               )}
                             </div>
                           </div>
-                        ))}
+                        )})}
                       </div>
                     </div>
                   );
