@@ -7,6 +7,7 @@ export const MAX_VIDEOS = 30;
 export interface VideoEntry {
   url: string;
   title?: string;
+  category?: string;
 }
 
 export interface ParsedVideo {
@@ -74,7 +75,11 @@ export function parseVideoList(raw: string | undefined): VideoEntry[] {
     return data
       .filter((v): v is VideoEntry => !!v && typeof v.url === "string" && !!parseVideoUrl(v.url))
       .slice(0, MAX_VIDEOS)
-      .map((v) => ({ url: v.url.trim(), title: typeof v.title === "string" ? v.title.slice(0, 160) : "" }));
+      .map((v) => ({
+        url: v.url.trim(),
+        title: typeof v.title === "string" ? v.title.slice(0, 160) : "",
+        category: typeof v.category === "string" && v.category.trim() ? v.category.trim().slice(0, 40) : undefined,
+      }));
   } catch {
     return [];
   }

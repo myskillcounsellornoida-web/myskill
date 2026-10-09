@@ -7,6 +7,7 @@ import { useState, type ReactNode } from "react";
 import { Txt, useCms } from "@/components/cms/CmsProvider";
 import Arranged from "@/components/cms/Arranged";
 import { CtaBand, PageHero, SectionHeading, fadeUp, stagger } from "@/components/cms/Sections";
+import { Tilt } from "@/components/cms/motion3d";
 
 type Service = { id?: number; title: string; description: string; icon?: string | null };
 type Faq = { question: string; answer: string };
@@ -94,10 +95,12 @@ export default function ServicesClient({ services, faqs }: { services: Service[]
           <SectionHeading label="services_programs_label" title="services_programs_title" />
           <motion.div className="program-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {programs.map((s, idx) => (
-              <motion.div key={s.id ?? idx} variants={fadeUp} className="program-card">
-                <div className="program-card-icon"><i className={iconClass(s.icon)} /></div>
-                <h3>{s.title}</h3>
-                <p>{s.description}</p>
+              <motion.div key={s.id ?? idx} variants={fadeUp}>
+                <Tilt className="program-card" max={7}>
+                  <div className="program-card-icon"><i className={iconClass(s.icon)} /></div>
+                  <h3>{s.title}</h3>
+                  <p>{s.description}</p>
+                </Tilt>
               </motion.div>
             ))}
           </motion.div>

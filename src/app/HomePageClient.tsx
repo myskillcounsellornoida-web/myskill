@@ -1,10 +1,11 @@
 "use client";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, type ReactNode } from "react";
 import { Txt, useCms } from "@/components/cms/CmsProvider";
 import { CtaBand, SectionHeading, cssUrl, fadeUp, stagger } from "@/components/cms/Sections";
+import { CountUp, Tilt } from "@/components/cms/motion3d";
 import Arranged from "@/components/cms/Arranged";
 import VideoGallery from "@/components/cms/VideoGallery";
 
@@ -59,10 +60,13 @@ export default function HomePageClient({
   testimonials: Testimonial[];
   faqs: Faq[];
 }) {
-  const { t } = useCms();
+  const { t, color } = useCms();
   const [slide, setSlide] = useState(0);
   const [paused, setPaused] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const { scrollY } = useScroll();
+  const heroShift = useTransform(scrollY, [0, 700], [0, 90]);
+  const heroFade = useTransform(scrollY, [0, 520], [1, 0.25]);
 
   useEffect(() => {
     if (paused) return;
@@ -101,26 +105,20 @@ export default function HomePageClient({
           <motion.div className="stage-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {[1, 2, 3].map((n, i) => (
               <motion.div key={n} variants={fadeUp}>
-                <Link href={`/services#${STAGE_ANCHORS[i]}`} className="stage-card">
-                  <div className="stage-card-img">
-                    <Image src={t(`service${n}_image`)} alt={t(`service${n}_title`)} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover" }} />
-                    <span className="stage-card-num">0{n}</span>
-                    <span className="stage-card-icon"><i className={`fas ${STAGE_ICONS[i]}`} /></span>
-                  </div>
-                  <div className="stage-card-body">
-                    <Txt k={`service${n}_subtitle`} className="stage-card-sub" />
-                    <Txt k={`service${n}_title`} as="h3" />
-                    <ul className="check-list">
-                      {[1, 2, 3, 4].map((p) => (
-                        <li key={p}>
-                          <i className="fas fa-check-circle" />
-                          <Txt k={`service${n}_point${p}`} />
-                        </li>
-                      ))}
-                    </ul>
-                    <span className="stage-card-more">Learn more <i className="fas fa-arrow-right" /></span>
-                  </div>
-                </Link>
+                <Tilt max={8}>
+                  <Link href={`/services#${STAGE_ANCHORS[i]}`} className="stage-card is-compact">
+                    <div className="stage-card-img">
+                      <Image src={t(`service${n}_image`)} alt={t(`service${n}_title`)} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover" }} />
+                      <span className="stage-card-num">0{n}</span>
+                      <span className="stage-card-icon"><i className={`fas ${STAGE_ICONS[i]}`} /></span>
+                    </div>
+                    <div className="stage-card-body">
+                      <Txt k={`service${n}_subtitle`} className="stage-card-sub" />
+                      <Txt k={`service${n}_title`} as="h3" />
+                      <span className="stage-card-more">See what&apos;s included <i className="fas fa-arrow-right" /></span>
+                    </div>
+                  </Link>
+                </Tilt>
               </motion.div>
             ))}
           </motion.div>
@@ -136,7 +134,7 @@ export default function HomePageClient({
           <SectionHeading label="steps_section_title" title="steps_heading" />
           <motion.div className="steps-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {[1, 2, 3, 4].map((n, i) => (
-              <motion.div key={n} variants={fadeUp} className="step-card">
+              <motion.div key={n} variants={fadeUp} className="step-card tilt-hover">
                 <span className="step-card-num">0{n}</span>
                 <div className="step-card-icon"><i className={`fas ${STEP_ICONS[i]}`} /></div>
                 <Txt k={`step${n}_title`} as="h3" />
@@ -192,7 +190,7 @@ export default function HomePageClient({
           <motion.div className="stats-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {["stat_students", "stat_universities", "stat_career_paths", "stat_success_rate"].map((k) => (
               <motion.div key={k} variants={fadeUp} className="stat-item">
-                <Txt k={k} className="stat-value" />
+                <CountUp value={t(k)} className="stat-value" style={color(k) ? { color: color(k) } : undefined} />
                 <Txt k={`${k}_label`} className="stat-label" />
               </motion.div>
             ))}
@@ -283,7 +281,7 @@ export default function HomePageClient({
           <SectionHeading label="media_section_label" title="media_section_title" />
           <motion.div className="media-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {MEDIA.map((m) => (
-              <motion.figure key={m.key} variants={fadeUp} className="media-card">
+              <motion.figure key={m.key} variants={fadeUp} className="media-card tilt-hover">
                 <div className="media-card-img">
                   <Image src={m.src} alt={t(m.key)} fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: "cover", objectPosition: "top" }} />
                 </div>
@@ -341,17 +339,17 @@ export default function HomePageClient({
         onMouseLeave={() => setPaused(false)}
       >
         {Array.from({ length: SLIDE_COUNT }, (_, i) => (
-          <div
+          <motion.div
             key={i}
             className={`home-hero-slide ${slide === i ? "is-active" : ""}`}
-            style={{ backgroundImage: cssUrl(t(`hero_slide${i + 1}_image`)) }}
+            style={{ backgroundImage: cssUrl(t(`hero_slide${i + 1}_image`)), y: heroShift }}
             aria-hidden={slide !== i}
           />
         ))}
         <div className="home-hero-overlay" />
 
         <div className="container home-hero-inner">
-          <motion.div initial="hidden" animate="visible" variants={fadeUp} className="home-hero-copy">
+          <motion.div initial="hidden" animate="visible" variants={fadeUp} className="home-hero-copy" style={{ opacity: heroFade }}>
             <Txt k="hero_badge_label" className="hero-pill" />
             <AnimatePresence mode="wait">
               <motion.div

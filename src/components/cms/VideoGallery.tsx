@@ -3,10 +3,12 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { parseVideoList, parseVideoUrl, VIDEOS_KEY, type ParsedVideo } from "@/lib/videos";
+import { VIDEO_CATEGORIES_KEY, orderedCategories, parseCategories } from "@/lib/categories";
 import { useCms } from "./CmsProvider";
+import CategoryTabs from "./CategoryTabs";
 import { SectionHeading, fadeUp, stagger } from "./Sections";
 
-type Item = { url: string; title?: string; video: ParsedVideo };
+type Item = { url: string; title?: string; category?: string; video: ParsedVideo };
 
 function YouTubeCard({ item }: { item: Item }) {
   const [playing, setPlaying] = useState(false);
@@ -42,11 +44,14 @@ function InstagramCard({ item }: { item: Item }) {
 /** Instagram / YouTube links pasted by the admin, rendered as embeds. */
 export default function VideoGallery({ className = "" }: { className?: string }) {
   const { content } = useCms();
-  const items: Item[] = parseVideoList(content[VIDEOS_KEY])
+  const all: Item[] = parseVideoList(content[VIDEOS_KEY])
     .map((v) => ({ ...v, video: parseVideoUrl(v.url)! }));
+  const categories = orderedCategories(parseCategories(content[VIDEO_CATEGORIES_KEY]), all.map((v) => v.category));
+  const [active, setActive] = useState<string | null>(null);
 
-  if (items.length === 0) return null;
+  if (all.length === 0) return null;
 
+  const items = active ? all.filter((v) => v.category === active) : all;
   const wide = items.filter((i) => i.video.platform === "youtube" && !i.video.vertical);
   const tall = items.filter((i) => !(i.video.platform === "youtube" && !i.video.vertical));
 
@@ -67,6 +72,7 @@ export default function VideoGallery({ className = "" }: { className?: string })
     <section className={`section ${className}`}>
       <div className="container">
         <SectionHeading label="videos_section_label" title="videos_section_title" desc="videos_section_desc" />
+        <CategoryTabs categories={categories} active={active} onChange={setActive} counts={all.map((v) => v.category)} />
         {wide.length > 0 && (
           <motion.div className="video-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {wide.map(card)}

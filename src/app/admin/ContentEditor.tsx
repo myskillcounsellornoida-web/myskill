@@ -15,6 +15,8 @@ import { CMS_MSG, isValidColor } from "@/components/cms/CmsProvider";
 import { updateSiteContentBatch } from "./actions";
 import ImageUploadButton from "./ImageUploadButton";
 import { LayoutPanel, VideosPanel } from "./EditorPanels";
+import SectionBuilder from "./SectionBuilder";
+import { CUSTOM_SECTIONS_KEY, parseCustomSections, sectionKey } from "@/lib/customSections";
 
 type Device = "desktop" | "tablet" | "mobile";
 // Preview renders at the real device width and is scaled down to fit the pane.
@@ -168,6 +170,7 @@ export default function ContentEditor({ initialContent, notify }: Props) {
       })).filter((g) => g.fields.length > 0)
     : CONTENT_GROUPS.filter((g) => g.page === page);
 
+  const customSections = parseCustomSections(draft[CUSTOM_SECTIONS_KEY]).filter((s) => s.page === page);
   const frameWidth = DEVICE_WIDTH[device];
   const scale = stage.width ? Math.min(1, (stage.width - 24) / frameWidth) : 1;
 
@@ -228,6 +231,15 @@ export default function ContentEditor({ initialContent, notify }: Props) {
                 draft={draft}
                 setValue={setValue}
                 onReveal={(id) => postToPreview({ type: CMS_MSG.section, id })}
+                extra={customSections.map((s) => ({ id: sectionKey(s.id), label: s.label || "Section" }))}
+              />
+              <SectionBuilder
+                key={`builder-${page}`}
+                page={page}
+                draft={draft}
+                setValue={setValue}
+                onReveal={(id) => postToPreview({ type: CMS_MSG.section, id })}
+                notify={notify}
               />
               {PAGE_SECTIONS[page].some((d) => d.id === "videos") && (
                 <VideosPanel key={`videos-${page}`} page={page} draft={draft} setValue={setValue} />

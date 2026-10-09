@@ -95,7 +95,7 @@ export default function BlogClient({ blogsList: blogs }: { blogsList: Blog[] }) 
           ) : (
             <motion.div className="blog-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
               {blogs.map((b) => (
-                <motion.article key={b.id ?? b.title} variants={fadeUp} className="blog-card" onClick={() => setActiveArticle(b)}>
+                <motion.article key={b.id ?? b.title} variants={fadeUp} className="blog-card tilt-hover" onClick={() => setActiveArticle(b)}>
                   <div className="blog-card-img">
                     <Image src={imageOf(b)} alt={b.title} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover" }} />
                     <span className="blog-card-tag">{b.tag || b.category || "Article"}</span>

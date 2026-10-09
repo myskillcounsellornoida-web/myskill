@@ -42,11 +42,19 @@ import {
   deleteSubscriber,
   sendBroadcastEmail,
   saveFaq,
-  deleteFaq
+  deleteFaq,
+  updateSiteContentBatch
 } from "./actions";
 import { logout } from "./login/actions";
 import RecipientPicker from "./RecipientPicker";
 import { MAX_MANUAL_RECIPIENTS, invalidEmails, parseEmailList } from "@/lib/emails";
+import {
+  MAX_CATEGORIES,
+  TESTIMONIAL_CATEGORIES_KEY,
+  TESTIMONIAL_CATEGORY_MAP_KEY,
+  parseCategories,
+  parseCategoryMap,
+} from "@/lib/categories";
 import ContentEditor from "./ContentEditor";
 import ImageUploadButton from "./ImageUploadButton";
 
@@ -125,7 +133,11 @@ export default function AdminClient({
   // Forms states
   const [showTestimonialModal, setShowTestimonialModal] = useState(false);
   const [editingTestimonial, setEditingTestimonial] = useState<any | null>(null);
-  const [testimonialForm, setTestimonialForm] = useState({ name: "", role: "", text: "" });
+  const [testimonialForm, setTestimonialForm] = useState({ name: "", role: "", text: "", category: "" });
+
+  // Testimonial categories live in site content, so no database change is needed.
+  const [testimonialCategories, setTestimonialCategories] = useState<string[]>(() => parseCategories(initialSiteContent[TESTIMONIAL_CATEGORIES_KEY]));
+  const [testimonialCategoryMap, setTestimonialCategoryMap] = useState<Record<string, string>>(() => parseCategoryMap(initialSiteContent[TESTIMONIAL_CATEGORY_MAP_KEY]));
 
   const [showBlogModal, setShowBlogModal] = useState(false);
   const [editingBlog, setEditingBlog] = useState<any | null>(null);
@@ -259,21 +271,57 @@ export default function AdminClient({
   /* ====================================================
      TESTIMONIALS
      ==================================================== */
+  const saveTestimonialCategoryData = async (categories: string[], map: Record<string, string>) => {
+    setTestimonialCategories(categories);
+    setTestimonialCategoryMap(map);
+    const res = await updateSiteContentBatch({
+      [TESTIMONIAL_CATEGORIES_KEY]: categories.length ? JSON.stringify(categories) : "",
+      [TESTIMONIAL_CATEGORY_MAP_KEY]: Object.keys(map).length ? JSON.stringify(map) : "",
+    });
+    if (!res.success) showNotify(`Could not save categories: ${res.error}`, "error");
+    return res.success;
+  };
+
+  const assignTestimonialCategory = async (id: number, category: string) => {
+    const name = category.trim();
+    const map = { ...testimonialCategoryMap };
+    if (name) map[String(id)] = name;
+    else delete map[String(id)];
+    const categories = name && !testimonialCategories.includes(name) && testimonialCategories.length < MAX_CATEGORIES
+      ? [...testimonialCategories, name]
+      : testimonialCategories;
+    await saveTestimonialCategoryData(categories, map);
+  };
+
+  const moveTestimonialCategory = (index: number, delta: number) => {
+    const next = [...testimonialCategories];
+    const target = index + delta;
+    if (target < 0 || target >= next.length) return;
+    [next[index], next[target]] = [next[target], next[index]];
+    saveTestimonialCategoryData(next, testimonialCategoryMap);
+  };
+
+  const deleteTestimonialCategory = (name: string) => {
+    if (!confirm(`Delete the category "${name}"? Testimonials in it are kept, just uncategorised.`)) return;
+    const map = Object.fromEntries(Object.entries(testimonialCategoryMap).filter(([, v]) => v !== name));
+    saveTestimonialCategoryData(testimonialCategories.filter((c) => c !== name), map);
+  };
+
   const openAddTestimonial = () => {
     setEditingTestimonial(null);
-    setTestimonialForm({ name: "", role: "", text: "" });
+    setTestimonialForm({ name: "", role: "", text: "", category: "" });
     setShowTestimonialModal(true);
   };
 
   const openEditTestimonial = (t: any) => {
     setEditingTestimonial(t);
-    setTestimonialForm({ name: t.name, role: t.role, text: t.text });
+    setTestimonialForm({ name: t.name, role: t.role, text: t.text, category: testimonialCategoryMap[String(t.id)] ?? "" });
     setShowTestimonialModal(true);
   };
 
   const handleSaveTestimonial = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { name, role, text } = testimonialForm;
+    const { name, role, text, category } = testimonialForm;
     if (!name || !role || !text) {
       showNotify("Please fill in all fields.", "error");
       return;
@@ -282,13 +330,15 @@ export default function AdminClient({
     if (editingTestimonial) {
       const res = await updateTestimonial(editingTestimonial.id, name, role, text);
       if (!res.success) return showNotify(`Could not save testimonial: ${res.error}`, "error");
-      setTestimonialsList(prev => prev.map(t => t.id === editingTestimonial.id ? { ...t, ...testimonialForm } : t));
+      setTestimonialsList(prev => prev.map(t => t.id === editingTestimonial.id ? { ...t, name, role, text } : t));
+      await assignTestimonialCategory(editingTestimonial.id, category);
       showNotify("Testimonial updated.", "success");
     } else {
       const res = await createTestimonial(name, role, text);
       if (!res.success) return showNotify(`Could not add testimonial: ${res.error}`, "error");
       const created = Array.isArray(res.data) ? res.data[0] : res.data;
       setTestimonialsList(prev => [created, ...prev]);
+      if (created?.id !== undefined) await assignTestimonialCategory(created.id, category);
       showNotify("Testimonial created.", "success");
     }
     setShowTestimonialModal(false);
@@ -1493,6 +1543,23 @@ export default function AdminClient({
                 </button>
               </div>
 
+              {testimonialCategories.length > 0 && (
+                <div className="cat-bar">
+                  <span className="cat-bar-title">Categories — drag order with the arrows; these become the tabs on the website</span>
+                  <ul>
+                    {testimonialCategories.map((c, i) => (
+                      <li key={c}>
+                        <span>{c}</span>
+                        <small>{Object.values(testimonialCategoryMap).filter(v => v === c).length}</small>
+                        <button type="button" aria-label={`Move ${c} left`} disabled={i === 0} onClick={() => moveTestimonialCategory(i, -1)}><i className="fas fa-arrow-left" /></button>
+                        <button type="button" aria-label={`Move ${c} right`} disabled={i === testimonialCategories.length - 1} onClick={() => moveTestimonialCategory(i, 1)}><i className="fas fa-arrow-right" /></button>
+                        <button type="button" aria-label={`Delete ${c}`} className="is-danger" onClick={() => deleteTestimonialCategory(c)}><i className="fas fa-times" /></button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {/* GRID */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "24px" }}>
                 {testimonialsList.map((t) => (
@@ -1516,6 +1583,9 @@ export default function AdminClient({
                       <div>
                         <strong style={{ display: "block", color: "var(--color-deep-teal)" }}>{t.name}</strong>
                         <span style={{ fontSize: "0.75rem", color: "var(--color-soft-teal)", fontWeight: 600 }}>{t.role}</span>
+                        {testimonialCategoryMap[String(t.id)] && (
+                          <span className="cat-chip">{testimonialCategoryMap[String(t.id)]}</span>
+                        )}
                       </div>
 
                       <div style={{ display: "flex", gap: "6px" }}>
@@ -1883,6 +1953,24 @@ export default function AdminClient({
                     style={{ width: "100%", padding: "10px 14px", borderRadius: "5px", border: "1px solid var(--border-color)", outline: "none", fontSize: "0.95rem", fontFamily: "var(--font-body)" }}
                     required
                   />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--color-deep-teal)", marginBottom: "6px" }}>
+                    CATEGORY (OPTIONAL — TYPE A NEW ONE TO CREATE IT)
+                  </label>
+                  <input
+                    type="text"
+                    list="testimonial-category-options"
+                    value={testimonialForm.category}
+                    onChange={(e) => setTestimonialForm(prev => ({ ...prev, category: e.target.value }))}
+                    placeholder="e.g. Parents, UK Admits, IELTS"
+                    maxLength={40}
+                    style={{ width: "100%", padding: "10px 14px", borderRadius: "5px", border: "1px solid var(--border-color)", outline: "none", fontSize: "0.95rem" }}
+                  />
+                  <datalist id="testimonial-category-options">
+                    {testimonialCategories.map(c => <option key={c} value={c} />)}
+                  </datalist>
                 </div>
 
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px" }}>

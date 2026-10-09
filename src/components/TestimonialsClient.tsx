@@ -3,24 +3,37 @@
 import { motion } from "framer-motion";
 import { useState, type ReactNode } from "react";
 import Image from "next/image";
-import { Txt } from "@/components/cms/CmsProvider";
+import { Txt, useCms } from "@/components/cms/CmsProvider";
+import CategoryTabs from "@/components/cms/CategoryTabs";
+import { TESTIMONIAL_CATEGORIES_KEY, TESTIMONIAL_CATEGORY_MAP_KEY, orderedCategories, parseCategories, parseCategoryMap } from "@/lib/categories";
 import Arranged from "@/components/cms/Arranged";
 import VideoGallery from "@/components/cms/VideoGallery";
 import { CtaBand, PageHero, fadeUp, stagger } from "@/components/cms/Sections";
+import { CountUp } from "@/components/cms/motion3d";
 
 type Testimonial = {
+  id?: number;
   name: string;
   role: string;
   text: string;
 };
+
+const DEFAULT_TSTATS = ["500+", "250+", "50+", "10+"];
 
 const TEST_FAQS = [
   { q: "Are these reviews verified?", a: "Yes, all our success stories are from actual students and parents who have worked with My Skill Counsellor through the complete admission lifecycle." },
   { q: "Can I speak to a past student?", a: "To protect the privacy of our students, we do not publicly share their direct contact information. However, during your initial consultation, we can discuss specific case studies relevant to your goals." },
 ];
 
-export default function TestimonialsClient({ testimonialsList: testimonials }: { testimonialsList: Testimonial[] }) {
+export default function TestimonialsClient({ testimonialsList: all }: { testimonialsList: Testimonial[] }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const { content } = useCms();
+  const [activeCat, setActiveCat] = useState<string | null>(null);
+
+  const categoryMap = parseCategoryMap(content[TESTIMONIAL_CATEGORY_MAP_KEY]);
+  const categoryOf = (t: Testimonial) => (t.id !== undefined ? categoryMap[String(t.id)] : undefined);
+  const categories = orderedCategories(parseCategories(content[TESTIMONIAL_CATEGORIES_KEY]), all.map(categoryOf));
+  const testimonials = activeCat ? all.filter((t) => categoryOf(t) === activeCat) : all;
 
   const sections: Record<string, ReactNode> = {
     stats: (
@@ -29,7 +42,7 @@ export default function TestimonialsClient({ testimonialsList: testimonials }: {
           <motion.div className="stats-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {[1, 2, 3, 4].map((n) => (
               <motion.div key={n} variants={fadeUp} className="stat-item">
-                <Txt k={`tstat${n}_value`} className="stat-value" />
+                <CountUp value={content[`tstat${n}_value`] || DEFAULT_TSTATS[n - 1]} className="stat-value" />
                 <Txt k={`tstat${n}_label`} className="stat-label" />
               </motion.div>
             ))}
@@ -40,9 +53,10 @@ export default function TestimonialsClient({ testimonialsList: testimonials }: {
     stories: (
       <section className="section bg-sage-section">
         <div className="container">
+          <CategoryTabs categories={categories} active={activeCat} onChange={setActiveCat} counts={all.map(categoryOf)} />
           <motion.div className="testimonial-wall" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             {testimonials.map((item, i) => (
-              <motion.figure key={i} variants={fadeUp} className="quote-card">
+              <motion.figure key={i} variants={fadeUp} className="quote-card tilt-hover">
                 <div className="quote-stars" aria-label="5 star review">
                   {Array.from({ length: 5 }, (_, s) => <i key={s} className="fas fa-star" />)}
                 </div>
