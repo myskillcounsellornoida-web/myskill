@@ -746,8 +746,14 @@ export default function AdminClient({
   /* ====================================================
      CMS / SITE SETTINGS BUSINESS LOGIC
      ==================================================== */
+  const handleLivePreviewChange = (key: string, value: string) => {
+    const iframe = document.getElementById("live-preview-iframe") as HTMLIFrameElement;
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({ type: "CMS_UPDATE", key, value }, "*");
+    }
+  };
+
   const handleUpdateCmsKey = async (key: string, value: string) => {
-    // Update local state
     setSiteContentList(prev => prev.map(item => item.key === key ? { ...item, value } : item));
     
     if (isDemoMode) {
@@ -2110,62 +2116,72 @@ export default function AdminClient({
              TAB 6: SITE CONTENT (CMS)
              ==================================================== */}
           {activeTab === "cms" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              <p style={{ color: "var(--text-secondary)", marginBottom: "30px", lineHeight: 1.7 }}>
-                ✏️ <strong>Full-site content editor.</strong> Every text block visible on the website is listed below — from hero headings and service descriptions to FAQs, footer taglines, and SEO meta tags. Click any field and blur (click away) to save changes instantly.
-              </p>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: "flex", gap: "24px", height: "calc(100vh - 120px)" }}>
+              <div style={{ flex: "1", overflowY: "auto", paddingRight: "10px", paddingBottom: "40px" }}>
+                <p style={{ color: "var(--text-secondary)", marginBottom: "30px", lineHeight: 1.7 }}>
+                  ✏️ <strong>Live Content Editor.</strong> Type in the fields below to instantly preview your changes on the right. Click away from the field to automatically save to the database.
+                </p>
 
-              {/* Group CMS keys by section */}
-              {[
-                { section: "🎯 Hero Carousel", keys: ["hero_badge_label","hero_slide1_caption","hero_slide1_sub","hero_slide2_caption","hero_slide2_sub","hero_slide3_caption","hero_slide3_sub","hero_slide4_caption","hero_slide4_sub","hero_slide5_caption","hero_slide5_sub","hero_cta_primary","hero_cta_secondary"] },
-                { section: "🎓 Services Cards", keys: ["services_section_title","services_section_subtitle","service1_title","service1_subtitle","service1_point1","service1_point2","service1_point3","service1_point4","service2_title","service2_subtitle","service2_point1","service2_point2","service2_point3","service2_point4","service3_title","service3_subtitle","service3_point1","service3_point2","service3_point3","service3_point4"] },
-                { section: "🔢 How It Works Steps", keys: ["steps_section_title","step1_title","step1_desc","step2_title","step2_desc","step3_title","step3_desc","step4_title","step4_desc"] },
-                { section: "👤 About / Founder", keys: ["about_heading","about_para1","about_para2","about_cta","founder_name","founder_title","founder_badge1","founder_badge2","founder_badge3","founder_badge4"] },
-                { section: "📊 Impact Statistics", keys: ["stat_students","stat_students_label","stat_universities","stat_universities_label","stat_career_paths","stat_career_paths_label","stat_success_rate","stat_success_rate_label"] },
-                { section: "🎤 Workshop / Masterclass", keys: ["workshop_section_label","workshop_section_heading","workshop_section_desc","workshop_title","workshop_date","workshop_cta"] },
-                { section: "⭐ Testimonials", keys: ["testimonials_section_label","testimonials_section_title","testimonials_cta"] },
-                { section: "📰 Media / Recognition", keys: ["media_section_label","media_section_title","media_article_caption"] },
-                { section: "❓ Homepage FAQs", keys: ["faq_section_label","faq_section_title","faq1_q","faq1_a","faq2_q","faq2_a","faq3_q","faq3_a","faq4_q","faq4_a"] },
-                { section: "📞 Contact Details", keys: ["contact_phone","contact_email","contact_location","whatsapp_number","instagram_url","linkedin_url"] },
-                { section: "🦶 Footer", keys: ["footer_tagline","footer_copyright"] },
-                { section: "🔍 Page Meta (SEO)", keys: ["meta_title","meta_description"] },
-              ].map(group => {
-                const items = siteContentList.filter(i => group.keys.includes(i.key));
-                if (!items.length) return null;
-                return (
-                  <div key={group.section} style={{ marginBottom: "28px", backgroundColor: "white", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-soft)", border: "1px solid var(--border-color)", overflow: "hidden" }}>
-                    <div style={{ padding: "14px 24px", backgroundColor: "rgba(37,95,107,0.05)", borderBottom: "1px solid var(--border-color)" }}>
-                      <h4 style={{ margin: 0, color: "var(--color-deep-teal)", fontSize: "0.95rem", fontWeight: 700 }}>{group.section}</h4>
-                    </div>
-                    <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
-                      {items.map(item => (
-                        <div key={item.key}>
-                          <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>
-                            {item.key.replace(/_/g, " ")}
-                          </label>
-                          <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
-                            {item.value.length > 60 ? (
-                              <textarea
-                                defaultValue={item.value}
-                                onBlur={e => handleUpdateCmsKey(item.key, e.target.value)}
-                                rows={3}
-                                style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontFamily: "var(--font-body)", fontSize: "0.9rem", outline: "none", lineHeight: 1.6 }}
-                              />
-                            ) : (
-                              <input
-                                type="text"
-                                defaultValue={item.value}
-                                onBlur={e => handleUpdateCmsKey(item.key, e.target.value)}
-                                style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontSize: "0.9rem", outline: "none" }}
-                              />
-                            )}
+                {/* Group CMS keys by section */}
+                {[
+                  { section: "🎯 Hero Carousel", keys: ["hero_badge_label","hero_slide1_caption","hero_slide1_sub","hero_slide2_caption","hero_slide2_sub","hero_slide3_caption","hero_slide3_sub","hero_slide4_caption","hero_slide4_sub","hero_slide5_caption","hero_slide5_sub","hero_cta_primary","hero_cta_secondary"] },
+                  { section: "🎓 Services Cards", keys: ["services_section_title","services_section_subtitle","service1_title","service1_subtitle","service1_point1","service1_point2","service1_point3","service1_point4","service2_title","service2_subtitle","service2_point1","service2_point2","service2_point3","service2_point4","service3_title","service3_subtitle","service3_point1","service3_point2","service3_point3","service3_point4"] },
+                  { section: "🔢 How It Works Steps", keys: ["steps_section_title","step1_title","step1_desc","step2_title","step2_desc","step3_title","step3_desc","step4_title","step4_desc"] },
+                  { section: "👤 About / Founder", keys: ["about_heading","about_para1","about_para2","about_cta","founder_name","founder_title","founder_badge1","founder_badge2","founder_badge3","founder_badge4"] },
+                  { section: "📊 Impact Statistics", keys: ["stat_students","stat_students_label","stat_universities","stat_universities_label","stat_career_paths","stat_career_paths_label","stat_success_rate","stat_success_rate_label"] },
+                  { section: "🎤 Workshop / Masterclass", keys: ["workshop_section_label","workshop_section_heading","workshop_section_desc","workshop_title","workshop_date","workshop_cta"] },
+                  { section: "⭐ Testimonials", keys: ["testimonials_section_label","testimonials_section_title","testimonials_cta"] },
+                  { section: "📰 Media / Recognition", keys: ["media_section_label","media_section_title","media_article_caption"] },
+                  { section: "❓ Homepage FAQs", keys: ["faq_section_label","faq_section_title","faq1_q","faq1_a","faq2_q","faq2_a","faq3_q","faq3_a","faq4_q","faq4_a"] },
+                  { section: "📞 Contact Details", keys: ["contact_phone","contact_email","contact_location","whatsapp_number","instagram_url","linkedin_url"] },
+                  { section: "🦶 Footer", keys: ["footer_tagline","footer_copyright"] },
+                  { section: "🔍 Page Meta (SEO)", keys: ["meta_title","meta_description"] },
+                ].map(group => {
+                  const items = siteContentList.filter(i => group.keys.includes(i.key));
+                  if (!items.length) return null;
+                  return (
+                    <div key={group.section} style={{ marginBottom: "28px", backgroundColor: "white", borderRadius: "var(--radius-md)", boxShadow: "var(--shadow-soft)", border: "1px solid var(--border-color)", overflow: "hidden" }}>
+                      <div style={{ padding: "14px 24px", backgroundColor: "rgba(37,95,107,0.05)", borderBottom: "1px solid var(--border-color)" }}>
+                        <h4 style={{ margin: 0, color: "var(--color-deep-teal)", fontSize: "0.95rem", fontWeight: 700 }}>{group.section}</h4>
+                      </div>
+                      <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: "20px" }}>
+                        {items.map(item => (
+                          <div key={item.key}>
+                            <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "6px" }}>
+                              {item.key.replace(/_/g, " ")}
+                            </label>
+                            <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                              {item.value.length > 60 ? (
+                                <textarea
+                                  defaultValue={item.value}
+                                  onChange={e => handleLivePreviewChange(item.key, e.target.value)}
+                                  onBlur={e => handleUpdateCmsKey(item.key, e.target.value)}
+                                  rows={3}
+                                  style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontFamily: "var(--font-body)", fontSize: "0.9rem", outline: "none", lineHeight: 1.6 }}
+                                />
+                              ) : (
+                                <input
+                                  type="text"
+                                  defaultValue={item.value}
+                                  onChange={e => handleLivePreviewChange(item.key, e.target.value)}
+                                  onBlur={e => handleUpdateCmsKey(item.key, e.target.value)}
+                                  style={{ flex: 1, padding: "10px 14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontSize: "0.9rem", outline: "none" }}
+                                />
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
+              <div style={{ flex: "1.2", position: "relative", borderRadius: "var(--radius-md)", overflow: "hidden", border: "4px solid var(--color-deep-teal)", boxShadow: "var(--shadow-soft)", background: "white" }}>
+                <div style={{ background: "var(--color-deep-teal)", padding: "8px 16px", color: "white", fontSize: "0.8rem", fontWeight: "bold", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <i className="fas fa-desktop"></i> Live Website Preview
+                </div>
+                <iframe id="live-preview-iframe" src="/" style={{ width: "100%", height: "calc(100% - 32px)", border: "none" }} />
+              </div>
             </motion.div>
           )}
 
