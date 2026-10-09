@@ -15,9 +15,15 @@ export default function Footer() {
         
         {/* Brand & Newsletter */}
         <div className="footer-brand">
-          <Link href="/">
-             {/* Using text logo here for better contrast against dark background if image logo is dark */}
-             <h3 style={{ color: 'var(--color-soft-teal)', fontSize: '1.8rem', marginBottom: '15px' }}>My Skill Counsellor</h3>
+          <Link href="/" style={{ textDecoration: 'none' }}>
+             <span style={{ lineHeight: 1.15, display: 'inline-block', marginBottom: '15px' }}>
+               <span style={{ display: 'block', fontFamily: 'var(--font-heading)', fontWeight: 700, fontSize: '1.65rem', color: '#FFFFFF', letterSpacing: '0.4px' }}>
+                 My Skill
+               </span>
+               <span style={{ display: 'block', fontFamily: 'var(--font-sans)', fontWeight: 700, fontSize: '0.78rem', color: 'var(--color-accent-gold)', letterSpacing: '2.5px', textTransform: 'uppercase', marginTop: '2px' }}>
+                 Counsellor
+               </span>
+             </span>
           </Link>
           <p style={{ color: 'var(--color-soft-ivory)', opacity: 0.8, marginBottom: '25px', lineHeight: '1.6' }}>
             Empowering students with clarity, strategy, and confidence to achieve global university admissions.

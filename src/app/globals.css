@@ -307,13 +307,16 @@ header.scrolled {
 .nav-links {
     display: flex;
     list-style: none;
-    gap: 30px;
+    gap: 36px;
+    align-items: center;
 }
 
 .nav-links a {
     color: var(--text-primary);
-    font-family: var(--font-heading);
-    font-weight: 500;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.08rem;
+    letter-spacing: 0.5px;
     position: relative;
     padding: 8px 0;
 }
