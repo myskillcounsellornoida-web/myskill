@@ -1,39 +1,42 @@
 /* ==========================================================================
    DESIGN SYSTEM & VARIABLES (Ria Jain - My Skill Counsellor)
+   Inspired by rich artistic & editorial aesthetic (Mrinalini Art palette)
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300..900;1,300..900&family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Space+Grotesk:wght@400;500;600;700&family=La+Belle+Aurore&family=Nunito:ital,wght@0,300..900;1,300..900&display=swap');
 
 :root {
-    /* Brand Colors — warm, eye-comfortable palette */
-    --color-soft-teal: #4A9FAA;       /* warm calm teal */
-    --color-deep-teal: #2D6B78;       /* rich dark teal – not too harsh */
-    --color-soft-ivory: #FAF8F4;      /* warm paper white */
-    --color-sage-green: #7FA87A;      /* muted moss green */
-    --color-soft-beige: #EDE5D8;      /* warm warm sand */
-    --color-muted-coral: #C47558;     /* terracotta warm red */
-    --color-warm-amber: #D4A055;      /* soft warm gold */
+    /* Rich Warm Palette (Mrinalini Art Inspired) */
+    --color-soft-ivory: #F7F4ED;      /* Natural warm paper ivory canvas */
+    --color-deep-teal: #1C2B2D;       /* Deep graphite teal - rich contrast */
+    --color-soft-teal: #3E8E98;       /* Calm sophisticated teal */
+    --color-muted-coral: #B84A39;     /* Rich terracotta rust accent */
+    --color-accent-gold: #C5A880;     /* Muted champagne gold accent */
+    --color-sage-green: #6E9469;      /* Muted natural sage green */
+    --color-soft-beige: #EDE5D8;      /* Warm sand tone */
     
     /* Functional Colors */
-    --bg-primary: #F5F2ED;            /* warm parchment – easy on eyes */
-    --bg-secondary: #FDFCF9;          /* near white, warm */
-    --text-primary: #2E3F40;          /* dark teal-grey – softer than black */
-    --text-secondary: #5A7071;        /* medium muted – not too gray */
+    --bg-primary: #F7F4ED;            /* Rich paper ivory background */
+    --bg-secondary: #FFFFFF;          /* Pure crisp white for cards */
+    --text-primary: #1C1C1C;          /* Deep graphite text */
+    --text-secondary: #5C6263;        /* Warm neutral grey for body text */
     --text-light: #FFFFFF;
-    --border-color: #DDD5C8;          /* warm sand border */
-    --color-accent: #C47558;
+    --border-color: rgba(28, 28, 28, 0.09);
+    --color-accent: #B84A39;          /* Terracotta rust accent */
     
-    /* Typography */
-    --font-heading: 'Nunito', sans-serif;
-    --font-body: 'Lato', sans-serif;
+    /* Typography Stack */
+    --font-heading: 'Cormorant Garamond', Georgia, serif;
+    --font-sans: 'Space Grotesk', sans-serif;
+    --font-cursive: 'La Belle Aurore', cursive;
+    --font-body: 'Nunito', sans-serif;
     
     /* Transitions & Shadows */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --shadow-soft: 0 4px 20px rgba(45, 107, 120, 0.07);
-    --shadow-medium: 0 10px 30px rgba(45, 107, 120, 0.11);
-    --shadow-hover: 0 20px 40px rgba(45, 107, 120, 0.15);
+    --transition-smooth: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    --shadow-soft: 0 4px 25px rgba(28, 43, 45, 0.06);
+    --shadow-medium: 0 12px 35px rgba(28, 43, 45, 0.1);
+    --shadow-hover: 0 22px 45px rgba(28, 43, 45, 0.14);
     
     /* Layout */
-    --max-width: 1200px;
+    --max-width: 1240px;
     --radius-sm: 10px;
     --radius-md: 18px;
     --radius-lg: 28px;
@@ -68,16 +71,44 @@ body {
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
     color: var(--color-deep-teal);
-    font-weight: 800;
-    line-height: 1.22;
+    font-weight: 600;
+    line-height: 1.18;
     margin-bottom: 0.5em;
     letter-spacing: -0.01em;
 }
 
-h1 { font-size: clamp(2.5rem, 5vw, 4rem); }
-h2 { font-size: clamp(2rem, 4vw, 2.75rem); }
-h3 { font-size: clamp(1.5rem, 3vw, 2rem); }
-h4 { font-size: clamp(1.2rem, 2vw, 1.5rem); }
+h1 { font-size: clamp(2.6rem, 5.5vw, 4.2rem); font-weight: 600; }
+h2 { font-size: clamp(2.1rem, 4vw, 3rem); font-weight: 600; }
+h3 { font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 600; }
+h4 { font-size: clamp(1.2rem, 2vw, 1.6rem); font-weight: 600; }
+
+.font-serif {
+    font-family: var(--font-heading) !important;
+}
+
+.font-cursive {
+    font-family: var(--font-cursive) !important;
+    color: var(--color-muted-coral);
+    font-weight: 400;
+}
+
+.font-sans {
+    font-family: var(--font-sans) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.text-highlight {
+    color: var(--color-muted-coral);
+    font-style: italic;
+    font-family: var(--font-heading);
+}
+
+.text-gold {
+    color: var(--color-accent-gold);
+}
 
 a {
     color: var(--color-soft-teal);
