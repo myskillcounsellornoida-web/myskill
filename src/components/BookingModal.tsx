@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { bookSession } from "@/app/actions";
+import { useCms } from "@/components/cms/CmsProvider";
+import { BOOKING_SERVICE_COUNT } from "@/lib/siteContent";
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -9,30 +11,32 @@ interface BookingModalProps {
   initialService?: string;
 }
 
-const SERVICES = [
-  { id: "study_abroad", title: "Global Study Abroad Counselling", desc: "End-to-end guidance for US, UK, Canada, Dubai & Europe", duration: "45 mins" },
-  { id: "sop_essay", title: "SOP & Essay Strategy Review", desc: "Personalized feedback & story-building for applications", duration: "30 mins" },
-  { id: "profile_building", title: "Extracurricular & Profile Building", desc: "Strategic roadmap for Class 9-12 & university applicants", duration: "45 mins" },
-  { id: "visa_counselling", title: "Visa & Loan Guidance", desc: "Complete documentation and mock visa interview practice", duration: "30 mins" },
-];
-
-const TIME_SLOTS = [
-  "10:00 AM",
-  "11:30 AM",
-  "02:00 PM",
-  "03:30 PM",
-  "05:00 PM",
-  "06:30 PM",
-];
-
 export default function BookingModal({ isOpen, onClose, initialService }: BookingModalProps) {
+  const { t } = useCms();
+
+  // Every label, session type and time slot below is editable under
+  // Admin → Edit Website → Contact → "Book a Session Form".
+  const services = useMemo(
+    () =>
+      Array.from({ length: BOOKING_SERVICE_COUNT }, (_, i) => ({
+        title: t(`booking_service${i + 1}_title`),
+        desc: t(`booking_service${i + 1}_desc`),
+        duration: t(`booking_service${i + 1}_duration`),
+      })).filter((s) => s.title.trim()),
+    [t]
+  );
+  const timeSlots = useMemo(
+    () => t("booking_slots").split("\n").map((s) => s.trim()).filter(Boolean),
+    [t]
+  );
+
   const [step, setStep] = useState<number>(1);
-  const [selectedService, setSelectedService] = useState<string>(initialService || SERVICES[0].title);
+  const [selectedService, setSelectedService] = useState<string>(initialService || services[0]?.title || "");
   // Default to tomorrow; the modal only renders client-side after a click.
   const [selectedDate, setSelectedDate] = useState<string>(
     () => new Date(Date.now() + 86400000).toISOString().split("T")[0]
   );
-  const [selectedTime, setSelectedTime] = useState<string>(TIME_SLOTS[0]);
+  const [selectedTime, setSelectedTime] = useState<string>(timeSlots[0] ?? "");
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
@@ -131,10 +135,10 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
         {/* Modal Header */}
         <div style={{ marginBottom: "24px" }}>
           <h2 style={{ fontSize: "1.6rem", fontWeight: 700, margin: "0", color: "#0f172a" }}>
-            Book 1-on-1 Counselling Session
+            {t("booking_title")}
           </h2>
           <p style={{ fontSize: "0.9rem", color: "#64748b", margin: "4px 0 0 0" }}>
-            Schedule a personal consultation with Ria Jain & the team.
+            {t("booking_subtitle")}
           </p>
         </div>
 
@@ -159,11 +163,11 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
         {/* STEP 1: SELECT SERVICE */}
         {step === 1 && (
           <div>
-            <h3 style={{ fontSize: "1.1rem", marginBottom: "15px", color: "#334155" }}>Step 1: Select a Service</h3>
+            <h3 style={{ fontSize: "1.1rem", marginBottom: "15px", color: "#334155" }}>{t("booking_step1_title")}</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "25px" }}>
-              {SERVICES.map((srv) => (
+              {services.map((srv) => (
                 <div
-                  key={srv.id}
+                  key={srv.title}
                   onClick={() => setSelectedService(srv.title)}
                   style={{
                     padding: "16px",
@@ -201,7 +205,7 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
                 cursor: "pointer",
               }}
             >
-              Next: Choose Date & Time →
+              {t("booking_next1")} →
             </button>
           </div>
         )}
@@ -209,10 +213,10 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
         {/* STEP 2: SELECT DATE & TIME */}
         {step === 2 && (
           <div>
-            <h3 style={{ fontSize: "1.1rem", marginBottom: "15px", color: "#334155" }}>Step 2: Choose Date & Time Slot</h3>
+            <h3 style={{ fontSize: "1.1rem", marginBottom: "15px", color: "#334155" }}>{t("booking_step2_title")}</h3>
 
             <div style={{ marginBottom: "20px" }}>
-              <label style={{ display: "block", fontSize: "0.9rem", fontWeight: "600", marginBottom: "6px" }}>Select Date</label>
+              <label style={{ display: "block", fontSize: "0.9rem", fontWeight: "600", marginBottom: "6px" }}>{t("booking_date_label")}</label>
               <input
                 type="date"
                 value={selectedDate}
@@ -229,9 +233,9 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
             </div>
 
             <div style={{ marginBottom: "25px" }}>
-              <label style={{ display: "block", fontSize: "0.9rem", fontWeight: "600", marginBottom: "10px" }}>Select Available Slot</label>
+              <label style={{ display: "block", fontSize: "0.9rem", fontWeight: "600", marginBottom: "10px" }}>{t("booking_slot_label")}</label>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px" }}>
-                {TIME_SLOTS.map((slot) => (
+                {timeSlots.map((slot) => (
                   <button
                     key={slot}
                     type="button"
@@ -266,7 +270,7 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
                   cursor: "pointer",
                 }}
               >
-                ← Back
+                ← {t("booking_back")}
               </button>
               <button
                 onClick={() => setStep(3)}
@@ -281,7 +285,7 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
                   cursor: "pointer",
                 }}
               >
-                Next: Enter Details →
+                {t("booking_next2")} →
               </button>
             </div>
           </div>
@@ -290,7 +294,7 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
         {/* STEP 3: CONTACT DETAILS FORM */}
         {step === 3 && (
           <form onSubmit={handleBookSubmit}>
-            <h3 style={{ fontSize: "1.1rem", marginBottom: "15px", color: "#334155" }}>Step 3: Provide Your Contact Information</h3>
+            <h3 style={{ fontSize: "1.1rem", marginBottom: "15px", color: "#334155" }}>{t("booking_step3_title")}</h3>
 
             {statusMsg && (
               <div style={{ padding: "12px", borderRadius: "8px", backgroundColor: "#fee2e2", color: "#b91c1c", marginBottom: "15px", fontSize: "0.9rem" }}>
@@ -300,11 +304,11 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
 
             <div style={{ display: "flex", flexDirection: "column", gap: "14px", marginBottom: "25px" }}>
               <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "4px" }}>Full Name *</label>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "4px" }}>{t("booking_name_label")}</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Aarav Sharma"
+                  placeholder={t("booking_name_placeholder")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   style={{ width: "100%", padding: "10px 14px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
@@ -312,11 +316,11 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "4px" }}>Email Address *</label>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "4px" }}>{t("booking_email_label")}</label>
                 <input
                   type="email"
                   required
-                  placeholder="e.g. aarav@example.com"
+                  placeholder={t("booking_email_placeholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   style={{ width: "100%", padding: "10px 14px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
@@ -324,11 +328,11 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "4px" }}>Phone / WhatsApp Number *</label>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "4px" }}>{t("booking_phone_label")}</label>
                 <input
                   type="tel"
                   required
-                  placeholder="e.g. +91 9990004878"
+                  placeholder={t("booking_phone_placeholder")}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   style={{ width: "100%", padding: "10px 14px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
@@ -336,10 +340,10 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "4px" }}>Specific Questions / Notes (Optional)</label>
+                <label style={{ display: "block", fontSize: "0.85rem", fontWeight: "600", marginBottom: "4px" }}>{t("booking_notes_label")}</label>
                 <textarea
                   rows={2}
-                  placeholder="Tell us what country or universities you are targeting..."
+                  placeholder={t("booking_notes_placeholder")}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   style={{ width: "100%", padding: "10px 14px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.95rem" }}
@@ -363,7 +367,7 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
                   cursor: "pointer",
                 }}
               >
-                ← Back
+                ← {t("booking_back")}
               </button>
               <button
                 type="submit"
@@ -381,7 +385,7 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
                   opacity: isSubmitting ? 0.7 : 1,
                 }}
               >
-                {isSubmitting ? "Booking Session..." : "Confirm & Send Email ✓"}
+                {isSubmitting ? t("booking_submitting") : `${t("booking_submit")} ✓`}
               </button>
             </div>
           </form>
@@ -391,13 +395,13 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
         {step === 4 && (
           <div style={{ textAlign: "center", padding: "20px 0" }}>
             <div style={{ fontSize: "50px", marginBottom: "15px" }}>🎉</div>
-            <h3 style={{ fontSize: "1.5rem", color: "#0f172a", marginBottom: "8px" }}>Session Booked Successfully!</h3>
+            <h3 style={{ fontSize: "1.5rem", color: "#0f172a", marginBottom: "8px" }}>{t("booking_success_title")}</h3>
             <p style={{ color: "#475569", lineHeight: "1.6", marginBottom: "20px" }}>
-              A confirmation email has been sent to <strong>{email}</strong>.<br />
-              We have scheduled your 1-on-1 session for:
+              {t("booking_success_desc")}
             </p>
 
             <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "10px", border: "1px solid #e2e8f0", marginBottom: "25px", textAlign: "left" }}>
+              <p style={{ margin: "4px 0" }}><strong>Confirmation sent to:</strong> {email}</p>
               <p style={{ margin: "4px 0" }}><strong>Service:</strong> {selectedService}</p>
               <p style={{ margin: "4px 0" }}><strong>Date:</strong> {selectedDate}</p>
               <p style={{ margin: "4px 0" }}><strong>Time Slot:</strong> {selectedTime}</p>
@@ -416,7 +420,7 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
                 cursor: "pointer",
               }}
             >
-              Done
+              {t("booking_done")}
             </button>
           </div>
         )}

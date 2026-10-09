@@ -1,5 +1,6 @@
-import { fetchTestimonials, fetchFaqs } from "@/app/admin/actions";
+import { fetchTestimonials, fetchFaqs, fetchServices } from "@/app/admin/actions";
 import HomePageClient from "./HomePageClient";
+import type { Program } from "@/lib/programs";
 
 const DEFAULT_TESTIMONIALS = [
   { name: "Aarav Sharma", role: "Admitted to NYU", text: "Ria completely transformed my application. Her insights on my SOP made all the difference." },
@@ -8,10 +9,11 @@ const DEFAULT_TESTIMONIALS = [
 ];
 
 export default async function Home() {
-  const [testimonialsRes, faqsRes] = await Promise.all([fetchTestimonials(), fetchFaqs()]);
+  const [testimonialsRes, faqsRes, servicesRes] = await Promise.all([fetchTestimonials(), fetchFaqs(), fetchServices()]);
 
   const testimonials = testimonialsRes.success && testimonialsRes.data?.length ? testimonialsRes.data : DEFAULT_TESTIMONIALS;
   const faqs = faqsRes.success && faqsRes.data ? faqsRes.data : [];
+  const programs: Program[] = servicesRes.success && servicesRes.data ? servicesRes.data : [];
 
-  return <HomePageClient testimonials={testimonials} faqs={faqs} />;
+  return <HomePageClient testimonials={testimonials} faqs={faqs} programs={programs} />;
 }

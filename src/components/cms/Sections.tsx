@@ -17,6 +17,13 @@ export const stagger = {
   visible: { transition: { staggerChildren: 0.12 } },
 };
 
+// Icons saved from the admin may be "fas fa-globe" or just "fa-globe".
+const ICON_STYLES = new Set(["fa", "fas", "far", "fab", "fa-solid", "fa-regular", "fa-brands"]);
+export const iconClass = (icon?: string | null) => {
+  if (!icon) return "fas fa-graduation-cap";
+  return icon.split(/\s+/).some((c) => ICON_STYLES.has(c)) ? icon : `fas ${icon}`;
+};
+
 /** Full-bleed image hero used by the inner pages. */
 export function PageHero({ prefix }: { prefix: string }) {
   const { t } = useCms();
