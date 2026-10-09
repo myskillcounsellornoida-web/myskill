@@ -1986,6 +1986,23 @@ footer {
     grid-template-columns: 1fr 1fr !important;
     gap: 16px !important;
   }
+
+  .gallery-grid {
+    grid-template-columns: 1fr !important;
+    grid-auto-rows: 240px;
+  }
+
+  .media-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .founder-photo-frame {
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  .stage-card.is-compact .stage-card-img {
+    height: 240px !important;
+  }
 }
 
 
@@ -2305,7 +2322,7 @@ ul.check-list.is-grid { color: var(--color-deep-teal); }
 
 /* ---------- Founder ---------- */
 .founder-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 72px; align-items: center; }
-.founder-photo { position: relative; padding: 0 24px 24px 0; }
+.founder-photo { position: relative; width: 100%; padding: 0 24px 24px 0; }
 .founder-photo::before {
     content: "";
     position: absolute;
@@ -2313,7 +2330,7 @@ ul.check-list.is-grid { color: var(--color-deep-teal); }
     border-radius: var(--radius-lg);
     border: 2px solid var(--color-accent-gold);
 }
-.founder-photo-frame { position: relative; border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 4 / 5; box-shadow: var(--shadow-hover); }
+.founder-photo-frame { position: relative; width: 100%; border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 4 / 5; box-shadow: var(--shadow-hover); }
 .founder-photo .founder-badge {
     position: absolute;
     right: -8px;
