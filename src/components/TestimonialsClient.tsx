@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 const fadeUp = {
@@ -25,8 +25,19 @@ type Testimonial = {
   text: string;
 };
 
-export default function TestimonialsClient({ testimonialsList }: { testimonialsList: Testimonial[] }) {
+export default function TestimonialsClient({ testimonialsList: initialList }: { testimonialsList: Testimonial[] }) {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialList);
+
+  useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data?.type === "TESTIMONIALS_PREVIEW" && e.data?.data) {
+        setTestimonials(e.data.data.length > 0 ? e.data.data : initialList);
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [initialList]);
 
   const testFaqs = [
     { q: "Are these reviews verified?", a: "Yes, all our success stories are from actual students and parents who have worked with My Skill Counsellor through the complete admission lifecycle." },
@@ -121,7 +132,7 @@ export default function TestimonialsClient({ testimonialsList }: { testimonialsL
             variants={staggerContainer}
             style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px' }}
           >
-            {testimonialsList.map((t, i) => (
+            {testimonials.map((t, i) => (
               <motion.div key={i} className="testimonial-card" variants={fadeUp} style={{ background: 'white', padding: '30px', borderRadius: '12px', borderTop: '4px solid var(--color-deep-teal)', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
                 <i className="fas fa-quote-left text-accent" style={{ fontSize: '2rem', opacity: 0.2 }}></i>
                 <p style={{ marginTop: '15px', fontStyle: 'italic', lineHeight: '1.6' }}>"{t.text}"</p>

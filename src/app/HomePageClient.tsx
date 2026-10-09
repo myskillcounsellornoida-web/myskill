@@ -7,10 +7,27 @@ import { useState, useEffect } from "react";
 const fade = { hidden:{opacity:0,y:25}, visible:{opacity:1,y:0,transition:{duration:0.7}} };
 const stag = { hidden:{}, visible:{transition:{staggerChildren:0.15}} };
 
-export default function HomePageClient({ initialCmsData }: { initialCmsData: Record<string, string> }) {
+export default function HomePageClient({ 
+  initialCmsData,
+  initialServices = [],
+  initialTestimonials = [],
+  initialFaqs = []
+}: { 
+  initialCmsData: Record<string, string>;
+  initialServices?: any[];
+  initialTestimonials?: any[];
+  initialFaqs?: any[];
+}) {
   const [cmsData, setCmsData] = useState(initialCmsData);
-  const [slide,setSlide]=useState(0);
-  const [faq,setFaq]=useState<number|null>(0);
+  const [slide, setSlide] = useState(0);
+  const [faq, setFaq] = useState<number | null>(0);
+  
+  const defaultTestimonials = [
+    { name: "Aarav Sharma", role: "Admitted to NYU", text: "Ria completely transformed my application. Her insights on my SOP made all the difference." },
+    { name: "Mrs. Kapoor", role: "Parent", text: "We were overwhelmed with the UK visa process. Ria handled everything smoothly and professionally." },
+    { name: "Simran Kaur", role: "IELTS Band 8", text: "The structured mock interviews and writing evaluations helped me score far above my target." },
+  ];
+  const [testimonials, setTestimonials] = useState<any[]>(initialTestimonials.length > 0 ? initialTestimonials : defaultTestimonials);
 
   useEffect(()=>{
     const timer=setInterval(()=>setSlide(p=>(p+1)%5),4500);
@@ -22,6 +39,15 @@ export default function HomePageClient({ initialCmsData }: { initialCmsData: Rec
     const handleMessage = (e: MessageEvent) => {
       if (e.data?.type === "CMS_UPDATE") {
         setCmsData(prev => ({ ...prev, [e.data.key]: e.data.value }));
+      }
+      if (e.data?.type === "TESTIMONIALS_PREVIEW" && e.data?.data) {
+        setTestimonials(e.data.data.length > 0 ? e.data.data : defaultTestimonials);
+      }
+      if (e.data?.type === "SERVICES_PREVIEW" && e.data?.data) {
+        setServices(e.data.data.length > 0 ? e.data.data : defaultServices);
+      }
+      if (e.data?.type === "FAQS_PREVIEW" && e.data?.data) {
+        setFaqs(e.data.data.length > 0 ? e.data.data : defaultFaqs);
       }
     };
     window.addEventListener("message", handleMessage);
@@ -58,7 +84,7 @@ export default function HomePageClient({ initialCmsData }: { initialCmsData: Rec
     }
   ];
 
-  const services = [
+  const defaultServices = [
     {
       title: t("service1_title", "Before the Offer Letter"),
       subtitle: t("service1_subtitle", "Building the Right Foundation"),
@@ -97,16 +123,36 @@ export default function HomePageClient({ initialCmsData }: { initialCmsData: Rec
     }
   ];
 
-  const faqs=[
+  const mapDbService = (s: any, i: number) => ({
+    title: s.title,
+    subtitle: s.subtitle || "Specialized Service",
+    icon: s.icon || "fa-seedling",
+    image: ["/images/service_card_before_offer.png", "/images/service_card_after_offer.png", "/images/service_card_after_departure.png"][i % 3],
+    points: s.description ? s.description.split('\n').filter((p:string) => p.trim()) : []
+  });
+
+  const [services, setServices] = useState<any[]>(
+    initialServices.length > 0 ? initialServices : defaultServices
+  );
+
+  const displayServices = services === defaultServices ? defaultServices : services.map(mapDbService);
+
+  const defaultFaqs=[
     {q:t("faq1_q", "When is the right time to start planning for study abroad?"),a:t("faq1_a", "We recommend starting as early as Class 9. This gives ample time to build a robust profile and plan extracurriculars without rushing.")},
     {q:t("faq2_q", "Do you guarantee university admissions?"),a:t("faq2_a", "While no consultant can guarantee admission to ivy-league universities, our track record speaks for itself. We maximise your chances by aligning your profile with university expectations.")},
     {q:t("faq3_q", "Do you assist with selecting the right major or course?"),a:t("faq3_a", "Yes. We use detailed psychometric evaluations and industry insights to help you choose a course that aligns with both your passions and future market demand.")},
     {q:t("faq4_q", "How do I start the process?"),a:t("faq4_a", "You can start by booking a free initial consultation through our contact page. We will assess your profile and discuss a personalized roadmap.")},
   ];
 
+  const [faqs, setFaqs] = useState<any[]>(
+    initialFaqs.length > 0 ? initialFaqs : defaultFaqs
+  );
+
+  const displayFaqs = faqs === defaultFaqs ? defaultFaqs : faqs.map(f => ({ q: f.question, a: f.answer }));
+
   return (
     <main>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({"@context":"https://schema.org","@type":"FAQPage",mainEntity:faqs.map(f=>({"@type":"Question",name:f.q,acceptedAnswer:{"@type":"Answer",text:f.a}}))})}} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({"@context":"https://schema.org","@type":"FAQPage",mainEntity:displayFaqs.map(f=>({"@type":"Question",name:f.q,acceptedAnswer:{"@type":"Answer",text:f.a}}))})}} />
 
       {/* HERO CAROUSEL */}
       <section className="hero" style={{position:"relative",display:"flex",alignItems:"center",overflow:"hidden",justifyContent:"center"}}>
@@ -154,7 +200,7 @@ export default function HomePageClient({ initialCmsData }: { initialCmsData: Rec
             <p style={{color:"var(--text-secondary)",fontSize:"1.05rem",marginTop:8}}>End-to-end support across every stage of your study abroad journey.</p>
           </motion.div>
           <motion.div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:28,marginTop:40}} initial="hidden" whileInView="visible" viewport={{once:true}} variants={stag}>
-            {services.map((s,i)=>(
+            {displayServices.slice(0, 3).map((s,i)=>(
               <Link key={i} href={i === 0 ? "/services#before-offer" : i === 1 ? "/services#after-offer" : "/services#after-departure"} style={{textDecoration:"none",color:"inherit",display:"block"}}>
                 <motion.div variants={fade} className="service-card-interactive" style={{background:"white",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-soft)",border:"1px solid var(--border-color)",position:"relative",height:"100%"}}>
                   <div className="svc-card-img" style={{height:220,position:"relative",overflow:"hidden"}}>
@@ -170,7 +216,7 @@ export default function HomePageClient({ initialCmsData }: { initialCmsData: Rec
                     
                     <div className="svc-details-visible" style={{marginTop:"15px"}}>
                       <ul style={{listStyle:"none",padding:0,margin:0,display:"flex",flexDirection:"column",gap:10}}>
-                        {s.points.map((p,j)=>(
+                        {s.points.map((p: string, j: number)=>(
                           <li key={j} style={{display:"flex",alignItems:"flex-start",gap:10,fontSize:"0.9rem",color:"var(--text-secondary)"}}>
                             <i className="fas fa-check-circle" style={{color:"var(--color-soft-teal)",fontSize:"1rem",flexShrink:0,marginTop:2}}/>
                             {p}
@@ -224,11 +270,7 @@ export default function HomePageClient({ initialCmsData }: { initialCmsData: Rec
             <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>{t("testimonials_section_title", "What Parents & Students Say")}</h2>
           </motion.div>
           <motion.div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:28,marginTop:32}} initial="hidden" whileInView="visible" viewport={{once:true}} variants={stag}>
-            {[
-              {name:"Aarav Sharma",role:"Admitted to NYU",text:"Ria completely transformed my application. Her insights on my SOP made all the difference."},
-              {name:"Mrs. Kapoor",role:"Parent",text:"We were overwhelmed with the UK visa process. Ria handled everything smoothly and professionally."},
-              {name:"Simran Kaur",role:"IELTS Band 8",text:"The structured mock interviews and writing evaluations helped me score far above my target."},
-            ].map((t_item,i)=>(
+            {testimonials.slice(0, 3).map((t_item, i)=>(
               <motion.div key={i} variants={fade} style={{background:"white",padding:30,borderRadius:16,borderLeft:"4px solid var(--color-soft-teal)",boxShadow:"var(--shadow-soft)"}}>
                 <i className="fas fa-quote-left" style={{fontSize:"1.8rem",color:"rgba(62,159,168,0.18)"}}/>
                 <p style={{marginTop:12,fontStyle:"italic",color:"var(--text-secondary)",lineHeight:1.75,fontSize:"0.95rem"}}>"{t_item.text}"</p>
@@ -331,7 +373,7 @@ export default function HomePageClient({ initialCmsData }: { initialCmsData: Rec
             <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>{t("faq_section_title", "Frequently Asked Questions")}</h2>
           </motion.div>
           <div style={{marginTop:36}}>
-            {faqs.map((f,i)=>(
+            {displayFaqs.map((f,i)=>(
               <div key={i} style={{marginBottom:12,background:"var(--bg-primary)",borderRadius:14,overflow:"hidden",boxShadow:"var(--shadow-soft)",border:"1px solid var(--border-color)"}}>
                 <button onClick={()=>setFaq(faq===i?null:i)} style={{width:"100%",padding:"18px 22px",display:"flex",justifyContent:"space-between",alignItems:"center",background:"none",border:"none",cursor:"pointer",textAlign:"left",fontWeight:700,fontSize:"1rem",color:"var(--color-deep-teal)",fontFamily:"var(--font-heading)"}}>
                   {f.q}
