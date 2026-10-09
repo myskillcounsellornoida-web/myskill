@@ -3,6 +3,8 @@
 import { db } from "@/db";
 import { inquiries } from "@/db/schema";
 import { Resend } from "resend";
+import { getLocalData, saveLocalData } from "@/db/localStore";
+import { revalidatePath } from "next/cache";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_dummy_key");
 
@@ -15,7 +17,7 @@ export async function submitContactForm(formData: FormData) {
   const message = formData.get("message") as string;
 
   try {
-    // 1. Save to Neon Database
+    // 1. Save to Neon Database if configured
     if (process.env.DATABASE_URL) {
       await db.insert(inquiries).values({
         name,
@@ -27,10 +29,29 @@ export async function submitContactForm(formData: FormData) {
       });
     }
 
-    // 2. Send Email Notification via Resend
+    // 2. Always persist to localStore JSON as well so Admin can see it immediately
+    const local = getLocalData();
+    const newInquiry = {
+      id: Date.now(),
+      name,
+      phone,
+      email,
+      qualification,
+      service,
+      message,
+      isContacted: false,
+      createdAt: new Date().toISOString()
+    };
+    local.inquiries = [newInquiry, ...local.inquiries];
+    saveLocalData(local);
+
+    revalidatePath("/admin");
+    revalidatePath("/adminria");
+
+    // 3. Send Email Notification via Resend if key present
     if (process.env.RESEND_API_KEY) {
       await resend.emails.send({
-        from: "My Skill Counsellor <onboarding@resend.dev>", // Replace with verified domain
+        from: "My Skill Counsellor <onboarding@resend.dev>",
         to: "ria.myskillcounsellor@gmail.com",
         subject: `New Lead: ${service} Inquiry from ${name}`,
         html: `
