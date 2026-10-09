@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
   CONTENT_GROUPS,
   DEFAULT_CONTENT,
+  PAGE_SECTIONS,
   PREVIEW_PAGES,
   THEME_FIELDS,
   colorKey,
@@ -13,6 +14,7 @@ import {
 import { CMS_MSG, isValidColor } from "@/components/cms/CmsProvider";
 import { updateSiteContentBatch } from "./actions";
 import ImageUploadButton from "./ImageUploadButton";
+import { LayoutPanel, VideosPanel } from "./EditorPanels";
 
 type Device = "desktop" | "tablet" | "mobile";
 // Preview renders at the real device width and is scaled down to fit the pane.
@@ -217,6 +219,21 @@ export default function ContentEditor({ initialContent, notify }: Props) {
           <p className="cms-hint">
             <i className="fas fa-mouse-pointer" /> Tip: click any text in the preview to jump to its field. Changes appear instantly and go live when you press <strong>Publish</strong>.
           </p>
+
+          {!q && (
+            <>
+              <LayoutPanel
+                key={`layout-${page}`}
+                page={page}
+                draft={draft}
+                setValue={setValue}
+                onReveal={(id) => postToPreview({ type: CMS_MSG.section, id })}
+              />
+              {PAGE_SECTIONS[page].some((d) => d.id === "videos") && (
+                <VideosPanel key={`videos-${page}`} page={page} draft={draft} setValue={setValue} />
+              )}
+            </>
+          )}
 
           {/* THEME COLOURS */}
           <div className={`cms-group ${themeOpen ? "is-open" : ""}`}>

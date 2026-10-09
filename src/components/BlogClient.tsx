@@ -1,10 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { subscribeNewsletter } from "@/app/actions";
 import { Txt, useCms } from "@/components/cms/CmsProvider";
+import Arranged from "@/components/cms/Arranged";
+import VideoGallery from "@/components/cms/VideoGallery";
 import { PageHero, fadeUp, stagger } from "@/components/cms/Sections";
 
 interface Blog {
@@ -60,22 +62,8 @@ export default function BlogClient({ blogsList: blogs }: { blogsList: Blog[] }) 
 
   const imageOf = (b: Blog) => b.image || b.img || "/images/poster_journey.png";
 
-  return (
-    <main>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: BLOG_FAQS.map((faq) => ({ "@type": "Question", name: faq.q, acceptedAnswer: { "@type": "Answer", text: faq.a } })),
-          }).replace(/</g, "\\u003c"),
-        }}
-      />
-
-      <PageHero prefix="blog" />
-
-      {/* AUTHOR BIO */}
+  const sections: Record<string, ReactNode> = {
+    author: (
       <section className="section bg-sage-section is-tight">
         <div className="container">
           <motion.div className="author-card" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
@@ -98,8 +86,8 @@ export default function BlogClient({ blogsList: blogs }: { blogsList: Blog[] }) 
           </motion.div>
         </div>
       </section>
-
-      {/* BLOG GRID */}
+    ),
+    articles: (
       <section className="section">
         <div className="container">
           {blogs.length === 0 ? (
@@ -126,6 +114,74 @@ export default function BlogClient({ blogsList: blogs }: { blogsList: Blog[] }) 
           )}
         </div>
       </section>
+    ),
+    newsletter: (
+      <section className="cta-band">
+        <div className="container cta-band-inner">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+            <i className="far fa-envelope cta-band-icon" />
+            <Txt k="blog_newsletter_title" as="h2" />
+            <Txt k="blog_newsletter_desc" as="p" />
+            <form className="newsletter-form" onSubmit={handleSubscribe}>
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                aria-label="Email address"
+              />
+              <button type="submit" className="btn btn-accent" disabled={subscribing}>
+                {subscribing ? "Subscribing…" : "Subscribe"}
+              </button>
+            </form>
+            {subscribeMsg && (
+              <p className={`form-status ${subscribeMsg.error ? "is-error" : "is-success"}`}>{subscribeMsg.text}</p>
+            )}
+          </motion.div>
+        </div>
+      </section>
+    ),
+    faq: (
+      <section className="section">
+        <div className="container narrow">
+          <motion.div className="section-heading" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+            <span className="eyebrow">Blog Resources</span>
+            <h2>Frequently Asked Questions</h2>
+          </motion.div>
+          <div className="faq-list">
+            {BLOG_FAQS.map((faq, i) => (
+              <div key={i} className={`faq-item ${openFaq === i ? "is-open" : ""}`}>
+                <button className="faq-question" onClick={() => setOpenFaq(openFaq === i ? null : i)} aria-expanded={openFaq === i}>
+                  <span>{faq.q}</span>
+                  <i className="fas fa-plus" />
+                </button>
+                {openFaq === i && <div className="faq-answer"><p>{faq.a}</p></div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    ),
+    videos: <VideoGallery />,
+  };
+
+  return (
+    <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: BLOG_FAQS.map((faq) => ({ "@type": "Question", name: faq.q, acceptedAnswer: { "@type": "Answer", text: faq.a } })),
+          }).replace(/</g, "\\u003c"),
+        }}
+      />
+
+      <PageHero prefix="blog" />
+
+      <Arranged page="/blog" sections={sections} />
 
       {/* ARTICLE READER */}
       <AnimatePresence>
@@ -168,54 +224,6 @@ export default function BlogClient({ blogsList: blogs }: { blogsList: Blog[] }) 
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* NEWSLETTER */}
-      <section className="cta-band">
-        <div className="container cta-band-inner">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <i className="far fa-envelope cta-band-icon" />
-            <Txt k="blog_newsletter_title" as="h2" />
-            <Txt k="blog_newsletter_desc" as="p" />
-            <form className="newsletter-form" onSubmit={handleSubscribe}>
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                aria-label="Email address"
-              />
-              <button type="submit" className="btn btn-accent" disabled={subscribing}>
-                {subscribing ? "Subscribing…" : "Subscribe"}
-              </button>
-            </form>
-            {subscribeMsg && (
-              <p className={`form-status ${subscribeMsg.error ? "is-error" : "is-success"}`}>{subscribeMsg.text}</p>
-            )}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="section">
-        <div className="container narrow">
-          <motion.div className="section-heading" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-            <span className="eyebrow">Blog Resources</span>
-            <h2>Frequently Asked Questions</h2>
-          </motion.div>
-          <div className="faq-list">
-            {BLOG_FAQS.map((faq, i) => (
-              <div key={i} className={`faq-item ${openFaq === i ? "is-open" : ""}`}>
-                <button className="faq-question" onClick={() => setOpenFaq(openFaq === i ? null : i)} aria-expanded={openFaq === i}>
-                  <span>{faq.q}</span>
-                  <i className="fas fa-plus" />
-                </button>
-                {openFaq === i && <div className="faq-answer"><p>{faq.a}</p></div>}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </main>
   );
 }

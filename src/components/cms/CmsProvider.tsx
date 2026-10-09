@@ -9,6 +9,7 @@ export const CMS_MSG = {
   update: "msc-cms:update",
   focus: "msc-cms:focus",
   select: "msc-cms:select",
+  section: "msc-cms:section",
 } as const;
 
 const HEX_COLOR = /^#[0-9a-f]{3,8}$/i;
@@ -61,6 +62,15 @@ export default function CmsProvider({
       const data = event.data;
       if (data?.type === CMS_MSG.update && data.content && typeof data.content === "object") {
         setDraft(data.content);
+      } else if (data?.type === CMS_MSG.section && typeof data.id === "string") {
+        const anchor = document.querySelector<HTMLElement>(`[data-section="${CSS.escape(data.id)}"]`);
+        const target = anchor?.nextElementSibling as HTMLElement | null;
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+          target.classList.remove("cms-section-flash");
+          void target.offsetWidth;
+          target.classList.add("cms-section-flash");
+        }
       } else if (data?.type === CMS_MSG.focus && typeof data.key === "string") {
         const el = document.querySelector<HTMLElement>(`[data-cms="${CSS.escape(data.key)}"]`);
         document.querySelectorAll(".cms-focused").forEach((n) => n.classList.remove("cms-focused"));

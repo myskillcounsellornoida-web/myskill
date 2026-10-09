@@ -49,6 +49,104 @@ export const THEME_FIELDS: ThemeField[] = [
   { key: "theme_body_text", label: "Body text", cssVar: "--text-secondary", default: "#5C6263" },
 ];
 
+/* ---------- Rearrangeable page sections (hero always stays on top) ---------- */
+export interface SectionDef {
+  id: string;
+  label: string;
+}
+
+export interface SectionState {
+  id: string;
+  hidden: boolean;
+}
+
+export const PAGE_SECTIONS: Record<PreviewPage, SectionDef[]> = {
+  "/": [
+    { id: "destinations", label: "Destinations strip" },
+    { id: "stages", label: "Services · three stages" },
+    { id: "steps", label: "How it works" },
+    { id: "about", label: "About the founder" },
+    { id: "stats", label: "Statistics & institutions" },
+    { id: "videos", label: "Videos" },
+    { id: "gallery", label: "Moments gallery" },
+    { id: "testimonials", label: "Testimonials" },
+    { id: "workshop", label: "Workshop / masterclass" },
+    { id: "media", label: "Media & recognition" },
+    { id: "faq", label: "FAQs" },
+    { id: "cta", label: "Call-to-action banner" },
+  ],
+  "/services": [
+    { id: "stages", label: "Three stages" },
+    { id: "programs", label: "Specialized programs" },
+    { id: "faq", label: "FAQs" },
+    { id: "cta", label: "Call-to-action banner" },
+  ],
+  "/testimonials": [
+    { id: "stats", label: "Statistics" },
+    { id: "stories", label: "Testimonial wall" },
+    { id: "videos", label: "Videos" },
+    { id: "press", label: "Press feature" },
+    { id: "faq", label: "FAQs" },
+    { id: "cta", label: "Call-to-action banner" },
+  ],
+  "/blog": [
+    { id: "author", label: "Author card" },
+    { id: "articles", label: "Articles" },
+    { id: "videos", label: "Videos" },
+    { id: "newsletter", label: "Newsletter" },
+    { id: "faq", label: "FAQs" },
+  ],
+  "/contact": [
+    { id: "form", label: "Enquiry form" },
+    { id: "info", label: "Contact cards" },
+    { id: "faq", label: "FAQs" },
+  ],
+};
+
+// Sections that start hidden until the admin switches them on.
+const HIDDEN_BY_DEFAULT: Partial<Record<PreviewPage, string[]>> = {
+  "/testimonials": ["videos"],
+  "/blog": ["videos"],
+};
+
+const LAYOUT_KEYS: Record<PreviewPage, string> = {
+  "/": "layout_home",
+  "/services": "layout_services",
+  "/testimonials": "layout_testimonials",
+  "/blog": "layout_blog",
+  "/contact": "layout_contact",
+};
+export const layoutKey = (page: PreviewPage) => LAYOUT_KEYS[page];
+export const LAYOUT_KEY_LIST = Object.values(LAYOUT_KEYS);
+
+/** Stored order + visibility, tolerant of unknown/missing ids (new sections are appended). */
+export function resolveLayout(raw: string | undefined, page: PreviewPage): SectionState[] {
+  const defs = PAGE_SECTIONS[page];
+  const known = new Set(defs.map((d) => d.id));
+  const result: SectionState[] = [];
+  const seen = new Set<string>();
+  if (raw) {
+    try {
+      const data = JSON.parse(raw);
+      if (Array.isArray(data)) {
+        for (const item of data) {
+          if (item && known.has(item.id) && !seen.has(item.id)) {
+            seen.add(item.id);
+            result.push({ id: item.id, hidden: !!item.hidden });
+          }
+        }
+      }
+    } catch {
+      // fall through to defaults
+    }
+  }
+  const hiddenDefaults = HIDDEN_BY_DEFAULT[page] ?? [];
+  for (const d of defs) {
+    if (!seen.has(d.id)) result.push({ id: d.id, hidden: hiddenDefaults.includes(d.id) });
+  }
+  return result;
+}
+
 const STAGE_DEFAULTS = [
   {
     title: "Before the Offer Letter",
@@ -199,6 +297,16 @@ export const CONTENT_GROUPS: ContentGroup[] = [
       text("testimonials_section_label", "Section label", "Success Stories"),
       text("testimonials_section_title", "Section heading", "What Parents & Students Say"),
       text("testimonials_cta", "Button", "Read All Success Stories"),
+    ],
+  },
+  {
+    id: "videos_home",
+    title: "Videos Section",
+    page: "/",
+    fields: [
+      text("videos_section_label", "Section label", "Watch & Learn"),
+      text("videos_section_title", "Section heading", "Videos & Reels"),
+      para("videos_section_desc", "Section description", "Quick tips, student stories and live sessions from our YouTube and Instagram."),
     ],
   },
   {

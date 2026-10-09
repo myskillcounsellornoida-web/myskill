@@ -3,8 +3,9 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Txt, useCms } from "@/components/cms/CmsProvider";
+import Arranged from "@/components/cms/Arranged";
 import { CtaBand, PageHero, SectionHeading, fadeUp, stagger } from "@/components/cms/Sections";
 
 type Service = { id?: number; title: string; description: string; icon?: string | null };
@@ -41,22 +42,8 @@ export default function ServicesClient({ services, faqs }: { services: Service[]
   const programs = services.length > 0 ? services : DEFAULT_PROGRAMS;
   const displayFaqs = faqs.length > 0 ? faqs.map((f) => ({ q: f.question, a: f.answer })) : DEFAULT_FAQS;
 
-  return (
-    <main>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: displayFaqs.map((faq) => ({ "@type": "Question", name: faq.q, acceptedAnswer: { "@type": "Answer", text: faq.a } })),
-          }).replace(/</g, "\\u003c"),
-        }}
-      />
-
-      <PageHero prefix="services" />
-
-      {/* STAGES — sticky overlapping stack */}
+  const sections: Record<string, ReactNode> = {
+    stages: (
       <section className="section">
         <div className="container">
           <SectionHeading label="services_stages_label" title="services_stages_title" desc="services_stages_desc" />
@@ -100,8 +87,8 @@ export default function ServicesClient({ services, faqs }: { services: Service[]
           </div>
         </div>
       </section>
-
-      {/* SPECIALIZED PROGRAMS — managed from Admin → Services */}
+    ),
+    programs: (
       <section className="section bg-white-section">
         <div className="container">
           <SectionHeading label="services_programs_label" title="services_programs_title" />
@@ -116,8 +103,8 @@ export default function ServicesClient({ services, faqs }: { services: Service[]
           </motion.div>
         </div>
       </section>
-
-      {/* FAQ */}
+    ),
+    faq: (
       <section className="section">
         <div className="container narrow">
           <SectionHeading label="services_faq_label" title="services_faq_title" />
@@ -134,8 +121,26 @@ export default function ServicesClient({ services, faqs }: { services: Service[]
           </div>
         </div>
       </section>
+    ),
+    cta: <CtaBand />,
+  };
 
-      <CtaBand />
+  return (
+    <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: displayFaqs.map((faq) => ({ "@type": "Question", name: faq.q, acceptedAnswer: { "@type": "Answer", text: faq.a } })),
+          }).replace(/</g, "\\u003c"),
+        }}
+      />
+
+      <PageHero prefix="services" />
+
+      <Arranged page="/services" sections={sections} />
     </main>
   );
 }
