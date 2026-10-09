@@ -467,7 +467,7 @@ export default function AdminClient({
     setIsSendingBroadcast(false);
     if (res.success && res.data) {
       setBroadcastReport(res.data);
-      showNotify(`Broadcast executed! Sent ${res.data.sent} of ${res.data.total} emails via Resend.`, "success");
+      showNotify(`Broadcast executed! Sent ${res.data.sent} of ${res.data.total} emails.`, "success");
     } else {
       showNotify(`Broadcast failed: ${res.error}`, "error");
     }
@@ -1577,7 +1577,7 @@ export default function AdminClient({
                 <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
                   <Mail size={24} style={{ color: "var(--color-soft-teal)" }} />
                   <div>
-                    <h3 style={{ margin: 0, fontSize: "1.2rem", color: "var(--color-deep-teal)" }}>Resend Broadcast Email Center</h3>
+                    <h3 style={{ margin: 0, fontSize: "1.2rem", color: "var(--color-deep-teal)" }}>Broadcast Email Center</h3>
                     <p style={{ margin: "2px 0 0 0", fontSize: "0.85rem", color: "#666" }}>Send live newsletter broadcasts or announcements to candidate audiences.</p>
                   </div>
                 </div>
@@ -1674,7 +1674,7 @@ export default function AdminClient({
                     <div style={{ padding: "15px", borderRadius: "8px", background: "#f0fdf4", border: "1px solid #bbf7d0", color: "#166534" }}>
                       <strong>🎉 Broadcast Execution Report:</strong>
                       <p style={{ margin: "4px 0 0 0", fontSize: "0.9rem" }}>
-                        Total Target Recipients: {broadcastReport.total} | Successfully Sent via Resend: {broadcastReport.sent} | Failed: {broadcastReport.failed}
+                        Total Target Recipients: {broadcastReport.total} | Successfully Sent: {broadcastReport.sent} | Failed: {broadcastReport.failed}
                       </p>
                     </div>
                   )}
@@ -1699,7 +1699,7 @@ export default function AdminClient({
                     }}
                   >
                     <Mail size={18} />
-                    {isSendingBroadcast ? "Sending Broadcast Mails..." : "Send Live Broadcast Email via Resend"}
+                    {isSendingBroadcast ? "Sending Broadcast Mails..." : "Send Live Broadcast Email"}
                   </button>
                 </form>
               </div>

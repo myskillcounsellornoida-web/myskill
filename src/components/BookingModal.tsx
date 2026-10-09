@@ -129,10 +129,7 @@ export default function BookingModal({ isOpen, onClose, initialService }: Bookin
 
         {/* Modal Header */}
         <div style={{ marginBottom: "24px" }}>
-          <span style={{ fontSize: "0.8rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", color: "var(--color-primary-teal, #0f4c81)" }}>
-            Calendly-Style Session Booking
-          </span>
-          <h2 style={{ fontSize: "1.6rem", fontWeight: 700, margin: "5px 0 0 0", color: "#0f172a" }}>
+          <h2 style={{ fontSize: "1.6rem", fontWeight: 700, margin: "0", color: "#0f172a" }}>
             Book 1-on-1 Counselling Session
           </h2>
           <p style={{ fontSize: "0.9rem", color: "#64748b", margin: "4px 0 0 0" }}>
