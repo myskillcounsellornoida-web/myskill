@@ -989,7 +989,8 @@ export default function AdminClient({
   return (
     <div style={{
       display: "flex",
-      minHeight: "100vh",
+      height: "100vh",
+      overflow: "hidden",
       backgroundColor: "#FAF9F5",
       color: "var(--text-primary)",
       fontFamily: "var(--font-body)"
