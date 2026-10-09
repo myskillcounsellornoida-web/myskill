@@ -132,6 +132,7 @@ export default function Navbar() {
           <div className="nav-cta" style={{ gap: "12px", alignItems: "center" }}>
             <button
               onClick={() => setIsBookingOpen(true)}
+              aria-label="Book a session"
               style={{
                 background: "var(--color-soft-teal, #0d9488)",
                 color: "#FFFFFF",
@@ -147,7 +148,7 @@ export default function Navbar() {
                 transition: "all 0.2s"
               }}
             >
-              <i className="far fa-calendar-alt" /> Book Session
+              <i className="far fa-calendar-alt" /> <span className="nav-btn-label">Book Session</span>
             </button>
 
             <Link href="/contact" className="btn btn-primary" style={{ padding: '10px 22px', fontSize: '0.95rem', fontWeight: 700, fontFamily: 'var(--font-sans)', letterSpacing: '0.5px' }}>

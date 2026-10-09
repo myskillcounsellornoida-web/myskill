@@ -1,306 +1,213 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { Txt, useCms } from "@/components/cms/CmsProvider";
+import { CtaBand, SectionHeading, cssUrl, fadeUp, stagger } from "@/components/cms/Sections";
 
-const fade = { hidden:{opacity:0,y:25}, visible:{opacity:1,y:0,transition:{duration:0.7}} };
-const stag = { hidden:{}, visible:{transition:{staggerChildren:0.15}} };
+type Testimonial = { name: string; role: string; text: string };
+type Faq = { question: string; answer: string };
 
-export default function HomePageClient({ 
-  initialCmsData,
-  initialServices = [],
-  initialTestimonials = [],
-  initialFaqs = []
-}: { 
-  initialCmsData: Record<string, string>;
-  initialServices?: any[];
-  initialTestimonials?: any[];
-  initialFaqs?: any[];
+const SLIDE_COUNT = 5;
+
+const DESTINATIONS = [
+  { code: "gb", name: "United Kingdom" },
+  { code: "us", name: "USA" },
+  { code: "ca", name: "Canada" },
+  { code: "ae", name: "Dubai" },
+  { code: "au", name: "Australia" },
+  { code: "ie", name: "Ireland" },
+  { code: "de", name: "Germany" },
+  { code: "fr", name: "France" },
+  { code: "sg", name: "Singapore" },
+];
+
+const PARTNER_LOGOS = [
+  { src: "/assets/u2.png", alt: "ERC Institute", dark: true },
+  { src: "/assets/u4.png", alt: "European Institute of Management & Technology" },
+  { src: "/assets/u5.png", alt: "IIAD" },
+];
+
+const STEP_ICONS = ["fa-user-graduate", "fa-map-marked-alt", "fa-pen-fancy", "fa-passport"];
+const STAGE_ICONS = ["fa-seedling", "fa-file-contract", "fa-globe-americas"];
+const STAGE_ANCHORS = ["before-offer", "after-offer", "after-departure"];
+
+// 4-column grid: one wide + one tall tile + four singles fill two rows exactly.
+const GALLERY = [
+  { src: "/images/whatsapp_image_2024-01-03_at_4.39.54_pm_2.jpeg", alt: "Career counselling program session", wide: true },
+  { src: "/images/whatsapp_image_2024-01-03_at_5.06.36_pm_2.jpeg", alt: "My Skill Counsellor services stand", tall: true },
+  { src: "/images/whatsapp_image_2024-03-20_at_10.27.00_1_1.jpeg", alt: "Community outreach with school children" },
+  { src: "/images/whatsapp_image_2024-12-24_at_14.13.32.jpeg", alt: "Study abroad fair booth" },
+  { src: "/images/whatsapp_image_2024-11-25_at_14.49.36_1.jpeg", alt: "Meeting university representatives" },
+  { src: "/images/whatsapp_image_2024-03-20_at_10.27.00_2_1.jpeg", alt: "Career awareness session for children" },
+];
+
+const MEDIA = [
+  { src: "/images/shah_times_article_cropped.jpg", key: "media_item1_caption", icon: "fa-newspaper" },
+  { src: "/assets/slider3.png", key: "media_item2_caption", icon: "fa-microphone" },
+  { src: "/images/whatsapp_image_2024-08-16_at_15.04.54_2.jpeg", key: "media_item3_caption", icon: "fa-award" },
+  { src: "/images/whatsapp_image_2024-09-24_at_16.15.48_1_2.jpeg", key: "media_item4_caption", icon: "fa-video" },
+];
+
+export default function HomePageClient({
+  testimonials,
+  faqs,
+}: {
+  testimonials: Testimonial[];
+  faqs: Faq[];
 }) {
-  const [cmsData] = useState(initialCmsData);
+  const { t } = useCms();
   const [slide, setSlide] = useState(0);
-  const [faq, setFaq] = useState<number | null>(0);
-  
-  const defaultTestimonials = [
-    { name: "Aarav Sharma", role: "Admitted to NYU", text: "Ria completely transformed my application. Her insights on my SOP made all the difference." },
-    { name: "Mrs. Kapoor", role: "Parent", text: "We were overwhelmed with the UK visa process. Ria handled everything smoothly and professionally." },
-    { name: "Simran Kaur", role: "IELTS Band 8", text: "The structured mock interviews and writing evaluations helped me score far above my target." },
-  ];
-  const [testimonials] = useState<any[]>(initialTestimonials.length > 0 ? initialTestimonials : defaultTestimonials);
+  const [paused, setPaused] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-  useEffect(()=>{
-    const timer=setInterval(()=>setSlide(p=>(p+1)%5),4500);
-    return()=>clearInterval(timer);
-  },[]);
+  useEffect(() => {
+    if (paused) return;
+    const timer = setInterval(() => setSlide((p) => (p + 1) % SLIDE_COUNT), 5500);
+    return () => clearInterval(timer);
+  }, [paused]);
 
+  const slideNo = slide + 1;
 
-
-  const t = (key: string, fallback: string) => cmsData[key] || fallback;
-
-  const slides = [
-    { 
-      img: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1600&auto=format&fit=crop",   
-      caption: t("hero_slide1_caption", "Your Gateway to Top Global Universities"), 
-      sub: t("hero_slide1_sub", "Don't leave your future to chance. Get admitted to elite institutions in the UK, USA, Canada, Dubai, and Europe with our proven admission strategies.") 
-    },
-    { 
-      img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1600&auto=format&fit=crop",  
-      caption: t("hero_slide2_caption", "Stop Guessing, Start Building."), 
-      sub: t("hero_slide2_sub", "Transform confusion into absolute clarity. We help you map out a high-demand career path tailored to your unique strengths and aspirations.") 
-    },
-    { 
-      img: "https://images.unsplash.com/photo-1455390582262-044cdead277a?q=80&w=1600&auto=format&fit=crop",     
-      caption: t("hero_slide3_caption", "Stand Out in a Sea of Applicants"), 
-      sub: t("hero_slide3_sub", "Grades aren't enough. We craft compelling Statements of Purpose and build Ivy-league-worthy portfolios that make admissions officers take notice.") 
-    },
-    { 
-      img: "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?q=80&w=1600&auto=format&fit=crop",      
-      caption: t("hero_slide4_caption", "Nail Your Target IELTS Score & Visa"), 
-      sub: t("hero_slide4_sub", "Achieve Band 8+ with our expert coaching. Once you're admitted, we handle the complex visa and financial paperwork so you don't have to.") 
-    },
-    { 
-      img: "https://images.unsplash.com/photo-1498243691581-b145c3f54a5c?q=80&w=1600&auto=format&fit=crop",         
-      caption: t("hero_slide5_caption", "We Walk With You — Every Step"), 
-      sub: t("hero_slide5_sub", "From the first profile evaluation to your first day on campus. We provide end-to-end support so you never walk alone.") 
-    }
-  ];
-
-  const defaultServices = [
-    {
-      title: t("service1_title", "Before the Offer Letter"),
-      subtitle: t("service1_subtitle", "Building the Right Foundation"),
-      icon: "fa-seedling",
-      image: "/images/service_card_before_offer.png",
-      points: [
-        t("service1_point1", "Career & Profile Assessment"),
-        t("service1_point2", "Course & University Selection"),
-        t("service1_point3", "SOP & LOR Guidance"),
-        t("service1_point4", "IELTS / TOEFL Preparation")
-      ]
-    },
-    {
-      title: t("service2_title", "After the Offer Letter"),
-      subtitle: t("service2_subtitle", "Preparing for the Move"),
-      icon: "fa-file-contract",
-      image: "/images/service_card_after_offer.png",
-      points: [
-        t("service2_point1", "Final University Selection"),
-        t("service2_point2", "Comprehensive Visa Support"),
-        t("service2_point3", "Financial Documentation"),
-        t("service2_point4", "Pre-Departure Guidance")
-      ]
-    },
-    {
-      title: t("service3_title", "After Departure"),
-      subtitle: t("service3_subtitle", "Settling into Your New Life"),
-      icon: "fa-globe-americas",
-      image: "/images/service_card_after_departure.png",
-      points: [
-        t("service3_point1", "Arrival & Settling-In Support"),
-        t("service3_point2", "Local Transport Navigation"),
-        t("service3_point3", "SIM & Banking Setup"),
-        t("service3_point4", "Campus Orientation")
-      ]
-    }
-  ];
-
-  const mapDbService = (s: any, i: number) => ({
-    title: s.title,
-    subtitle: s.subtitle || "Specialized Service",
-    icon: s.icon || "fa-seedling",
-    image: ["/images/service_card_before_offer.png", "/images/service_card_after_offer.png", "/images/service_card_after_departure.png"][i % 3],
-    points: s.description ? s.description.split('\n').filter((p:string) => p.trim()) : []
-  });
-
-  const [services] = useState<any[]>(
-    initialServices.length > 0 ? initialServices : defaultServices
-  );
-
-  const displayServices = services === defaultServices ? defaultServices : services.map(mapDbService);
-
-  const defaultFaqs=[
-    {q:t("faq1_q", "When is the right time to start planning for study abroad?"),a:t("faq1_a", "We recommend starting as early as Class 9. This gives ample time to build a robust profile and plan extracurriculars without rushing.")},
-    {q:t("faq2_q", "Do you guarantee university admissions?"),a:t("faq2_a", "While no consultant can guarantee admission to ivy-league universities, our track record speaks for itself. We maximise your chances by aligning your profile with university expectations.")},
-    {q:t("faq3_q", "Do you assist with selecting the right major or course?"),a:t("faq3_a", "Yes. We use detailed psychometric evaluations and industry insights to help you choose a course that aligns with both your passions and future market demand.")},
-    {q:t("faq4_q", "How do I start the process?"),a:t("faq4_a", "You can start by booking a free initial consultation through our contact page. We will assess your profile and discuss a personalized roadmap.")},
-  ];
-
-  const [faqs] = useState<any[]>(
-    initialFaqs.length > 0 ? initialFaqs : defaultFaqs
-  );
-
-  const displayFaqs = faqs === defaultFaqs ? defaultFaqs : faqs.map(f => ({ q: f.question, a: f.answer }));
+  // Admin-managed FAQs take precedence; otherwise fall back to the CMS copy.
+  const displayFaqs = faqs.length > 0
+    ? faqs.map((f) => ({ q: f.question, a: f.answer, qKey: undefined, aKey: undefined }))
+    : [1, 2, 3, 4].map((n) => ({ q: t(`faq${n}_q`), a: t(`faq${n}_a`), qKey: `faq${n}_q`, aKey: `faq${n}_a` }));
 
   return (
     <main>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify({"@context":"https://schema.org","@type":"FAQPage",mainEntity:displayFaqs.map(f=>({"@type":"Question",name:f.q,acceptedAnswer:{"@type":"Answer",text:f.a}}))})}} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: displayFaqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+          }).replace(/</g, "\\u003c"),
+        }}
+      />
 
       {/* HERO CAROUSEL */}
-      <section className="hero" style={{position:"relative",display:"flex",alignItems:"center",overflow:"hidden",justifyContent:"center"}}>
-        {slides.map((s,i)=>(
-          <div key={i} style={{position:"absolute",inset:0,transition:"opacity 1.2s ease",opacity:slide===i?1:0,backgroundImage:`url(${s.img})`,backgroundSize:"cover",backgroundPosition:"center top"}} />
+      <section
+        className="hero home-hero"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        {Array.from({ length: SLIDE_COUNT }, (_, i) => (
+          <div
+            key={i}
+            className={`home-hero-slide ${slide === i ? "is-active" : ""}`}
+            style={{ backgroundImage: cssUrl(t(`hero_slide${i + 1}_image`)) }}
+            aria-hidden={slide !== i}
+          />
         ))}
-        {/* Cleaner, more premium gradient overlay */}
-        <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom, rgba(37,95,107,0.85) 0%, rgba(37,95,107,0.4) 50%, rgba(10,20,25,0.7) 100%)"}} />
-        
-        <div className="container" style={{position:"relative",zIndex:2,textAlign:"center"}}>
-          <motion.div initial="hidden" animate="visible" variants={fade} style={{maxWidth:800,margin:"0 auto"}}>
-            <span style={{display:"inline-block",background:"rgba(255,255,255,0.15)",color:"#fff",fontFamily:"var(--font-heading)",fontWeight:700,fontSize:"0.85rem",letterSpacing:"3px",textTransform:"uppercase",padding:"8px 20px",borderRadius:30,marginBottom:24,border:"1px solid rgba(255,255,255,0.3)",backdropFilter:"blur(5px)"}}>
-              {t("hero_badge_label", "We Turn Confusion into Career Fusion")}
-            </span>
-            <h1 style={{color:"#fff",fontSize:"clamp(2.5rem,6vw,4.5rem)",lineHeight:1.15,marginBottom:20,fontFamily:"var(--font-heading)",fontWeight:800,textShadow:"0 4px 20px rgba(0,0,0,0.3)"}}>
-              {slides[slide].caption}
-            </h1>
-            <p style={{color:"rgba(255,255,255,0.9)",fontSize:"1.2rem",marginBottom:40,lineHeight:1.6,maxWidth:600,margin:"0 auto 40px"}}>
-              {slides[slide].sub}
-            </p>
-            <div className="hero-buttons" style={{display:"flex",gap:16,justifyContent:"center"}}>
-              <Link href="/contact" className="btn btn-primary" style={{padding:"14px 32px",fontSize:"1.05rem",borderRadius:"30px"}}>{t("hero_cta_primary", "Book a Free Consultation")}</Link>
-              <Link href="/services" className="btn btn-outline" style={{color:"#fff",borderColor:"rgba(255,255,255,0.6)",padding:"14px 32px",fontSize:"1.05rem",borderRadius:"30px",backdropFilter:"blur(5px)"}}>{t("hero_cta_secondary", "Explore Services")}</Link>
+        <div className="home-hero-overlay" />
+
+        <div className="container home-hero-inner">
+          <motion.div initial="hidden" animate="visible" variants={fadeUp} className="home-hero-copy">
+            <Txt k="hero_badge_label" className="hero-pill" />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={slide}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.45 }}
+              >
+                <Txt k={`hero_slide${slideNo}_caption`} as="h1" className="home-hero-title" />
+                <Txt k={`hero_slide${slideNo}_sub`} as="p" className="home-hero-sub" />
+              </motion.div>
+            </AnimatePresence>
+            <div className="hero-buttons">
+              <Link href="/contact" className="btn btn-accent btn-lg">
+                <Txt k="hero_cta_primary" /> <i className="fas fa-arrow-right" />
+              </Link>
+              <Link href="/services" className="btn btn-ghost-light btn-lg">
+                <Txt k="hero_cta_secondary" />
+              </Link>
             </div>
           </motion.div>
-          
-          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:16,marginTop:60}}>
-            <button onClick={()=>setSlide(p=>(p-1+slides.length)%slides.length)} style={{background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:"50%",width:44,height:44,cursor:"pointer",color:"#fff",fontSize:"1.2rem",backdropFilter:"blur(5px)",transition:"all 0.3s"}} className="hero-nav-btn">‹</button>
-            <div style={{display:"flex",gap:10}}>
-              {slides.map((_,i)=>(
-                <button key={i} onClick={()=>setSlide(i)} style={{width:slide===i?36:10,height:10,borderRadius:5,background:slide===i?"#F0C987":"rgba(255,255,255,0.4)",border:"none",cursor:"pointer",transition:"all 0.4s cubic-bezier(0.4, 0, 0.2, 1)"}} />
+
+          <div className="hero-controls">
+            <button aria-label="Previous slide" onClick={() => setSlide((p) => (p - 1 + SLIDE_COUNT) % SLIDE_COUNT)} className="hero-nav-btn">
+              <i className="fas fa-chevron-left" />
+            </button>
+            <div className="hero-dots">
+              {Array.from({ length: SLIDE_COUNT }, (_, i) => (
+                <button key={i} aria-label={`Go to slide ${i + 1}`} onClick={() => setSlide(i)} className={slide === i ? "is-active" : ""} />
               ))}
             </div>
-            <button onClick={()=>setSlide(p=>(p+1)%slides.length)} style={{background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:"50%",width:44,height:44,cursor:"pointer",color:"#fff",fontSize:"1.2rem",backdropFilter:"blur(5px)",transition:"all 0.3s"}} className="hero-nav-btn">›</button>
+            <button aria-label="Next slide" onClick={() => setSlide((p) => (p + 1) % SLIDE_COUNT)} className="hero-nav-btn">
+              <i className="fas fa-chevron-right" />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* 3 SERVICES */}
-      <section className="bg-sage-section" style={{padding:"80px 0"}}>
+      {/* DESTINATIONS STRIP */}
+      <section className="destinations-strip">
+        <div className="container destinations-inner">
+          <Txt k="destinations_label" className="eyebrow" />
+          <ul className="destinations-list">
+            {DESTINATIONS.map((d) => (
+              <li key={d.code}>
+                {/* eslint-disable-next-line @next/next/no-img-element -- tiny external flag sprites */}
+                <img src={`https://flagcdn.com/w80/${d.code}.png`} alt="" width={28} height={20} loading="lazy" />
+                <span>{d.name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* 3 SERVICE STAGES */}
+      <section className="section bg-sage-section">
         <div className="container">
-          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade}>
-            <span className="text-accent font-sans">{t("services_section_title", "Our Services")}</span>
-            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:600}} dangerouslySetInnerHTML={{ __html: t("services_section_subtitle", "How We Support <span class=\"text-highlight\">Your Journey</span>") }} />
-            <p style={{color:"var(--text-secondary)",fontSize:"1.05rem",marginTop:8}}>End-to-end support across every stage of your study abroad journey.</p>
-          </motion.div>
-          <motion.div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:28,marginTop:40}} initial="hidden" whileInView="visible" viewport={{once:true}} variants={stag}>
-            {displayServices.slice(0, 3).map((s,i)=>(
-              <Link key={i} href={i === 0 ? "/services#before-offer" : i === 1 ? "/services#after-offer" : "/services#after-departure"} style={{textDecoration:"none",color:"inherit",display:"block"}}>
-                <motion.div variants={fade} className="service-card-interactive" style={{background:"white",borderRadius:18,overflow:"hidden",boxShadow:"var(--shadow-soft)",border:"1px solid var(--border-color)",position:"relative",height:"100%"}}>
-                  <div className="svc-card-img" style={{height:220,position:"relative",overflow:"hidden"}}>
-                    <Image src={s.image} alt={s.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" style={{objectFit:"cover",transition:"transform 0.6s ease"}} className="svc-img" />
-                    <div style={{position:"absolute",inset:0,background:"linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)"}} />
-                    <div style={{position:"absolute",bottom:16,left:24,width:48,height:48,borderRadius:"50%",background:"rgba(255,255,255,0.2)",backdropFilter:"blur(5px)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:"1.2rem",border:"1px solid rgba(255,255,255,0.3)"}}>
-                      <i className={`fas ${s.icon}`}/>
-                    </div>
+          <SectionHeading label="services_section_title" title="services_heading" highlight="services_heading_highlight" desc="services_section_desc" />
+          <motion.div className="stage-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            {[1, 2, 3].map((n, i) => (
+              <motion.div key={n} variants={fadeUp}>
+                <Link href={`/services#${STAGE_ANCHORS[i]}`} className="stage-card">
+                  <div className="stage-card-img">
+                    <Image src={t(`service${n}_image`)} alt={t(`service${n}_title`)} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover" }} />
+                    <span className="stage-card-num">0{n}</span>
+                    <span className="stage-card-icon"><i className={`fas ${STAGE_ICONS[i]}`} /></span>
                   </div>
-                  <div style={{padding:"28px 24px",position:"relative",zIndex:2,background:"white"}} className="svc-content">
-                    <span style={{fontSize:"0.75rem",fontWeight:800,color:"var(--color-muted-coral)",textTransform:"uppercase",letterSpacing:"1.5px",fontFamily:"var(--font-heading)"}}>{s.subtitle}</span>
-                    <h3 style={{fontSize:"1.4rem",color:"var(--color-deep-teal)",margin:"8px 0 16px",fontFamily:"var(--font-heading)",fontWeight:800}}>{s.title}</h3>
-                    
-                    <div className="svc-details-visible" style={{marginTop:"15px"}}>
-                      <ul style={{listStyle:"none",padding:0,margin:0,display:"flex",flexDirection:"column",gap:10}}>
-                        {s.points.map((p: string, j: number)=>(
-                          <li key={j} style={{display:"flex",alignItems:"flex-start",gap:10,fontSize:"0.9rem",color:"var(--text-secondary)"}}>
-                            <i className="fas fa-check-circle" style={{color:"var(--color-soft-teal)",fontSize:"1rem",flexShrink:0,marginTop:2}}/>
-                            {p}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                  <div className="stage-card-body">
+                    <Txt k={`service${n}_subtitle`} className="stage-card-sub" />
+                    <Txt k={`service${n}_title`} as="h3" />
+                    <ul className="check-list">
+                      {[1, 2, 3, 4].map((p) => (
+                        <li key={p}>
+                          <i className="fas fa-check-circle" />
+                          <Txt k={`service${n}_point${p}`} />
+                        </li>
+                      ))}
+                    </ul>
+                    <span className="stage-card-more">Learn more <i className="fas fa-arrow-right" /></span>
                   </div>
-                </motion.div>
-              </Link>
+                </Link>
+              </motion.div>
             ))}
           </motion.div>
-          <div style={{textAlign:"center",marginTop:40}}>
-            <Link href="/services" className="btn btn-outline">View Full Service Details</Link>
+          <div className="section-cta">
+            <Link href="/services" className="btn btn-secondary"><Txt k="services_cta" /></Link>
           </div>
         </div>
       </section>
 
       {/* HOW IT WORKS */}
-      <section style={{background:"var(--bg-secondary)",padding:"80px 0"}}>
+      <section className="section bg-white-section">
         <div className="container">
-          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade}>
-            <span className="text-accent">{t("steps_section_title", "How It Works")}</span>
-            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>The 4-Step Journey</h2>
-          </motion.div>
-          <motion.div className="steps-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:24,marginTop:40}} initial="hidden" whileInView="visible" viewport={{once:true}} variants={stag}>
-            {[
-              {step:"01",title:t("step1_title", "Discovery Profile"),desc:t("step1_desc", "We evaluate your academic background, interests and aspirations."),icon:"fa-user-graduate"},
-              {step:"02",title:t("step2_title", "Strategic Roadmap"),desc:t("step2_desc", "We shortlist universities and map required tests like IELTS/TOEFL."),icon:"fa-map-marked-alt"},
-              {step:"03",title:t("step3_title", "Application & SOP"),desc:t("step3_desc", "We meticulously build your portfolio and craft compelling essays."),icon:"fa-pen-fancy"},
-              {step:"04",title:t("step4_title", "Visa & Pre-Departure"),desc:t("step4_desc", "We secure your visa and prepare you for life in a new country."),icon:"fa-passport"},
-            ].map((p,i)=>(
-              <motion.div key={i} variants={fade} style={{background:"var(--bg-primary)",padding:30,borderRadius:16,position:"relative",boxShadow:"var(--shadow-soft)",border:"1px solid var(--border-color)"}}>
-                <div style={{position:"absolute",top:-14,left:22,background:"var(--color-deep-teal)",color:"white",padding:"4px 14px",borderRadius:20,fontWeight:800,fontSize:"0.8rem",fontFamily:"var(--font-heading)"}}>Step {p.step}</div>
-                <div style={{width:44,height:44,borderRadius:"50%",background:"rgba(62,159,168,0.12)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--color-deep-teal)",fontSize:"1.2rem",marginTop:12,marginBottom:14}}>
-                  <i className={`fas ${p.icon}`}/>
-                </div>
-                <h3 style={{marginTop:0,fontSize:"1.1rem",color:"var(--color-deep-teal)",fontFamily:"var(--font-heading)",fontWeight:800}}>{p.title}</h3>
-                <p style={{color:"var(--text-secondary)",margin:0,lineHeight:1.7,fontSize:"0.92rem"}}>{p.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section className="bg-sage-section" style={{padding:"80px 0"}}>
-        <div className="container">
-          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade}>
-            <span className="text-accent">{t("testimonials_section_label", "Success Stories")}</span>
-            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>{t("testimonials_section_title", "What Parents & Students Say")}</h2>
-          </motion.div>
-          <motion.div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:28,marginTop:32}} initial="hidden" whileInView="visible" viewport={{once:true}} variants={stag}>
-            {testimonials.slice(0, 3).map((t_item, i)=>(
-              <motion.div key={i} variants={fade} style={{background:"white",padding:30,borderRadius:16,borderLeft:"4px solid var(--color-soft-teal)",boxShadow:"var(--shadow-soft)"}}>
-                <i className="fas fa-quote-left" style={{fontSize:"1.8rem",color:"rgba(62,159,168,0.18)"}}/>
-                <p style={{marginTop:12,fontStyle:"italic",color:"var(--text-secondary)",lineHeight:1.75,fontSize:"0.95rem"}}>&quot;{t_item.text}&quot;</p>
-                <h4 style={{marginTop:18,color:"var(--color-deep-teal)",marginBottom:4,fontFamily:"var(--font-heading)",fontWeight:800}}>{t_item.name}</h4>
-                <span style={{fontSize:"0.8rem",color:"var(--text-secondary)"}}>{t_item.role}</span>
-              </motion.div>
-            ))}
-          </motion.div>
-          <div style={{textAlign:"center",marginTop:36}}>
-            <Link href="/testimonials" className="btn btn-outline">{t("testimonials_cta", "Read All Success Stories")}</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* WORKSHOP */}
-      <section style={{background:"var(--bg-secondary)",padding:"80px 0"}}>
-        <div className="container">
-          <div className="flex-section" style={{display:"flex",flexWrap:"wrap",gap:50,alignItems:"center"}}>
-            <motion.div style={{flex:"1 1 300px"}} initial={{opacity:0,x:-30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.6}}>
-              <Image src="/images/whatsapp_image_2024-03-20_at_10.27.00_2_1.jpeg" alt="Workshop event" width={600} height={400} style={{width:"100%",height:"auto",borderRadius:18,boxShadow:"0 20px 40px rgba(0,0,0,0.1)"}}/>
-            </motion.div>
-            <motion.div style={{flex:"1 1 300px"}} initial={{opacity:0,x:30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.6}}>
-              <span className="text-accent">{t("workshop_section_label", "Live Events")}</span>
-              <h2 style={{fontSize:"clamp(1.8rem,3vw,2.3rem)",color:"var(--color-deep-teal)",marginBottom:18,fontFamily:"var(--font-heading)",fontWeight:800}}>{t("workshop_section_heading", "Upcoming Masterclasses")}</h2>
-              <p style={{fontSize:"1.05rem",color:"var(--text-secondary)",marginBottom:26,lineHeight:1.8}}>{t("workshop_section_desc", "Join our free online masterclasses where we break down the Ivy League admission process, IELTS strategies, and profile-building secrets.")}</p>
-              <div style={{background:"var(--bg-primary)",padding:20,borderRadius:12,marginBottom:22,borderLeft:"4px solid var(--color-soft-teal)"}}>
-                <h4 style={{color:"var(--color-deep-teal)",marginBottom:6,fontFamily:"var(--font-heading)",fontWeight:800}}>{t("workshop_title", "Mastering the Common App")}</h4>
-                <p style={{fontSize:"0.9rem",color:"#666",margin:0}}><i className="far fa-calendar-alt"/> {t("workshop_date", "August 15th, 2026 | 6:00 PM IST")}</p>
-              </div>
-              <Link href="/contact" className="btn btn-primary">{t("workshop_cta", "Register for Free")}</Link>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* STATS */}
-      <section style={{background:"var(--color-deep-teal)",color:"white",padding:"60px 0"}}>
-        <div className="container">
-          <motion.div className="stats-grid" style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:30,textAlign:"center"}} initial="hidden" whileInView="visible" viewport={{once:true}} variants={stag}>
-            {[
-              {v:t("stat_students", "500+"),l:t("stat_students_label", "Students Placed")},
-              {v:t("stat_universities", "1500+"),l:t("stat_universities_label", "Top Universities")},
-              {v:t("stat_career_paths", "160+"),l:t("stat_career_paths_label", "Career Paths")},
-              {v:t("stat_success_rate", "98%"),l:t("stat_success_rate_label", "Success Rate")}
-            ].map((s,i)=>(
-              <motion.div key={i} variants={fade}>
-                <h2 style={{fontSize:"clamp(2rem,4vw,3rem)",color:"#F0C987",margin:"0 0 6px",fontFamily:"var(--font-heading)",fontWeight:800}}>{s.v}</h2>
-                <p style={{fontSize:"1rem",opacity:0.9,margin:0}}>{s.l}</p>
+          <SectionHeading label="steps_section_title" title="steps_heading" />
+          <motion.div className="steps-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            {[1, 2, 3, 4].map((n, i) => (
+              <motion.div key={n} variants={fadeUp} className="step-card">
+                <span className="step-card-num">0{n}</span>
+                <div className="step-card-icon"><i className={`fas ${STEP_ICONS[i]}`} /></div>
+                <Txt k={`step${n}_title`} as="h3" />
+                <Txt k={`step${n}_desc`} as="p" />
               </motion.div>
             ))}
           </motion.div>
@@ -308,65 +215,177 @@ export default function HomePageClient({
       </section>
 
       {/* ABOUT FOUNDER */}
-      <section style={{background:"var(--bg-primary)",padding:"80px 0"}}>
+      <section className="section">
+        <div className="container founder-grid">
+          <motion.div className="founder-photo" initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <div className="founder-photo-frame">
+              <Image src={t("founder_image")} alt={`${t("founder_name")} – ${t("founder_title")}`} width={500} height={620} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            </div>
+            <div className="founder-badge">
+              <Txt k="founder_name" className="font-cursive founder-badge-name" />
+              <Txt k="founder_title" as="p" className="founder-badge-title" />
+            </div>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <Txt k="about_label" className="eyebrow" />
+            <h2 className="founder-heading">
+              <Txt k="about_title" /> <Txt k="about_title_highlight" className="text-highlight" />
+            </h2>
+            <Txt k="about_para1" as="p" className="lead-text" />
+            <Txt k="about_para2" as="p" className="lead-text" />
+            <div className="badge-row">
+              {[1, 2, 3, 4].map((n) => (
+                <span key={n} className="cred-badge">
+                  <i className="fas fa-certificate" />
+                  <Txt k={`founder_badge${n}`} />
+                </span>
+              ))}
+            </div>
+            <div className="founder-actions">
+              <Link href="/contact" className="btn btn-primary">
+                <Txt k="about_cta" /> <i className="fas fa-arrow-right" />
+              </Link>
+              <a href={t("linkedin_url")} target="_blank" rel="noopener noreferrer" className="linkedin-link">
+                <i className="fab fa-linkedin" /> Verify on LinkedIn
+              </a>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section className="stats-band">
         <div className="container">
-          <div className="flex-section" style={{display:"flex",flexWrap:"wrap",gap:50,alignItems:"center"}}>
-            <motion.div style={{flex:"1 1 300px",position:"relative"}} initial={{opacity:0,x:-30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.6}}>
-              <Image src="/images/ria_portrait.jpg" alt="Ria Jain – Founder & Lead Counsellor" width={500} height={600} style={{width:"100%",height:"auto",borderRadius:20,boxShadow:"0 25px 50px rgba(0,0,0,0.15)"}} />
-              <div className="founder-badge" style={{position:"absolute",bottom:-20,right:-20,background:"var(--color-deep-teal)",color:"white",padding:"16px 24px",borderRadius:16,boxShadow:"0 15px 30px rgba(0,0,0,0.15)",border:"1px solid var(--color-accent-gold)"}}>
-                <span className="font-cursive" style={{fontSize:"1.8rem",color:"var(--color-accent-gold)",display:"block",lineHeight:1}}>{t("founder_name", "Ria Jain")}</span>
-                <p style={{margin:"4px 0 0",fontSize:"0.72rem",fontFamily:"var(--font-sans)",textTransform:"uppercase",letterSpacing:"1.5px",opacity:0.9}}>{t("founder_title", "Lead Counsellor & Founder")}</p>
-              </div>
-            </motion.div>
-            <motion.div style={{flex:"1 1 300px"}} initial={{opacity:0,x:30}} whileInView={{opacity:1,x:0}} viewport={{once:true}} transition={{duration:0.6}}>
-              <span className="text-accent font-sans">About Us</span>
-              <h2 style={{fontSize:"clamp(2.2rem,4vw,3.2rem)",color:"var(--color-deep-teal)",marginBottom:18,fontFamily:"var(--font-heading)",fontWeight:600}} dangerouslySetInnerHTML={{ __html: t("about_heading", "Guiding You <span class=\"text-highlight\">Beyond Borders</span>") }} />
-              <p style={{fontSize:"1.05rem",color:"var(--text-secondary)",marginBottom:16,lineHeight:1.8}}>{t("about_para1", "Sometimes, all we need is the right guidance at the right time. That's why My Skill Counsellor was founded in 2023—to be a trusted guide, helping individuals navigate important academic and career decisions with clarity and confidence.")}</p>
-              <p style={{fontSize:"1.05rem",color:"var(--text-secondary)",marginBottom:28,lineHeight:1.8}}>{t("about_para2", "As both a counsellor and a parent of an international student myself, I bring professional expertise and real-world understanding. Every student has a different story, pace, and aspiration.")}</p>
-              <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:28}}>
-                {[
-                  t("founder_badge1", "MA English Degree"),
-                  t("founder_badge2", "EduMilestones Certified"),
-                  t("founder_badge3", "CCCIS Certified"),
-                  t("founder_badge4", "USA / UK / Canada Visa Certified")
-                ].map((b,i)=>(
-                  <span key={i} style={{padding:"6px 14px",borderRadius:20,background:"rgba(62,159,168,0.1)",color:"var(--color-deep-teal)",fontSize:"0.82rem",fontWeight:700,fontFamily:"var(--font-heading)",display:"inline-flex",alignItems:"center",gap:6}}>
-                    <i className="fas fa-certificate" style={{color:"var(--color-soft-teal)",fontSize:"0.75rem"}}/>
-                    {b}
-                  </span>
-                ))}
-              </div>
-              <div style={{display:"flex",gap:16,alignItems:"center",flexWrap:"wrap"}}>
-                <Link href="/contact" className="btn btn-outline" style={{display:"inline-flex",alignItems:"center",gap:10}}>{t("about_cta", "Book a Chat")} <i className="fas fa-arrow-right"/></Link>
-                <Link href="https://www.linkedin.com/in/riajain26" target="_blank" style={{color:"var(--color-deep-teal)",fontWeight:700,fontSize:"0.9rem",display:"inline-flex",alignItems:"center",gap:6,textDecoration:"none"}}>
-                  <i className="fab fa-linkedin" style={{fontSize:"1.2rem",color:"#0077b5"}}/> Verify on LinkedIn
-                </Link>
-              </div>
-            </motion.div>
+          <motion.div className="stats-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            {["stat_students", "stat_universities", "stat_career_paths", "stat_success_rate"].map((k) => (
+              <motion.div key={k} variants={fadeUp} className="stat-item">
+                <Txt k={k} className="stat-value" />
+                <Txt k={`${k}_label`} className="stat-label" />
+              </motion.div>
+            ))}
+          </motion.div>
+          <div className="partners">
+            <Txt k="partners_label" className="partners-label" />
+            <div className="partners-row">
+              {PARTNER_LOGOS.map((l) => (
+                <div key={l.src} className={`partner-logo ${l.dark ? "is-dark" : ""}`}>
+                  <div className="partner-logo-inner">
+                    <Image src={l.src} alt={l.alt} fill sizes="200px" style={{ objectFit: "contain" }} />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section style={{padding:"80px 0",background:"var(--bg-secondary)"}}>
-        <div className="container" style={{maxWidth:780,margin:"0 auto"}}>
-          <motion.div className="section-title" initial="hidden" whileInView="visible" viewport={{once:true}} variants={fade}>
-            <span className="text-accent">{t("faq_section_label", "Clarifications")}</span>
-            <h2 style={{fontFamily:"var(--font-heading)",fontWeight:800}}>{t("faq_section_title", "Frequently Asked Questions")}</h2>
+      {/* GALLERY */}
+      <section className="section bg-white-section">
+        <div className="container">
+          <SectionHeading label="gallery_section_label" title="gallery_section_title" desc="gallery_section_desc" />
+          <motion.div className="gallery-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            {GALLERY.map((g) => (
+              <motion.figure key={g.src} variants={fadeUp} className={`gallery-item ${g.wide ? "is-wide" : ""} ${g.tall ? "is-tall" : ""}`}>
+                <Image src={g.src} alt={g.alt} fill sizes="(max-width: 768px) 100vw, 33vw" style={{ objectFit: "cover", objectPosition: "center 20%" }} />
+                <figcaption>{g.alt}</figcaption>
+              </motion.figure>
+            ))}
           </motion.div>
-          <div style={{marginTop:36}}>
-            {displayFaqs.map((f,i)=>(
-              <div key={i} style={{marginBottom:12,background:"var(--bg-primary)",borderRadius:14,overflow:"hidden",boxShadow:"var(--shadow-soft)",border:"1px solid var(--border-color)"}}>
-                <button onClick={()=>setFaq(faq===i?null:i)} style={{width:"100%",padding:"18px 22px",display:"flex",justifyContent:"space-between",alignItems:"center",background:"none",border:"none",cursor:"pointer",textAlign:"left",fontWeight:700,fontSize:"1rem",color:"var(--color-deep-teal)",fontFamily:"var(--font-heading)"}}>
-                  {f.q}
-                  <i className={`fas fa-chevron-${faq===i?"up":"down"}`} style={{color:"var(--color-soft-teal)",flexShrink:0,marginLeft:12}}/>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="section bg-sage-section">
+        <div className="container">
+          <SectionHeading label="testimonials_section_label" title="testimonials_section_title" />
+          <motion.div className="testimonial-grid-home" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            {testimonials.slice(0, 3).map((item, i) => (
+              <motion.figure key={i} variants={fadeUp} className="quote-card">
+                <div className="quote-stars" aria-label="5 star review">
+                  {Array.from({ length: 5 }, (_, s) => <i key={s} className="fas fa-star" />)}
+                </div>
+                <blockquote>&ldquo;{item.text}&rdquo;</blockquote>
+                <figcaption>
+                  <span className="quote-avatar">{item.name.charAt(0)}</span>
+                  <span>
+                    <strong>{item.name}</strong>
+                    <small>{item.role}</small>
+                  </span>
+                </figcaption>
+              </motion.figure>
+            ))}
+          </motion.div>
+          <div className="section-cta">
+            <Link href="/testimonials" className="btn btn-secondary"><Txt k="testimonials_cta" /></Link>
+          </div>
+        </div>
+      </section>
+
+      {/* WORKSHOP */}
+      <section className="section">
+        <div className="container split-grid">
+          <motion.div className="split-media" initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <Image src={t("workshop_image")} alt="Workshop event" width={640} height={480} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <Txt k="workshop_section_label" className="eyebrow" />
+            <Txt k="workshop_section_heading" as="h2" />
+            <Txt k="workshop_section_desc" as="p" className="lead-text" />
+            <div className="event-card">
+              <div className="event-card-icon"><i className="far fa-calendar-alt" /></div>
+              <div>
+                <Txt k="workshop_title" as="h4" />
+                <Txt k="workshop_date" as="p" />
+              </div>
+            </div>
+            <Link href="/contact" className="btn btn-primary"><Txt k="workshop_cta" /></Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* MEDIA & RECOGNITION */}
+      <section className="section bg-white-section">
+        <div className="container">
+          <SectionHeading label="media_section_label" title="media_section_title" />
+          <motion.div className="media-grid" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            {MEDIA.map((m) => (
+              <motion.figure key={m.key} variants={fadeUp} className="media-card">
+                <div className="media-card-img">
+                  <Image src={m.src} alt={t(m.key)} fill sizes="(max-width: 768px) 100vw, 25vw" style={{ objectFit: "cover", objectPosition: "top" }} />
+                </div>
+                <figcaption>
+                  <i className={`fas ${m.icon}`} />
+                  <Txt k={m.key} />
+                </figcaption>
+              </motion.figure>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="section">
+        <div className="container narrow">
+          <SectionHeading label="faq_section_label" title="faq_section_title" />
+          <div className="faq-list">
+            {displayFaqs.map((f, i) => (
+              <div key={i} className={`faq-item ${openFaq === i ? "is-open" : ""}`}>
+                <button className="faq-question" onClick={() => setOpenFaq(openFaq === i ? null : i)} aria-expanded={openFaq === i}>
+                  {f.qKey ? <Txt k={f.qKey} /> : <span>{f.q}</span>}
+                  <i className="fas fa-plus" />
                 </button>
-                {faq===i&&<div style={{padding:"0 22px 18px",color:"var(--text-secondary)",lineHeight:1.75,fontSize:"0.95rem"}}><p style={{margin:0}}>{f.a}</p></div>}
+                {openFaq === i && (
+                  <div className="faq-answer">
+                    {f.aKey ? <Txt k={f.aKey} as="p" /> : <p>{f.a}</p>}
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      <CtaBand />
     </main>
   );
 }
