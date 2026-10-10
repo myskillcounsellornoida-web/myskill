@@ -1,5 +1,15 @@
 import { fetchTestimonials } from "@/app/admin/actions";
 import TestimonialsClient from "@/components/TestimonialsClient";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Client Testimonials & Success Stories | My Skill Counsellor",
+  description: "Read success stories and reviews from students and parents who have benefited from our career counselling and study abroad services in Noida.",
+  keywords: ["student testimonials", "study abroad success stories", "career counsellor reviews noida", "My Skill Counsellor reviews"],
+  alternates: {
+    canonical: "https://myskillcounsellor.com/testimonials",
+  }
+};
 
 export const revalidate = 60;
 

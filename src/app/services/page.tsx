@@ -1,5 +1,15 @@
 import { fetchServices, fetchFaqs } from "@/app/admin/actions";
 import ServicesClient from "./ServicesClient";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Career Counselling & Study Abroad Services | My Skill Counsellor Noida",
+  description: "Explore our expert career counseling, study abroad consultation, IELTS preparation, and university admission services in Noida. Start your successful journey today.",
+  keywords: ["career counsellor in noida", "study abroad consultant in noida", "best career counsellor in noida", "student career counselling", "IELTS preparation", "university admissions"],
+  alternates: {
+    canonical: "https://myskillcounsellor.com/services",
+  }
+};
 
 export const revalidate = 60;
 

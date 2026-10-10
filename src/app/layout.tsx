@@ -18,14 +18,20 @@ const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope-src", we
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getSiteContent();
   const title = content.meta_title || DEFAULT_CONTENT.meta_title;
-  const description = content.meta_description || DEFAULT_CONTENT.meta_description;
+  const description = content.meta_description || "My Skill Counsellor is the best career counsellor in Noida, offering study abroad consulting, IELTS preparation, university admissions, and career counselling.";
 
   return {
     metadataBase: new URL("https://myskillcounsellor.com"),
     title,
     description,
     keywords: [
-      "career counselling",
+      "study abroad consultant in noida",
+      "career consultant noida",
+      "best career counsellor in noida",
+      "career counsellor in noida",
+      "career counseling near me",
+      "student career counselling",
+      "career skill",
       "study abroad",
       "IELTS preparation",
       "visa support",
@@ -34,18 +40,29 @@ export async function generateMetadata(): Promise<Metadata> {
       "Ria Jain",
       "My Skill Counsellor",
       "education consultant",
-      "study in UK",
-      "study in USA",
-      "study in Dubai",
     ],
     openGraph: {
       title,
       description,
       url: "https://myskillcounsellor.com",
       siteName: "My Skill Counsellor",
-      images: [{ url: "/images/logo.png", width: 1536, height: 1024 }],
-      locale: "en_US",
+      images: [{ url: "/images/logo.png", width: 1536, height: 1024, alt: "My Skill Counsellor Logo" }],
+      locale: "en_IN",
       type: "website",
+    },
+    alternates: {
+      canonical: "https://myskillcounsellor.com",
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
   };
 }
@@ -58,28 +75,57 @@ export default async function RootLayout({
   const content = await getSiteContent();
   const pick = (key: string) => content[key] || DEFAULT_CONTENT[key];
 
-  // AEO & GEO Structured Data (JSON-LD)
+  // AEO & GEO & LLMO Structured Data (JSON-LD)
   const schemaData = {
     "@context": "https://schema.org",
-    "@type": "EducationalOrganization",
-    name: "My Skill Counsellor",
-    founder: {
-      "@type": "Person",
-      name: pick("founder_name"),
-      jobTitle: pick("founder_title"),
-    },
-    description: pick("meta_description"),
-    url: "https://myskillcounsellor.com",
-    logo: "https://myskillcounsellor.com/images/logo.png",
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: pick("contact_phone"),
-      contactType: "customer service",
-      email: pick("contact_email"),
-      areaServed: "IN",
-      availableLanguage: ["English", "Hindi"],
-    },
-    sameAs: [pick("linkedin_url"), pick("whatsapp_url")],
+    "@graph": [
+      {
+        "@type": "EducationalOrganization",
+        "@id": "https://myskillcounsellor.com/#organization",
+        name: "My Skill Counsellor",
+        founder: {
+          "@type": "Person",
+          name: pick("founder_name"),
+          jobTitle: pick("founder_title"),
+        },
+        description: pick("meta_description") || "My Skill Counsellor is the best career counsellor in Noida, offering study abroad consulting, IELTS preparation, university admissions, and career counselling.",
+        url: "https://myskillcounsellor.com",
+        logo: "https://myskillcounsellor.com/images/logo.png",
+        contactPoint: {
+          "@type": "ContactPoint",
+          telephone: pick("contact_phone"),
+          contactType: "customer service",
+          email: pick("contact_email"),
+          areaServed: "IN",
+          availableLanguage: ["English", "Hindi"],
+        },
+        sameAs: [pick("linkedin_url"), pick("whatsapp_url")],
+      },
+      {
+        "@type": "LocalBusiness",
+        "@id": "https://myskillcounsellor.com/#localbusiness",
+        name: "My Skill Counsellor",
+        image: "https://myskillcounsellor.com/images/logo.png",
+        url: "https://myskillcounsellor.com",
+        telephone: pick("contact_phone"),
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Noida",
+          addressRegion: "Uttar Pradesh",
+          addressCountry: "IN"
+        },
+        geo: {
+          "@type": "GeoCoordinates",
+          latitude: 28.5355,
+          longitude: 77.3910
+        },
+        description: "Leading career and study abroad consultant in Noida providing personalized guidance.",
+        areaServed: {
+          "@type": "City",
+          name: "Noida"
+        }
+      }
+    ]
   };
 
   const fontVars = [cormorant, spaceGrotesk, laBelleAurore, nunito, manrope].map((f) => f.variable).join(" ");
